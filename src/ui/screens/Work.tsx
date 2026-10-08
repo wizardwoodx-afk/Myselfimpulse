@@ -350,7 +350,7 @@ function thread(msgs: ReturnType<typeof useVh.getState>["msgs"], resp: ReturnTyp
     const ld = resp.liveData;
     out.push({
       id: "answer", who: captainName, at: lastVh?.at, led: ledFor(answerLed(resp, resp.memberRuns ?? []), busy),
-      line: planned ? "Planned — connect a provider and it will run" : one(resp.reply),
+      line: planned ? "Planned — plan only, nothing executes until you connect a provider" : one(resp.reply),
       body: <>
         <p className="prose">{resp.reply}</p>
         {record.length > 0 && <>

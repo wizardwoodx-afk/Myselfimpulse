@@ -121,13 +121,23 @@ export default function Federation(): React.ReactElement {
           <div className="si-card" data-testid="federation-pairing">
             <h3>Pair a peer</h3>
             <p className="si-mono si-big" data-testid="federation-pairing-code">{st.pairingCode}</p>
-            <p className="si-note">Works once. Expires {st.pairingExpires ?? "—"}.</p>
+            <p className="si-note">
+              This code works <strong>once</strong>, and it expires {st.pairingExpires ?? "—"} — after which
+              it is dead. It is not the host&rsquo;s token: the code only mints a credential scoped to the
+              one peer that redeems it, and it is destroyed by being used.
+            </p>
           </div>
         ) : null}
       </section>
 
       <section className="si-card">
         <h3>Listener</h3>
+        <p className="si-note" data-testid="federation-scope-note">
+          There is no &ldquo;everything&rdquo; option — every mount names one scope. Choose the loopback
+          address and only this machine can reach it. Choose a network address and this becomes reachable:
+          Anything else on the same network can reach what you mount while it is running, so mount for as
+          long as you need it and stop it after.
+        </p>
 
         {!st.running ? (
           <fieldset className="si-fieldset" data-testid="federation-choose">
@@ -189,11 +199,17 @@ export default function Federation(): React.ReactElement {
         </div>
 
         <p className="si-note">
-          This app does not start a federation listener on launch. Mounting publishes a signed agent card
-          describing this machine; a peer must present an authorized credential to call it.
+          SelfImpulse does <strong>not</strong> start a federation listener on launch. Mounting opens one listener and
+          publishes a <strong>signed agent card</strong> describing this machine; a peer must present an
+          authorized credential to call it, and nothing listens until you press the button above.
         </p>
 
-        {!st.bundled ? <p className="si-note">This build has no A2A host bundle.</p> : null}
+        {!st.bundled ? (
+          <p className="si-note">
+            This build shipped without the A2A host bundle, so mounting is unavailable here — the control is
+            disabled rather than failing silently on a press.
+          </p>
+        ) : null}
 
         {outcome ? (
           <pre className="si-mono si-small si-pre" role="status" data-testid="federation-outcome">{outcome}</pre>

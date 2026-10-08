@@ -94,7 +94,17 @@ function waitExpired(nowMs, deadlineMs) {
 }
 
 // probe/retryLanes.test.ts
-var ROOT = process.env.SI_ROOT ?? path.resolve(import.meta.dirname, "..");
+function findRoot(start) {
+  let dir = start;
+  for (let i = 0; i < 8; i++) {
+    if (fs.existsSync(path.join(dir, "src", "mission")) && fs.existsSync(path.join(dir, "package.json"))) return dir;
+    const up = path.dirname(dir);
+    if (up === dir) break;
+    dir = up;
+  }
+  return path.resolve(start, "..");
+}
+var ROOT = process.env.SI_ROOT ?? findRoot(import.meta.dirname);
 var passed = 0;
 var failed = 0;
 var failures = [];

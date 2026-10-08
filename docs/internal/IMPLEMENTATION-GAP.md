@@ -250,6 +250,16 @@ in three more files.
 (~97 s)** or `offlinePack.test.ts` fails on drift. Correct behaviour, high
 friction. Worth a `npm run verify` that does both.
 
+Half of this is now answered. A tree that has DELIBERATELY dropped the pack —
+a source-only archive, a clean extract, a disk that needed the room back — no
+longer gets an ENOENT stack trace at suite load: `offlinePack` and
+`docConsistency` detect the absence, print what could not be checked and the one
+command that restores it, and exit with a marked `SI-SKIP` line that
+`tools/run-all-probes.mjs` tallies separately from passed and failed, so a
+skipped check can never be read as a green one. What remains open is the
+friction: the drift gate itself still needs the pack present, which is exactly
+what the rebuild provides.
+
 **OPEN-13 · `routeWithModel`'s LLM call is still made and largely discarded.**
 Its ordering is undone by `selectCrew`'s score sort, but it *truncates the
 candidate pool to `MAX_K = 3`*, which is a real effect on routing. Removing it

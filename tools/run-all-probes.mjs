@@ -47,6 +47,9 @@ const files = listProbeSuites(probeDir);
 let totalPass = 0;
 let totalFail = 0;
 const failures = [];
+// Suites that declared SKIPPED (see the SI-SKIP protocol below). Kept apart from both
+// tallies: a skip is not a pass, and the summary has to be able to say so.
+const skipped = [];
 
 for (const file of files) {
   const fullPath = path.join(probeDir, file);
@@ -80,8 +83,21 @@ for (const file of files) {
       encoding: "utf8",
     });
     process.stdout.write(stdout);
-    console.log(`PASS: ${file}\n`);
-    totalPass++;
+    /* SI-SKIP protocol. A suite may declare itself skipped when the thing it verifies
+       is an artifact this tree legitimately does not carry — offlinePack with no pack,
+       docConsistency's bundle count with no pack to count. The declaration is a printed
+       line rather than an exit code, because exit 0 is also how a suite that checked
+       forty things says "all true"; those two outcomes must not be the same colour.
+       A skip cannot mask a failure: this branch is only reachable when the suite exited
+       0, and a suite that throws lands in the catch below as a plain FAIL. */
+    const skipDecl = stdout.split("\n").find((l) => l.startsWith("SI-SKIP:"));
+    if (skipDecl) {
+      console.log(`SKIP: ${file}`);
+      skipped.push(`${file} — ${skipDecl.slice("SI-SKIP:".length).trim()}`);
+    } else {
+      console.log(`PASS: ${file}\n`);
+      totalPass++;
+    }
   } catch (err) {
     console.log(`FAIL: ${file}`);
     const message = err && typeof err.message === "string" ? err.message : String(err);
@@ -106,8 +122,13 @@ for (const file of files) {
 }
 
 console.log(`\n========================================`);
-console.log(`ALL PROBES SUMMARY: ${totalPass} passed, ${totalFail} failed.`);
+console.log(`ALL PROBES SUMMARY: ${totalPass} passed, ${totalFail} failed${skipped.length ? `, ${skipped.length} skipped` : ""}.`);
 console.log(`========================================\n`);
+if (skipped.length > 0) {
+  console.log("SKIPPED — declared by the suite itself, counted as neither passed nor failed:");
+  for (const s of skipped) console.log(`  - ${s}`);
+  console.log("");
+}
 
 if (failures.length > 0) {
   console.error("Failed test suites:", failures);

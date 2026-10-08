@@ -23,9 +23,15 @@ function section(name) {
 == ${name}`);
 }
 var probeSuites = fs.readdirSync(path.join(ROOT, "probe")).filter((f) => (f.endsWith(".test.ts") || f.endsWith(".test.tsx")) && !f.startsWith(".")).length;
-var offlineBundles = fs.readdirSync(path.join(ROOT, "verify", "suites")).filter((f) => f.endsWith(".mjs") && !f.endsWith(".spec.mjs")).length;
+var packDir = path.join(ROOT, "verify", "suites");
+var packPresent = fs.existsSync(packDir);
+var offlineBundles = packPresent ? fs.readdirSync(packDir).filter((f) => f.endsWith(".mjs") && !f.endsWith(".spec.mjs")).length : 0;
 ok("the tree has at least one probe suite", probeSuites > 0, `${probeSuites}`);
-ok("the tree has at least one offline bundle", offlineBundles > 0, `${offlineBundles}`);
+if (!packPresent) {
+  console.log("  SKIP the tree has at least one offline bundle \u2014 the pack is not present in this tree (run node tools/rebuild-pack.mjs to build it, then this check runs for real)");
+} else {
+  ok("the tree has at least one offline bundle", offlineBundles > 0, `${offlineBundles}`);
+}
 function liveDocs() {
   const out = ["README.md"];
   const walk = (dir, rel = "docs") => {
@@ -57,6 +63,10 @@ section("1. every suite count stated in live documentation is the measured one")
       for (const m of claims) {
         const n = Number(m[1]);
         const isBundle = /self-contained|offline bundles/.test(m[0]);
+        if (isBundle && !packPresent) {
+          console.log(`  SKIP ${doc} states ${m[0].trim()} \u2014 no pack in this tree to measure it against`);
+          continue;
+        }
         const expected = isBundle ? offlineBundles : probeSuites;
         if (n === expected) {
           checked += 1;

@@ -55,6 +55,7 @@ import type { ReadPdfOutcome } from "./pdfRender";
 import { readImages, ocrLine } from "./ocr";
 import type { OcrOutcome, OcrRefusal } from "./ocr";
 import { ocrDataPath, ocrLanguage, ocrCorePath, ocrWorkerPath } from "./ocrData";
+import { findLocalOcrData } from "./ocr";
 
 /** The markdown a scan produced, or a refusal in words. Structurally a `ParseResult`. */
 export type ScanReadResult =
@@ -201,14 +202,17 @@ export type AssetCheck =
  */
 export async function ensureLocalAssets(options: ScanReadOptions, deps?: { fetchImpl?: FetchProbe | null }): Promise<AssetCheck> {
   const language = options.language ?? ocrLanguage();
-  const dataPath = options.dataPath === undefined ? ocrDataPath() : options.dataPath;
+  /* Configured folder first, then the LOCAL folders the app ships with. This gate used to
+     refuse the moment nothing had been configured, which is how a captured scan was refused
+     on a machine that had its language data sitting in public/ocr/tessdata. */
+  const dataPath = options.dataPath === undefined ? (ocrDataPath() ?? findLocalOcrData(ocrLanguage())) : options.dataPath;
 
   if (!dataPath) {
     return {
       ok: false,
       code: "ocr-unavailable",
       words:
-        "this document has no text layer, so it would have to be read as an image — and this build has no OCR language data configured. Nothing was read, and nothing was fetched: the language data must be present on this machine. Add it, then drop the file again.",
+        "this document has no text layer, so it would have to be read as an image — and no OCR language data was found on this machine: not in the folder this build was configured with, and not in the folders the app ships with. Nothing was read and nothing was fetched — SelfImpulse does not download language data. Add eng.traineddata (or eng.traineddata.gz) to one of those folders, then drop the file again.",
     };
   }
 
@@ -394,7 +398,7 @@ export async function readScannedPdf(bytes: Uint8Array, options: ScanReadOptions
   }
 
   const read: OcrOutcome = await readImages(images, {
-    dataPath: options.dataPath === undefined ? (ocrDataPath() as string) : (options.dataPath as string),
+    dataPath: (options.dataPath === undefined ? ocrDataPath() : options.dataPath) ?? undefined,
     language,
     maxPages: options.capPages,
     maxTextChars: options.maxChars,
@@ -458,7 +462,7 @@ export async function readImageDocument(bytes: Uint8Array, options: ScanReadOpti
   const deadlineAt = options.deadlineAt ?? Number.POSITIVE_INFINITY;
 
   const read: OcrOutcome = await readImages([{ page: 1, png: bytes }], {
-    dataPath: options.dataPath === undefined ? (ocrDataPath() as string) : (options.dataPath as string),
+    dataPath: (options.dataPath === undefined ? ocrDataPath() : options.dataPath) ?? undefined,
     language,
     maxTextChars: options.maxChars,
     minConfidence: options.minConfidence,

@@ -55,7 +55,7 @@ function run(label, file, args, opts = {}) {
   } catch { /* a log that cannot be written must never fail the gate */ }
   // The gate is noisy; show the verdict lines and any failure, not the whole log.
   for (const line of out.split("\n")) {
-    if (/ALL PROBES SUMMARY|Offline VERIFY SUMMARY|^FAIL|^Failed test suites|passed, \d+ failed/.test(line)) {
+    if (/ALL PROBES SUMMARY|Offline VERIFY SUMMARY|^FAIL|^SKIP|^Failed test suites|passed, \d+ failed/.test(line)) {
       process.stdout.write(`    ${line.trim()}\n`);
     }
   }

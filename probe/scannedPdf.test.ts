@@ -257,7 +257,7 @@ section("9a. THE PREFLIGHT ASKS THE QUESTION THAT FITS THE RUNTIME");
   // (g) No configuration at all is a refusal, and it happens before any probing.
   const unconfigured = await ensureLocalAssets({ maxChars: 1000, dataPath: null }, { fetchImpl: null });
   ok("an unconfigured build refuses", unconfigured.ok === false, unconfigured.ok ? "allowed" : "");
-  ok("…with words that name the situation", unconfigured.ok === false && /no OCR language data configured/.test(unconfigured.words), "");
+  ok("…with words that name the situation", unconfigured.ok === false && /no OCR language data/i.test(unconfigured.words), "");
 }
 function notDiskWords(r: { ok: boolean; words?: string }): string { return r.ok ? "ALLOWED" : (r.words ?? "").slice(0, 90); }
 

@@ -3456,7 +3456,7 @@ describe("the shell is wired", () => {
   });
   it2("the design system is ONE stylesheet with the house tokens (no Tailwind runtime, no blue)", () => {
     const main = fs.readFileSync(path.join(ROOT, "src", "main.tsx"), "utf8");
-    assert.ok(main.includes("ui/vh.css"));
+    assert.ok(main.includes("ui/ink.css") && main.includes("ui/si/si.css") && main.includes("ui/theme.css"));
     const css = fs.readFileSync(path.join(ROOT, "src", "ui", "vh.css"), "utf8");
     const accentHex = css.match(/--accent:\s*(#[0-9a-f]{6})/i)?.[1] ?? "";
     assert.ok(/--bg:\s*#[0-9a-f]{3,8}/i.test(css) && /^#[0-9a-f]{6}$/i.test(accentHex), `accent ${accentHex} is not a declared colour`);
@@ -3470,7 +3470,7 @@ describe("the shell is wired", () => {
     const work = fs.readFileSync(path.join(ROOT, "src", "ui", "screens", "Work.tsx"), "utf8");
     assert.ok(gate.includes("Your approval is needed") && gate.includes("receipt  issued on approve AND on refuse"));
     assert.ok(chat.includes("provenanceDigest"));
-    assert.ok(work.includes("Planned \u2014 connect a provider to execute"));
+    assert.ok(work.includes("Planned \u2014 plan only, nothing executes until you connect a provider"));
   });
 });
 /*! Bundled license information:

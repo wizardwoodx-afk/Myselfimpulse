@@ -2,7 +2,7 @@
   "name": "selfimpulse",
   "private": true,
   "version": "1.9.2",
-  "description": "SelfImpulse — Intelligence That Collaborates.",
+  "description": "SelfImpulse — Intelligence Meets Collaboration.",
   "type": "module",
   "engines": {
     "node": ">=22.12.0"

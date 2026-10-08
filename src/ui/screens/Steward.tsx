@@ -115,6 +115,12 @@ export function Steward(): React.ReactElement {
                   <button className="btn primary" onClick={() => setHist(true)}>Open a past conversation</button>
                 </>
                 : <p className="hint">Describe what you need below. The Captain routes it, and the whole exchange stays on this device.</p>}
+              {/* The state of the product, stated on the one screen every first run
+                  lands on: without a provider key this is plan only, and nothing the
+                  Captain answers has executed anywhere. */}
+              {!provider
+                ? <p className="hint">Without a provider key this is <b>plan only</b> — nothing executes, and every answer says so. Connect one in Settings.</p>
+                : null}
             </div>
           )}
 

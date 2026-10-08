@@ -38,7 +38,21 @@ import {
   type RunRetryAccounting,
 } from "../src/mission/retryLanes";
 
-const ROOT = process.env.SI_ROOT ?? path.resolve(import.meta.dirname, "..");
+/* The bundle that runs this file sits in probe/ under the dev gate and in
+ * verify/suites/ under the offline pack, so one relative hop is not a root: it is a
+ * root only in the first case, which is how this suite passed for months and failed
+ * in the pack. Walk up until the tree identifies itself instead. */
+function findRoot(start: string): string {
+  let dir = start;
+  for (let i = 0; i < 8; i++) {
+    if (fs.existsSync(path.join(dir, "src", "mission")) && fs.existsSync(path.join(dir, "package.json"))) return dir;
+    const up = path.dirname(dir);
+    if (up === dir) break;
+    dir = up;
+  }
+  return path.resolve(start, "..");
+}
+const ROOT = process.env.SI_ROOT ?? findRoot(import.meta.dirname);
 
 let passed = 0;
 let failed = 0;

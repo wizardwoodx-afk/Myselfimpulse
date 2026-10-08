@@ -1,5 +1,5 @@
 /**
- * SelfImpulse org — the company, five rungs, never a flat crowd and never a
+ * SelfImpulse org — five rungs, never a flat crowd and never a
  * skipped layer:
  *
  *   USER  ⇄  CAPTAIN (the CEO — the only human-facing seat; talks to the user)

@@ -27,6 +27,10 @@
  * deliberate choice and probe/fileIngest.test.ts §egress pins that no module
  * in this path can call out.
  */
+/* The reader that needs it imports it: pdf.js calls Promise.withResolvers(), which Node
+   20 and older webviews do not provide. Side-effect import on purpose — it must run
+   before the dynamic `pdfjs-dist` import below, and a host cannot forget it. */
+import "./promiseShim";
 import JSZip from "jszip";
 import * as mammoth from "mammoth";
 import type { PDFDocumentProxy } from "pdfjs-dist";

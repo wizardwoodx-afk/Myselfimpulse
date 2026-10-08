@@ -123,7 +123,7 @@ var require_react_production_min = __commonJS({
         return b3[a2];
       });
     }
-    var P3 = /\/+/g;
+    var P4 = /\/+/g;
     function Q2(a, b3) {
       return "object" === typeof a && null !== a && null != a.key ? escape2("" + a.key) : b3.toString(36);
     }
@@ -144,9 +144,9 @@ var require_react_production_min = __commonJS({
               h = true;
           }
       }
-      if (h) return h = a, c = c(h), a = "" === d2 ? "." + Q2(h, 0) : d2, I2(c) ? (e2 = "", null != a && (e2 = a.replace(P3, "$&/") + "/"), R2(c, b3, e2, "", function(a2) {
+      if (h) return h = a, c = c(h), a = "" === d2 ? "." + Q2(h, 0) : d2, I2(c) ? (e2 = "", null != a && (e2 = a.replace(P4, "$&/") + "/"), R2(c, b3, e2, "", function(a2) {
         return a2;
-      })) : null != c && (O2(c) && (c = N2(c, e2 + (!c.key || h && h.key === c.key ? "" : ("" + c.key).replace(P3, "$&/") + "/") + a)), b3.push(c)), 1;
+      })) : null != c && (O2(c) && (c = N2(c, e2 + (!c.key || h && h.key === c.key ? "" : ("" + c.key).replace(P4, "$&/") + "/") + a)), b3.push(c)), 1;
       h = 0;
       d2 = "" === d2 ? "." : d2 + ":";
       if (I2(a)) for (var g2 = 0; g2 < a.length; g2++) {
@@ -2995,7 +2995,7 @@ var require_react_dom_server_legacy_node_production_min = __commonJS({
     var M2 = 0;
     var N2 = null;
     var O2 = 0;
-    function P3() {
+    function P4() {
       if (null === H2) throw Error("Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:\n1. You might have mismatching versions of React and the renderer (such as React DOM)\n2. You might be breaking the Rules of Hooks\n3. You might have more than one copy of React in the same app\nSee https://reactjs.org/link/invalid-hook-call for tips about how to debug and fix this problem.");
       return H2;
     }
@@ -3018,7 +3018,7 @@ var require_react_dom_server_legacy_node_production_min = __commonJS({
       return "function" === typeof b3 ? b3(a) : b3;
     }
     function vb(a, b3, c) {
-      H2 = P3();
+      H2 = P4();
       J2 = sb();
       if (K3) {
         var d2 = J2.queue;
@@ -3041,7 +3041,7 @@ var require_react_dom_server_legacy_node_production_min = __commonJS({
       return [J2.memoizedState, a];
     }
     function xb(a, b3) {
-      H2 = P3();
+      H2 = P4();
       J2 = sb();
       b3 = void 0 === b3 ? null : b3;
       if (null !== J2) {
@@ -3079,10 +3079,10 @@ var require_react_dom_server_legacy_node_production_min = __commonJS({
     var zb = { readContext: function(a) {
       return a._currentValue2;
     }, useContext: function(a) {
-      P3();
+      P4();
       return a._currentValue2;
     }, useMemo: xb, useReducer: vb, useRef: function(a) {
-      H2 = P3();
+      H2 = P4();
       J2 = sb();
       var b3 = J2.memoizedState;
       return null === b3 ? (a = { current: a }, J2.memoizedState = a) : b3;
@@ -3094,10 +3094,10 @@ var require_react_dom_server_legacy_node_production_min = __commonJS({
         return a;
       }, b3);
     }, useImperativeHandle: Q2, useEffect: Q2, useDebugValue: Q2, useDeferredValue: function(a) {
-      P3();
+      P4();
       return a;
     }, useTransition: function() {
-      P3();
+      P4();
       return [false, yb];
     }, useId: function() {
       var a = ob.treeContext;
@@ -3111,7 +3111,7 @@ var require_react_dom_server_legacy_node_production_min = __commonJS({
       0 < b3 && (a += "H" + b3.toString(32));
       return a + ":";
     }, useMutableSource: function(a, b3) {
-      P3();
+      P4();
       return b3(a._source);
     }, useSyncExternalStore: function(a, b3, c) {
       if (void 0 === c) throw Error("Missing getServerSnapshot, which is required for server-rendered content. Will revert to client rendering.");
@@ -4544,7 +4544,7 @@ var require_react_dom_server_node_production_min = __commonJS({
       for (d2 in a) c[d2] = b3[d2];
       return c;
     }
-    var P3 = null;
+    var P4 = null;
     function Q2(a, b3) {
       if (a !== b3) {
         a.context._currentValue = a.parentValue;
@@ -4582,8 +4582,8 @@ var require_react_dom_server_node_production_min = __commonJS({
       b3.context._currentValue = b3.value;
     }
     function nc(a) {
-      var b3 = P3;
-      b3 !== a && (null === b3 ? kc(a) : null === a ? jc(b3) : b3.depth === a.depth ? Q2(b3, a) : b3.depth > a.depth ? lc(b3, a) : mc(b3, a), P3 = a);
+      var b3 = P4;
+      b3 !== a && (null === b3 ? kc(a) : null === a ? jc(b3) : b3.depth === a.depth ? Q2(b3, a) : b3.depth > a.depth ? lc(b3, a) : mc(b3, a), P4 = a);
     }
     var oc = { isMounted: function() {
       return false;
@@ -4973,15 +4973,15 @@ var require_react_dom_server_node_production_min = __commonJS({
             d2 = d2.value;
             e2 = c._currentValue;
             c._currentValue = d2;
-            g2 = P3;
-            P3 = d2 = { parent: g2, depth: null === g2 ? 0 : g2.depth + 1, context: c, parentValue: e2, value: d2 };
+            g2 = P4;
+            P4 = d2 = { parent: g2, depth: null === g2 ? 0 : g2.depth + 1, context: c, parentValue: e2, value: d2 };
             b3.context = d2;
             Z2(a, b3, f2);
-            a = P3;
+            a = P4;
             if (null === a) throw Error("Tried to pop a Context at the root of the app. This is a bug in React.");
             d2 = a.parentValue;
             a.context._currentValue = d2 === ec ? a.context._defaultValue : d2;
-            a = P3 = a.parent;
+            a = P4 = a.parent;
             b3.context = a;
             return;
           case Wb:
@@ -5105,7 +5105,7 @@ var require_react_dom_server_node_production_min = __commonJS({
     }
     function Qc(a) {
       if (2 !== a.status) {
-        var b3 = P3, c = Nc.current;
+        var b3 = P4, c = Nc.current;
         Nc.current = Mc;
         var d2 = Lc;
         Lc = a.responseState;
@@ -30502,7 +30502,7 @@ var init_captains = __esm({
         name,
         domain: domain2,
         mandate,
-        systemPrompt: `You are the ${name} in the SelfImpulse company. You report to the ${TITLES.captain} (the CEO) and to no one else: you never address the user, and you never command a ${TITLES.crew.toLowerCase()} directly \u2014 your ${TITLES.adept}s lead the crews, and their results reach you through their desks. ${focus} Report only what actually happened: name the members involved, their real outcomes, and the single next step. Never claim work that did not run. Layer discipline is absolute \u2014 no message skips a rung.`
+        systemPrompt: `You are the ${name} in SelfImpulse. You report to the ${TITLES.captain} (the lead) and to no one else: you never address the user, and you never command a ${TITLES.crew.toLowerCase()} directly \u2014 your ${TITLES.adept}s lead the crews, and their results reach you through their desks. ${focus} Report only what actually happened: name the members involved, their real outcomes, and the single next step. Never claim work that did not run. Layer discipline is absolute \u2014 no message skips a rung.`
       };
     };
     CAPTAINS = [
@@ -65621,7 +65621,8 @@ function musterWorkspace(request) {
     };
   });
   const consulCount = new Set(desks.map((d2) => d2.consul.id)).size;
-  const line = `${WORKSPACE_NAME}: ${TITLES.captain} opened ${desks.length} desk(s) under ${consulCount} ${TITLES.consul}(s) \xB7 floor ${floor2.length}/${FLOOR_CAP} ${TITLES.crew.toLowerCase()}s of ${ESTABLISHED_SPECIALISTS.length} \xB7 ${ORG_SPECIALIST_COUNT} domain specialists (${TITLES.adept}+HR) across ${ORG_DESK_COUNT} desks \xB7 MoE tier=${selection.gate.tier}. Autonomous \u2014 no team was picked by the user.`;
+  const line = `${floor2.length}/${FLOOR_CAP} sub-agents working on this task \xB7 each one chosen automatically \u2014 no team was picked by the user.`;
+  const machineLine = `${WORKSPACE_NAME}: ${TITLES.captain} opened ${desks.length} desk(s) under ${consulCount} ${TITLES.consul}(s) \xB7 floor ${floor2.length}/${FLOOR_CAP} ${TITLES.crew.toLowerCase()}s of ${ESTABLISHED_SPECIALISTS.length} \xB7 ${ORG_SPECIALIST_COUNT} domain specialists (${TITLES.adept}+HR) across ${ORG_DESK_COUNT} desks \xB7 MoE tier=${selection.gate.tier}. Autonomous \u2014 no team was picked by the user.`;
   return {
     name: WORKSPACE_NAME,
     captain: "Captain",
@@ -65630,7 +65631,8 @@ function musterWorkspace(request) {
     floor: floor2,
     selection,
     considered: pool.considered,
-    line
+    line,
+    machineLine
   };
 }
 function floorAsCrew(office) {
@@ -65651,7 +65653,8 @@ function officeSnapshot(office) {
     })),
     floor: office.floor.map((s) => ({ id: s.id, desk: s.desk, name: s.name })),
     cap: FLOOR_CAP,
-    line: office.line
+    line: office.line,
+    machineLine: office.machineLine
   };
 }
 var WORKSPACE_NAME, FLOOR_CAP, DESK_SCORE_MIN;
@@ -69243,7 +69246,7 @@ ${routed.selected.length} of ${routed.considered} specialists were weighed for t
          tell a self-assembled crew from one they picked. What left is the machine
          register it used to be stated in ("floor 3/25 sub-agents of 1500 · 60
          domain specialists (Adept+HR) across 30 desks"). */
-      (officeSnap ? ` The Captain assembled this crew itself: 11WORKSPACE opened ${officeSnap.desks.length} desk${officeSnap.desks.length === 1 ? "" : "s"} and put ${officeSnap.floor.length} on the floor \u2014 you did not pick the team.` : "") + (routed.fallbackReason ? ` One note: ${routed.fallbackReason}.` : ""),
+      (officeSnap ? ` ${officeSnap.line}` : "") + (routed.fallbackReason ? ` One note: ${routed.fallbackReason}.` : ""),
       routed,
       executed: false,
       outcome: "planned",
@@ -69251,7 +69254,7 @@ ${routed.selected.length} of ${routed.considered} specialists were weighed for t
       /* The machine record goes here instead: `note` is rendered as a hint line on
          the Work door's answer step, which is where a person goes to inspect a run,
          not the bubble they read for an answer. */
-      note: `provider not configured \u2014 plan only, nothing executed. Routing: ${routed.strategy} via ${routed.routedBy}. ` + (moeV2 ? moeV2Line(moeV2) : moeReport ? moeLine(moeReport) : "") + (officeSnap ? ` ${officeSnap.line}` : "")
+      note: `provider not configured \u2014 plan only, nothing executed. Routing: ${routed.strategy} via ${routed.routedBy}. ` + (moeV2 ? moeV2Line(moeV2) : moeReport ? moeLine(moeReport) : "") + (officeSnap ? ` ${officeSnap.machineLine}` : "")
     });
   }
   const gateLine = "You operate behind a human gate; risky actions are paused for approval. Never claim work you did not do.";
@@ -69413,7 +69416,7 @@ ${synthesisFailure ? `${synthesisFailure}
     });
   }
   const composedSystem = [
-    `You are the SelfImpulse ${TITLES.captain} (engine: MJ) \u2014 the company's CEO and the only voice the user hears. Answer directly and concisely. Work travels strictly down the chain \u2014 ${TITLES.captain} \u2192 ${TITLES.consul}s \u2192 ${TITLES.adept}s \u2192 ${TITLES.crew.toLowerCase()}s \u2014 and reports travel up it; no layer ever speaks past its neighbour.`,
+    `You are the SelfImpulse ${TITLES.captain} (engine: MJ) \u2014 the lead, and the only voice the user hears. Answer directly and concisely. Work travels strictly down the chain \u2014 ${TITLES.captain} \u2192 ${TITLES.consul}s \u2192 ${TITLES.adept}s \u2192 ${TITLES.crew.toLowerCase()}s \u2014 and reports travel up it; no layer ever speaks past its neighbour.`,
     gateLine,
     ...briefing
   ].join("\n\n");
@@ -90106,6 +90109,27 @@ var init_archiveScan = __esm({
     UNIX_KIND_DIRECTORY = 16384;
     UNIX_KIND_SYMLINK = 40960;
     ARCHIVE_SUFFIX = /\.(zip|jar|war|ear|docx|xlsx|pptx|odt|ods|odp|apk|epub|cbz|egg|whl|kmz|7z|rar|tar|gz|tgz|bz2|xz|zst)$/i;
+  }
+});
+
+// src/mission/promiseShim.ts
+var P3, PROMISE_WITH_RESOLVERS_AVAILABLE;
+var init_promiseShim = __esm({
+  "src/mission/promiseShim.ts"() {
+    "use strict";
+    P3 = Promise;
+    if (typeof P3.withResolvers !== "function") {
+      P3.withResolvers = function() {
+        let resolve2;
+        let reject2;
+        const promise2 = new Promise((res, rej) => {
+          resolve2 = res;
+          reject2 = rej;
+        });
+        return { promise: promise2, resolve: resolve2, reject: reject2 };
+      };
+    }
+    PROMISE_WITH_RESOLVERS_AVAILABLE = typeof Promise.withResolvers === "function";
   }
 });
 
@@ -117580,6 +117604,7 @@ var DEFAULTS;
 var init_pdfRender = __esm({
   "src/mission/pdfRender.ts"() {
     "use strict";
+    init_promiseShim();
     DEFAULTS = {
       renderScannedPages: false,
       dpi: 96,
@@ -121812,6 +121837,30 @@ var require_src = __commonJS({
 });
 
 // src/mission/ocr.ts
+function localOcrDataCandidates() {
+  const out = [];
+  try {
+    const env2 = globalThis.process?.env ?? {};
+    for (const v2 of [env2.SI_OCR_DATA, env2.HANDLE_OCR_DATA]) {
+      if (typeof v2 === "string" && v2.trim() !== "") out.push(v2.trim());
+    }
+  } catch {
+  }
+  return [...out, ...LOCAL_OCR_DATA_CANDIDATES];
+}
+function findLocalOcrData(language2) {
+  const lang = typeof language2 === "string" && language2.trim() !== "" ? language2.trim() : "eng";
+  for (const dir of localOcrDataCandidates()) {
+    try {
+      const fs4 = globalThis.process?.getBuiltinModule?.("node:fs");
+      if (!fs4) return null;
+      if (fs4.existsSync(`${dir}/${lang}.traineddata.gz`) || fs4.existsSync(`${dir}/${lang}.traineddata`)) return dir;
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
 function refuse3(code, words) {
   return { ok: false, refusal: { code, words } };
 }
@@ -121820,13 +121869,14 @@ function looksLikeImage(b3) {
 }
 async function readImages(inputs, options) {
   const o = { ...DEFAULTS2, ...options };
+  const dataPath2 = (typeof o.dataPath === "string" && o.dataPath.trim() !== "" ? o.dataPath.trim() : findLocalOcrData(o.language)) ?? "";
   const now = options.now ?? (() => Date.now());
   const startedAt = now();
   const expired = () => now() - startedAt > o.budgetMs;
-  if (!o.dataPath || o.dataPath.trim() === "") {
+  if (dataPath2 === "") {
     return refuse3(
       "no-language-data",
-      "no local folder was given for OCR language data. SelfImpulse does not download language data: point it at a folder holding the trained data, or skip OCR, and the page stays an image."
+      `no OCR language data was found on this machine. SelfImpulse does not download language data \u2014 that would send a request the moment it ran. Put ${o.language}.traineddata (or ${o.language}.traineddata.gz) in one of these folders and try again: ${localOcrDataCandidates().join(", ")}. Until then the page stays an image.`
     );
   }
   const hasData = o.hasLanguageData ?? ((dir, lang) => {
@@ -121838,10 +121888,10 @@ async function readImages(inputs, options) {
       return false;
     }
   });
-  if (!hasData(o.dataPath, o.language)) {
+  if (!hasData(dataPath2, o.language)) {
     return refuse3(
       "language-data-missing",
-      `OCR language data for "${o.language}" is not in ${o.dataPath}. This reader does not fetch language data over the network \u2014 that would send a request the moment it ran and would make the on-device promise false. Put ${o.language}.traineddata (or ${o.language}.traineddata.gz) in that folder, or skip OCR and the page stays an image.`
+      `OCR language data for "${o.language}" is not in ${dataPath2}. This reader does not fetch language data over the network \u2014 that would send a request the moment it ran and would make the on-device promise false. Put ${o.language}.traineddata (or ${o.language}.traineddata.gz) in that folder, or skip OCR and the page stays an image.`
     );
   }
   if (!inputs || inputs.length === 0) {
@@ -121879,11 +121929,11 @@ async function readImages(inputs, options) {
   let engine = null;
   let lastWorkerError = null;
   try {
-    const factory = o.engineFactory ?? (async (language2, dataPath2) => {
+    const factory = o.engineFactory ?? (async (language2, dataPath3) => {
       const mod = await Promise.resolve().then(() => __toESM(require_src(), 1));
       return mod.createWorker(language2, void 0, {
-        langPath: dataPath2,
-        cachePath: dataPath2,
+        langPath: dataPath3,
+        cachePath: dataPath3,
         gzip: true,
         // DESKTOP CSP — this is the switch that makes OCR run at all.
         // tesseract.js defaults `workerBlobURL` to true (its
@@ -121907,7 +121957,7 @@ async function readImages(inputs, options) {
         }
       });
     });
-    engine = await factory(o.language, o.dataPath);
+    engine = await factory(o.language ?? DEFAULTS2.language, dataPath2);
   } catch (e2) {
     return refuse3(
       "reader-unavailable",
@@ -121960,7 +122010,7 @@ async function readImages(inputs, options) {
         pages,
         confidence: pages.length > 0 ? confidenceSum / pages.length : 0,
         language: o.language,
-        dataPath: o.dataPath
+        dataPath: dataPath2
       }
     };
   } finally {
@@ -121970,7 +122020,7 @@ async function readImages(inputs, options) {
     }
   }
 }
-var DEFAULTS2, IMAGE_SIGNATURES;
+var DEFAULTS2, LOCAL_OCR_DATA_CANDIDATES, IMAGE_SIGNATURES;
 var init_ocr = __esm({
   "src/mission/ocr.ts"() {
     "use strict";
@@ -121981,6 +122031,12 @@ var init_ocr = __esm({
       minConfidence: 55,
       budgetMs: 6e4
     };
+    LOCAL_OCR_DATA_CANDIDATES = [
+      "public/ocr/tessdata",
+      "ocr/tessdata",
+      "../public/ocr/tessdata",
+      "../../public/ocr/tessdata"
+    ];
     IMAGE_SIGNATURES = [
       [137, 80, 78, 71, 13, 10, 26, 10],
       // PNG
@@ -122046,12 +122102,12 @@ async function assetState(url2, fetchImpl) {
 }
 async function ensureLocalAssets(options, deps) {
   const language2 = options.language ?? ocrLanguage();
-  const dataPath2 = options.dataPath === void 0 ? ocrDataPath() : options.dataPath;
+  const dataPath2 = options.dataPath === void 0 ? ocrDataPath() ?? findLocalOcrData(ocrLanguage()) : options.dataPath;
   if (!dataPath2) {
     return {
       ok: false,
       code: "ocr-unavailable",
-      words: "this document has no text layer, so it would have to be read as an image \u2014 and this build has no OCR language data configured. Nothing was read, and nothing was fetched: the language data must be present on this machine. Add it, then drop the file again."
+      words: "this document has no text layer, so it would have to be read as an image \u2014 and no OCR language data was found on this machine: not in the folder this build was configured with, and not in the folders the app ships with. Nothing was read and nothing was fetched \u2014 SelfImpulse does not download language data. Add eng.traineddata (or eng.traineddata.gz) to one of those folders, then drop the file again."
     };
   }
   if (options.hasLanguageData) {
@@ -122184,7 +122240,7 @@ async function readScannedPdf(bytes, options) {
     );
   }
   const read4 = await readImages(images, {
-    dataPath: options.dataPath === void 0 ? ocrDataPath() : options.dataPath,
+    dataPath: (options.dataPath === void 0 ? ocrDataPath() : options.dataPath) ?? void 0,
     language: language2,
     maxPages: options.capPages,
     maxTextChars: options.maxChars,
@@ -122233,7 +122289,7 @@ async function readImageDocument(bytes, options) {
   const now = options.now ?? (() => Date.now());
   const deadlineAt = options.deadlineAt ?? Number.POSITIVE_INFINITY;
   const read4 = await readImages([{ page: 1, png: bytes }], {
-    dataPath: options.dataPath === void 0 ? ocrDataPath() : options.dataPath,
+    dataPath: (options.dataPath === void 0 ? ocrDataPath() : options.dataPath) ?? void 0,
     language: language2,
     maxTextChars: options.maxChars,
     minConfidence: options.minConfidence,
@@ -122277,6 +122333,7 @@ var init_scannedPdf = __esm({
     init_pdfRender();
     init_ocr();
     init_ocrData();
+    init_ocr();
   }
 });
 
@@ -124916,8 +124973,8 @@ var init_pdf = __esm({
       5966(module2, __unused_webpack_exports, __webpack_require__2) {
         var aCallable = __webpack_require__2(9306);
         var isNullOrUndefined = __webpack_require__2(4117);
-        module2.exports = function(V2, P3) {
-          var func = V2[P3];
+        module2.exports = function(V2, P4) {
+          var func = V2[P4];
           return isNullOrUndefined(func) ? void 0 : aCallable(func);
         };
       },
@@ -125083,19 +125140,19 @@ var init_pdf = __esm({
             return store2.has(it2);
           };
         } else {
-          var STATE2 = sharedKey("state");
-          hiddenKeys[STATE2] = true;
+          var STATE3 = sharedKey("state");
+          hiddenKeys[STATE3] = true;
           set2 = function(it2, metadata) {
-            if (hasOwn(it2, STATE2)) throw new TypeError2(OBJECT_ALREADY_INITIALIZED);
+            if (hasOwn(it2, STATE3)) throw new TypeError2(OBJECT_ALREADY_INITIALIZED);
             metadata.facade = it2;
-            createNonEnumerableProperty(it2, STATE2, metadata);
+            createNonEnumerableProperty(it2, STATE3, metadata);
             return metadata;
           };
           get2 = function(it2) {
-            return hasOwn(it2, STATE2) ? it2[STATE2] : {};
+            return hasOwn(it2, STATE3) ? it2[STATE3] : {};
           };
           has3 = function(it2) {
-            return hasOwn(it2, STATE2);
+            return hasOwn(it2, STATE3);
           };
         }
         module2.exports = {
@@ -125713,14 +125770,14 @@ var init_pdf = __esm({
         var ENUMERABLE = "enumerable";
         var CONFIGURABLE = "configurable";
         var WRITABLE = "writable";
-        exports2.f = DESCRIPTORS ? V8_PROTOTYPE_DEFINE_BUG ? function defineProperty(O2, P3, Attributes) {
+        exports2.f = DESCRIPTORS ? V8_PROTOTYPE_DEFINE_BUG ? function defineProperty(O2, P4, Attributes) {
           anObject(O2);
-          P3 = toPropertyKey(P3);
+          P4 = toPropertyKey(P4);
           anObject(Attributes);
-          if (typeof O2 === "function" && P3 === "prototype" && "value" in Attributes && WRITABLE in Attributes && !Attributes[WRITABLE]) {
-            var current = $getOwnPropertyDescriptor(O2, P3);
+          if (typeof O2 === "function" && P4 === "prototype" && "value" in Attributes && WRITABLE in Attributes && !Attributes[WRITABLE]) {
+            var current = $getOwnPropertyDescriptor(O2, P4);
             if (current && current[WRITABLE]) {
-              O2[P3] = Attributes.value;
+              O2[P4] = Attributes.value;
               Attributes = {
                 configurable: CONFIGURABLE in Attributes ? Attributes[CONFIGURABLE] : current[CONFIGURABLE],
                 enumerable: ENUMERABLE in Attributes ? Attributes[ENUMERABLE] : current[ENUMERABLE],
@@ -125728,17 +125785,17 @@ var init_pdf = __esm({
               };
             }
           }
-          return $defineProperty(O2, P3, Attributes);
-        } : $defineProperty : function defineProperty(O2, P3, Attributes) {
+          return $defineProperty(O2, P4, Attributes);
+        } : $defineProperty : function defineProperty(O2, P4, Attributes) {
           anObject(O2);
-          P3 = toPropertyKey(P3);
+          P4 = toPropertyKey(P4);
           anObject(Attributes);
           if (IE8_DOM_DEFINE) try {
-            return $defineProperty(O2, P3, Attributes);
+            return $defineProperty(O2, P4, Attributes);
           } catch (error63) {
           }
           if ("get" in Attributes || "set" in Attributes) throw new $TypeError("Accessors not supported");
-          if ("value" in Attributes) O2[P3] = Attributes.value;
+          if ("value" in Attributes) O2[P4] = Attributes.value;
           return O2;
         };
       },
@@ -125753,14 +125810,14 @@ var init_pdf = __esm({
         var hasOwn = __webpack_require__2(9297);
         var IE8_DOM_DEFINE = __webpack_require__2(5917);
         var $getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
-        exports2.f = DESCRIPTORS ? $getOwnPropertyDescriptor : function getOwnPropertyDescriptor(O2, P3) {
+        exports2.f = DESCRIPTORS ? $getOwnPropertyDescriptor : function getOwnPropertyDescriptor(O2, P4) {
           O2 = toIndexedObject(O2);
-          P3 = toPropertyKey(P3);
+          P4 = toPropertyKey(P4);
           if (IE8_DOM_DEFINE) try {
-            return $getOwnPropertyDescriptor(O2, P3);
+            return $getOwnPropertyDescriptor(O2, P4);
           } catch (error63) {
           }
-          if (hasOwn(O2, P3)) return createPropertyDescriptor(!call(propertyIsEnumerableModule.f, O2, P3), O2[P3]);
+          if (hasOwn(O2, P4)) return createPropertyDescriptor(!call(propertyIsEnumerableModule.f, O2, P4), O2[P4]);
         };
       },
       /***/
@@ -127232,7 +127289,7 @@ var init_pdf = __esm({
           var val = holder[name];
           var unmodified = node2 && val === node2.value;
           var context = unmodified && typeof node2.source == "string" ? { source: node2.source } : {};
-          var elementRecordsLen, keys2, len, i2, P3;
+          var elementRecordsLen, keys2, len, i2, P4;
           if (isObject4(val)) {
             var nodeIsArray = isArray(val);
             var nodes = unmodified ? node2.nodes : nodeIsArray ? [] : {};
@@ -127246,8 +127303,8 @@ var init_pdf = __esm({
               keys2 = enumerableOwnProperties(val);
               len = lengthOfArrayLike(keys2);
               for (i2 = 0; i2 < len; i2++) {
-                P3 = keys2[i2];
-                internalizeProperty(val, P3, internalize(val, P3, reviver, hasOwn(nodes, P3) ? nodes[P3] : void 0));
+                P4 = keys2[i2];
+                internalizeProperty(val, P4, internalize(val, P4, reviver, hasOwn(nodes, P4) ? nodes[P4] : void 0));
               }
             }
           }
@@ -154959,6 +155016,7 @@ var import_jszip2, mammoth, utf82, MAX_LINE_CHARS, MAX_SHEETS, SAMPLE_ROWS, MAX_
 var init_documentParsers = __esm({
   "src/mission/documentParsers.ts"() {
     "use strict";
+    init_promiseShim();
     import_jszip2 = __toESM(require_lib3(), 1);
     mammoth = __toESM(require_lib6(), 1);
     init_archiveScan();
@@ -160665,7 +160723,12 @@ function Steward() {
             " this machine has kept, or describe something new below."
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "btn primary", onClick: () => setHist(true), children: "Open a past conversation" })
-        ] }) : /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("p", { className: "hint", children: "Describe what you need below. The Captain routes it, and the whole exchange stays on this device." })
+        ] }) : /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("p", { className: "hint", children: "Describe what you need below. The Captain routes it, and the whole exchange stays on this device." }),
+        !provider ? /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("p", { className: "hint", children: [
+          "Without a provider key this is ",
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("b", { children: "plan only" }),
+          " \u2014 nothing executes, and every answer says so. Connect one in Settings."
+        ] }) : null
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
         Composer,
@@ -160714,14 +160777,15 @@ function Work() {
   const steps = (0, import_react11.useMemo)(() => thread(msgs, lastResp, gate2, busy, stewardName, go), [msgs, lastResp, gate2, busy, stewardName, go]);
   const runs = lastResp?.memberRuns ?? [];
   const calls = runs.reduce((n, r3) => n + r3.toolReceipts.length, 0);
+  const ran = runs.length > 0;
+  const crew = ran ? runs.length : lastResp?.specialistIds.length ?? 0;
   return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_jsx_runtime6.Fragment, { children: [
     /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("header", { className: "top", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "sub", children: busy ? "Running" : lastResp ? lastResp.outcome : "" }),
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "sub", children: busy ? "Running" : lastResp ? RUN_SAYS[lastResp.outcome] ?? lastResp.outcome : "" }),
       /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "right", children: [
-        lastResp && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("span", { className: "pill", children: [
-          runs.length,
-          " agent",
-          runs.length === 1 ? "" : "s"
+        lastResp && crew > 0 && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("span", { className: "pill", children: [
+          plural2(crew, "agent"),
+          ran ? " ran" : " chosen, none ran"
         ] }),
         lastResp && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("span", { className: "pill", children: [
           calls,
@@ -160770,17 +160834,43 @@ function Work() {
     ] }) })
   ] });
 }
-function ledFor(outcome, busy) {
-  if (busy) return "live";
-  const o = outcome.toLowerCase();
-  if (/error|fail|refus|deni|block|gated/.test(o)) return "bad";
-  if (/plan|pend|wait|partial/.test(o)) return "warn";
-  return "ok";
+function clauses(note) {
+  return note.split(/\s+·\s+|\s*\.\s+(?=[A-Z0-9(])|\s*\.\s*$/).map((c) => c.replace(/\s+/g, " ").trim()).filter(Boolean);
+}
+function ledFor(word, busy) {
+  return busy ? "live" : ledClass(word);
 }
 function worstOf(receipts) {
-  const bad2 = receipts.find((r3) => /error|fail|refus|deni|block|gated/i.test(r3.outcome));
-  if (bad2) return bad2.outcome;
-  return receipts[0]?.outcome ?? "planned";
+  if (receipts.length === 0) return "planned";
+  return receipts.reduce((worst, r3) => rankOf(r3.outcome) < rankOf(worst) ? r3.outcome : worst, receipts[0].outcome);
+}
+function memberLed(mr, loggedOutcome) {
+  const fromTools = ledClass(worstOf(mr.toolReceipts));
+  if (fromTools === "bad") return "error";
+  if (loggedOutcome && ledClass(loggedOutcome) === "bad") return loggedOutcome;
+  if (mr.truncated || fromTools === "warn") return "partial";
+  if (mr.toolReceipts.length === 0) return loggedOutcome ?? "planned";
+  return "ok";
+}
+function answerLed(resp, runs) {
+  if (resp.outcome !== "answered") return resp.outcome;
+  if (!resp.executed) return "partial";
+  if (resp.captain && resp.captain.status !== "completed") return resp.captain.status;
+  if (runs.some((r3) => r3.truncated)) return "partial";
+  if (runs.some((r3) => r3.toolReceipts.some((t) => ledClass(t.outcome) === "bad"))) return "partial";
+  if (resp.liveData && !resp.liveData.verified) return "partial";
+  return "answered";
+}
+function liveSays(ld) {
+  const tried = ld.retrieval?.length ?? 0;
+  const got = ld.retrieval?.filter((r3) => r3.status === "retrieved").length ?? 0;
+  if (ld.verified && ld.verifiedBy === "retrieval") {
+    return `Time-sensitive claims checked against the sources themselves \u2014 ${got} of the ${plural2(tried, "cited source")} fetched came back holding what the answer cites.`;
+  }
+  if (ld.verified) {
+    return `Time-sensitive claims carry disclosure only \u2014 the answer names ${plural2(ld.sources, "source")} and ${plural2(ld.datedClaims, "dated claim")}, but nothing was fetched to check them.`;
+  }
+  return `Time-sensitive claims NOT verified${tried ? ` \u2014 ${got} of the ${plural2(tried, "cited source")} fetched held nothing the answer cites` : ""}. The reply carries the flag.`;
 }
 function thread(msgs, resp, gate2, busy, captainName, go) {
   const out = [];
@@ -160798,93 +160888,130 @@ function thread(msgs, resp, gate2, busy, captainName, go) {
   }
   if (resp) {
     const dropped = resp.routed.policyDropped ?? [];
+    const runs = resp.memberRuns ?? [];
+    const report = resp.captain;
     out.push({
       id: "route",
       who: captainName,
       at: lastVh?.at,
       led: ledFor(resp.outcome, busy),
-      line: resp.specialistIds.length ? `Took it \u2014 ${plural2(resp.specialistIds.length, "agent")} from ${resp.routed.considered} considered, ${resp.routed.routedBy}` : `Nothing was routed (${resp.routed.considered} considered)`,
+      line: resp.specialistIds.length ? `Chose ${plural2(resp.specialistIds.length, "agent")} from ${resp.routed.considered} considered` : resp.executed ? "Took it itself \u2014 no agent was routed" : `Sent nobody \u2014 ${resp.routed.considered} considered, none went to work`,
       body: /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_jsx_runtime6.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("p", { className: "hint", children: [
+          "Routing \u2014 ",
+          STRATEGY_SAYS[resp.routed.strategy] ?? resp.routed.strategy,
+          ", picked by ",
+          ROUTED_BY_SAYS[resp.routed.routedBy] ?? resp.routed.routedBy,
+          "."
+        ] }),
+        resp.routed.fallbackReason && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("p", { className: "hint", children: [
+          "The model re-rank was tried and fell back: ",
+          resp.routed.fallbackReason
+        ] }),
         /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("ul", { className: "dl", children: resp.specialistIds.map((sid, i2) => {
           const sp = getSpecialist(sid);
-          const score = resp.routed.selected.find((c) => c.id === sid)?.score;
+          const cand = resp.routed.selected.find((c) => c.id === sid);
+          const score = cand?.score;
           return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("li", { children: [
             /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "agent-tag", children: `AGENT ${String(i2 + 1).padStart(2, "0")}` }),
             /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("b", { children: sp?.category ?? sid }),
-            typeof score === "number" && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "faint mono", children: score })
+            typeof score === "number" && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "faint mono", children: score }),
+            cand && cand.reasons.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "faint", children: cand.reasons.slice(0, 2).join(" \xB7 ") })
           ] }, sid);
         }) }),
-        dropped.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("p", { className: "hint", children: [
-          "Not sent: ",
-          dropped.map((d2) => `${d2.domain} \u2014 ${d2.reason ?? "off shift"}`).join(" \xB7 ")
+        dropped.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_jsx_runtime6.Fragment, { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "hint", children: "The router scored these; the shift policy kept them off the run:" }),
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("ul", { className: "dl", children: dropped.map((d2) => /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("li", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("b", { children: d2.domain }),
+            /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "faint", children: d2.reason ?? "off shift" })
+          ] }, d2.id)) })
         ] }),
         resp.workspace && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("p", { className: "hint", children: [
-          "Workspace \u2014 ",
-          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "mono", children: resp.workspace.kind })
+          "Its tools worked on ",
+          SEAM_SAYS[resp.workspace.kind] ?? resp.workspace.kind,
+          " \u2014 ",
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "mono", children: resp.workspace.root })
         ] }),
-        resp.authority && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("p", { className: "hint", children: [
-          "Mandate \u2014 ",
+        resp.authority ? /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("p", { className: "hint", children: [
+          "This run rode a signed mandate \u2014 ",
           /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("span", { className: "mono", children: [
             resp.authority.mandateDigest.slice(0, 12),
             "\u2026"
           ] }),
           " (",
-          resp.authority.owner,
-          ")"
-        ] })
+          resp.authority.scheme,
+          ") held by ",
+          resp.authority.owner
+        ] }) : /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "hint", children: "No mandate rode on this run." })
       ] })
     });
     const office = resp.office;
     if (office && office.desks.length > 0) {
       out.push({
         id: "office",
-        who: TITLES.consul,
+        who: captainName,
         at: lastVh?.at,
-        led: busy ? "live" : "ok",
-        line: `${plural2(office.desks.length, "desk")} opened \xB7 ${office.floor.length} of ${office.cap} ${TITLES.crew.toLowerCase()}s on the floor`,
+        led: busy ? "live" : office.floor.length > 0 ? "ok" : "warn",
+        line: office.floor.length > 0 ? `Opened ${plural2(office.desks.length, "desk")} and put ${plural2(office.floor.length, TITLES.crew.toLowerCase())} on the floor, of a ${office.cap}-seat cap` : `Opened ${plural2(office.desks.length, "desk")} \u2014 nobody went to the floor`,
         body: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("ul", { className: "dl", children: office.desks.map((d2) => /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("li", { children: [
           /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("b", { children: d2.label }),
-          /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("span", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("span", { className: "faint", children: [
+            "under ",
+            d2.consul
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("span", { className: "faint", children: [
             d2.lead,
-            " leads \xB7 ",
-            d2.hr,
-            " HR"
+            " \xB7 ",
+            d2.hr
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("span", { className: d2.onFloor > 0 ? "" : "faint", children: [
             d2.onFloor,
-            " on floor"
+            " on the floor of ",
+            d2.pooled,
+            " pooled here"
           ] })
         ] }, d2.id)) })
       });
     }
-    (resp.memberRuns ?? []).forEach((mr, i2) => {
+    runs.forEach((mr, i2) => {
       const receipts = mr.toolReceipts;
+      const logged = report?.members.find((m) => m.specialistId === mr.specialistId);
+      const failed2 = !!logged && ledClass(logged.outcome) === "bad";
       out.push({
         id: `m${i2}`,
         who: `AGENT ${String(i2 + 1).padStart(2, "0")}`,
         at: lastVh?.at,
-        led: ledFor(mr.truncated ? "partial" : worstOf(receipts), busy),
-        line: receipts.length ? `${plural2(receipts.length, "tool call")} \xB7 ${plural2(mr.providerCalls, "provider call")}${mr.truncated ? " \xB7 stopped early" : ""}` : mr.tools.length ? `${plural2(mr.providerCalls, "provider call")} \xB7 ${plural2(mr.tools.length, "tool")} carried, none used` : `Toolless \u2014 ${plural2(mr.providerCalls, "provider call")}`,
+        led: ledFor(memberLed(mr, logged?.outcome), busy),
+        line: failed2 ? SAY_MEMBER(logged.outcome) : receipts.length ? `${plural2(receipts.length, "tool call")} ran over ${plural2(mr.providerCalls, "provider call")}${mr.truncated ? " \u2014 cut off at the step limit" : ""}` : mr.tools.length ? `Carried ${plural2(mr.tools.length, "tool")} and used none \u2014 ${plural2(mr.providerCalls, "provider call")}` : `Answered from the model alone \u2014 ${plural2(mr.providerCalls, "provider call")}`,
         body: /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_jsx_runtime6.Fragment, { children: [
           /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("p", { className: "hint", children: [
             getSpecialist(mr.specialistId)?.category ?? mr.specialistId,
-            " \xB7 ",
-            plural2(mr.tools.length, "tool"),
-            " carried \xB7 ",
+            " \u2014 ",
+            plural2(mr.providerCalls, "provider call"),
+            ", ",
             (mr.latencyMs / 1e3).toFixed(1),
-            "s"
+            "s end to end",
+            mr.truncated ? ", and it stopped before finishing" : ""
           ] }),
-          receipts.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "hint", children: "No tool ran \u2014 this member answered from the model alone." }) : /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("ul", { className: "rcpts", children: receipts.map((t, j2) => /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("li", { children: [
+          mr.tools.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("p", { className: "mono faint", children: [
+            "carried: ",
+            mr.tools.join(" \xB7 ")
+          ] }),
+          failed2 && logged?.note && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("p", { className: "hint", children: [
+            "Why: ",
+            logged.note
+          ] }),
+          receipts.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "hint", children: "No tool ran under this agent." }) : /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("ul", { className: "rcpts", children: receipts.map((t, j2) => /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("li", { children: [
             /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "rcpt-h", children: [
               /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("b", { children: t.tool }),
-              /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: `pill ${/error|fail/i.test(t.outcome) ? "bad" : /refus|deni|block|gated/i.test(t.outcome) ? "warn" : "ok"}`, children: t.outcome })
+              /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: `pill ${ledClass(t.outcome)}`, children: SAY_TOOL(t.outcome) })
             ] }),
             t.inputPreview && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("p", { className: "hint", children: [
-              "in \xB7 ",
+              "asked \xB7 ",
               t.inputPreview
             ] }),
             t.outputPreview && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("p", { className: "prose", children: [
-              "out \xB7 ",
+              "came back \xB7 ",
               t.outputPreview
             ] }),
             t.digest && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "mono faint", children: `receipt ${t.digest.slice(0, 8)}\u2026` })
@@ -160892,32 +161019,34 @@ function thread(msgs, resp, gate2, busy, captainName, go) {
         ] })
       });
     });
-    const rep = resp.captain;
-    if (rep) {
+    if (report) {
       out.push({
         id: "report",
-        who: rep.domain,
+        who: report.captainName,
         at: lastVh?.at,
-        led: ledFor(rep.status, busy),
-        line: one(rep.summary),
+        led: ledFor(report.status, busy),
+        line: one(report.summary),
         body: /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_jsx_runtime6.Fragment, { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "prose", children: rep.summary }),
-          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("ul", { className: "dl", children: rep.members.map((m, i2) => /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("li", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "prose", children: report.summary }),
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("ul", { className: "dl", children: report.members.map((m, i2) => /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("li", { children: [
             /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "agent-tag", children: `AGENT ${String(i2 + 1).padStart(2, "0")}` }),
-            /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("b", { children: m.outcome }),
-            m.note && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "hint", children: m.note }),
+            /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("b", { children: SAY_MEMBER(m.outcome) }),
+            ledClass(m.outcome) === "bad" && m.note && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("span", { className: "hint", children: [
+              "Why: ",
+              m.note
+            ] }),
             m.memberDigest && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("span", { className: "mono faint", children: [
               m.memberDigest.slice(0, 8),
               "\u2026"
             ] })
           ] }, `${m.specialistId}_${i2}`)) }),
-          rep.failures.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("p", { className: "hint", children: [
-            "Failed: ",
-            rep.failures.join(" \xB7 ")
+          report.failures.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_jsx_runtime6.Fragment, { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "hint", children: "What did not run:" }),
+            /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("ul", { className: "dl", children: report.failures.map((f2, i2) => /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("li", { children: f2 }, `f${i2}`)) })
           ] }),
-          rep.nextStep && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("p", { className: "hint", children: [
+          report.nextStep && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("p", { className: "hint", children: [
             "Next: ",
-            rep.nextStep
+            report.nextStep
           ] })
         ] })
       });
@@ -160926,10 +161055,10 @@ function thread(msgs, resp, gate2, busy, captainName, go) {
     if (syn) {
       out.push({
         id: "synthesis",
-        who: TITLES.captain,
+        who: syn.captainName,
         at: lastVh?.at,
-        led: "ok",
-        line: `Synthesis over ${syn.divergences.membersCompared} member${syn.divergences.membersCompared === 1 ? "" : "s"} \u2014 ${plural2(syn.divergences.corroborated.length, "point")} agreed, ${plural2(syn.divergences.singleSourced.length, "point")} single-sourced`,
+        led: busy ? "live" : "ok",
+        line: `Weighed ${plural2(syn.divergences.membersCompared, "member answer")} \u2014 ${plural2(syn.divergences.corroborated.length, "point")} every answering member backed, ${plural2(syn.divergences.singleSourced.length, "point")} only one did; the points are listed below`,
         body: /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_jsx_runtime6.Fragment, { children: [
           /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "prose", children: syn.text }),
           /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("p", { className: "hint", children: [
@@ -160939,9 +161068,16 @@ function thread(msgs, resp, gate2, busy, captainName, go) {
             "s",
             syn.digest ? ` \xB7 ${syn.digest.slice(0, 12)}\u2026` : ""
           ] }),
-          syn.divergences.singleSourced.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("p", { className: "hint", children: [
-            "Only one member said: ",
-            syn.divergences.singleSourced.map((s) => s.atom).join(" \xB7 ")
+          syn.divergences.singleSourced.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_jsx_runtime6.Fragment, { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "hint", children: "One member said this and nobody backed it:" }),
+            /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("ul", { className: "dl", children: syn.divergences.singleSourced.map((s, i2) => /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("li", { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("b", { children: s.atom }),
+              /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "faint", children: s.kind })
+            ] }, `s${i2}`)) })
+          ] }),
+          syn.divergences.corroborated.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_jsx_runtime6.Fragment, { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "hint", children: "Every answering member said this:" }),
+            /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("ul", { className: "dl", children: syn.divergences.corroborated.map((s, i2) => /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("li", { children: s }, `c${i2}`)) })
           ] })
         ] })
       });
@@ -160949,29 +161085,43 @@ function thread(msgs, resp, gate2, busy, captainName, go) {
   }
   if (resp) {
     const planned = resp.outcome === "planned" && !resp.executed;
+    const record3 = resp.note ? clauses(resp.note) : [];
+    const ld = resp.liveData;
     out.push({
       id: "answer",
       who: captainName,
       at: lastVh?.at,
-      led: ledFor(resp.outcome, busy),
-      line: planned ? "Planned \u2014 connect a provider to execute" : one(resp.reply),
+      led: ledFor(answerLed(resp, resp.memberRuns ?? []), busy),
+      line: planned ? "Planned \u2014 plan only, nothing executes until you connect a provider" : one(resp.reply),
       body: /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_jsx_runtime6.Fragment, { children: [
         /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "prose", children: resp.reply }),
-        resp.note && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "hint", children: resp.note }),
+        record3.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_jsx_runtime6.Fragment, { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "hint", children: "Run record \u2014 every clause the engine logged:" }),
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("ul", { className: "dl", children: record3.map((c, i2) => /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("li", { children: c }, `n${i2}`)) })
+        ] }),
         resp.failure && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("p", { className: "hint", children: [
           resp.failure.meaning,
           " \u2014 ",
-          resp.failure.advice
+          resp.failure.advice,
+          resp.failure.retryable ? " (retryable)" : ""
         ] }),
-        resp.liveData && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("p", { className: "hint", children: [
-          "Live claims ",
-          resp.liveData.verified ? "verified against the sources fetched" : "NOT verified",
-          resp.liveData.retrieval?.length ? ` \xB7 ${plural2(resp.liveData.retrieval.length, "fetch")}` : ""
-        ] }),
+        ld && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "hint", children: liveSays(ld) }),
+        ld?.retrieval && ld.retrieval.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("ul", { className: "dl", children: ld.retrieval.map((r3, i2) => /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("li", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: `pill ${r3.status === "retrieved" ? "ok" : "bad"}`, children: r3.status === "retrieved" ? "fetched" : "not fetched" }),
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "mono faint", children: r3.url }),
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("span", { className: "faint", children: [
+            plural2(r3.claimHits, "claim"),
+            " found \xB7 ",
+            r3.bytes,
+            " bytes \xB7 ",
+            clock(r3.fetchedAt)
+          ] }),
+          r3.detail && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "faint", children: r3.detail })
+        ] }, `${r3.url}_${i2}`)) }),
         resp.provenanceDigest && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("p", { className: "mono faint", children: [
           "provenance ",
           resp.provenanceDigest.slice(0, 12),
-          "\u2026"
+          "\u2026 \u2014 what the receipt commits to"
         ] }),
         !busy && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "acts", children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("button", { className: "btn sm ghost", onClick: () => go("chat"), children: "Read the answer" }) })
       ] })
@@ -160996,7 +161146,7 @@ function thread(msgs, resp, gate2, busy, captainName, go) {
   }
   return out;
 }
-var import_react11, import_jsx_runtime6, one, plural2, clock;
+var import_react11, import_jsx_runtime6, one, plural2, clock, LED_OF, ledClass, RANK, rankOf, RUN_SAYS, STRATEGY_SAYS, ROUTED_BY_SAYS, SEAM_SAYS, TOOL_SAYS, MEMBER_SAYS, SAY_TOOL, SAY_MEMBER;
 var init_Work = __esm({
   "src/ui/screens/Work.tsx"() {
     "use strict";
@@ -161015,6 +161165,60 @@ var init_Work = __esm({
         return "";
       }
     };
+    LED_OF = {
+      ok: "ok",
+      answered: "ok",
+      completed: "ok",
+      executed: "ok",
+      "peer-delegated": "ok",
+      planned: "warn",
+      partial: "warn",
+      pending: "warn",
+      proposed: "warn",
+      error: "bad",
+      refused: "bad",
+      "gated-out": "bad",
+      blocked: "bad",
+      failed: "bad"
+    };
+    ledClass = (word) => LED_OF[word.toLowerCase().trim()] ?? "warn";
+    RANK = { bad: 0, warn: 1, ok: 2 };
+    rankOf = (word) => RANK[ledClass(word)];
+    RUN_SAYS = {
+      answered: "Answered",
+      planned: "Planned \u2014 nothing executed",
+      refused: "Refused",
+      "gated-out": "Stopped at the gate",
+      "peer-delegated": "Handed to a peer",
+      error: "Did not complete"
+    };
+    STRATEGY_SAYS = { single: "one agent", multi: "a crew", none: "no agent" };
+    ROUTED_BY_SAYS = { deterministic: "the deterministic ranker", "llm-assisted": "a model re-rank" };
+    SEAM_SAYS = {
+      node: "a folder on this machine",
+      "browser-memory": "a browser sandbox that is not on disk",
+      "browser-fs-access": "a folder you granted in the browser"
+    };
+    TOOL_SAYS = {
+      ok: "ran",
+      executed: "ran",
+      error: "failed",
+      refused: "refused",
+      "gated-out": "held at the gate"
+    };
+    MEMBER_SAYS = {
+      answered: "answered in its own call",
+      completed: "answered in its own call",
+      executed: "ran",
+      error: "its own provider call did not complete",
+      refused: "refused before it ran",
+      "gated-out": "held at the gate",
+      blocked: "blocked",
+      planned: "planned, never ran",
+      partial: "finished only part of it"
+    };
+    SAY_TOOL = (w2) => TOOL_SAYS[w2.toLowerCase().trim()] ?? w2;
+    SAY_MEMBER = (w2) => MEMBER_SAYS[w2.toLowerCase().trim()] ?? w2;
   }
 });
 
@@ -161429,6 +161633,8 @@ function Receipts() {
   }, [st2.msgs]);
   const rows = all2.filter((r3) => !q2 || (r3.title + r3.signer + r3.digest + r3.kind).toLowerCase().includes(q2.toLowerCase()));
   const ok2 = all2.filter((r3) => r3.state === "ok").length, refused = all2.filter((r3) => r3.state === "refused").length, pending2 = all2.filter((r3) => r3.state === "pending").length, errored = all2.filter((r3) => r3.state === "error").length;
+  const one3 = (n, s, p) => n === 1 ? s : p;
+  const seal2 = audit === null ? { v: "\u2014", l: "Seal check has not run yet" } : audit.total === 0 ? { v: "\u2014", l: "Nothing sealed on this machine yet" } : audit.broken.length > 0 ? { v: String(audit.broken.length), l: `Sealed ${one3(audit.broken.length, "receipt", "receipts")} failed the seal check` } : { v: String(audit.total), l: `Sealed ${one3(audit.total, "receipt", "receipts")} re-checked, ${one3(audit.total, "seal", "seals")} intact` };
   const fmt = (iso) => {
     if (!iso) return "\u2014";
     try {
@@ -161441,24 +161647,21 @@ function Receipts() {
   return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(import_jsx_runtime8.Fragment, { children: [
     /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("header", { className: "top", children: [
       /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("h2", { children: "Receipts" }),
-      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("span", { className: "sub", children: [
-        all2.length,
-        " this session"
-      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "sub", children: rows.length === all2.length ? `${all2.length} in this ledger` : `${rows.length} of ${all2.length} match \u201C${q2}\u201D` }),
       /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "right", children: [
         /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { className: "input sm", "aria-label": "Search receipts", placeholder: "Search receipts", value: q2, onChange: (e2) => setQ(e2.target.value) }),
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { className: "btn sm", onClick: () => download(all2), disabled: !all2.length, children: "Export JSON" })
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { className: "btn sm", onClick: () => download(all2), disabled: !all2.length, title: "Downloads every receipt, not only the ones the search shows", children: "Export all as JSON" })
       ] })
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "scroll", children: /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "page narrow", children: [
       /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "kpis", children: [
         /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("b", { children: audit ? `${audit.valid}/${audit.total}` : "\u2014" }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { children: "Chains audited" })
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("b", { children: seal2.v }),
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { children: seal2.l })
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { children: [
           /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("b", { children: ok2 }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { children: "Recorded" })
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { children: "Recorded in this ledger" })
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { children: [
           /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("b", { children: pending2 }),
@@ -161466,60 +161669,82 @@ function Receipts() {
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { children: [
           /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("b", { children: refused }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { children: "Refused" })
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { children: "Refused by you or by policy" })
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { children: [
           /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("b", { children: errored }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { children: "Errored" })
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { children: "Failed to finish" })
         ] })
       ] }),
       audit && audit.broken.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "tamper", role: "alert", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("b", { children: [
-          audit.broken.length,
-          " stored ",
-          audit.broken.length === 1 ? "chain fails" : "chains fail",
-          " verification."
-        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("b", { children: `${audit.broken.length} of ${audit.total} sealed ${one3(audit.total, "receipt", "receipts")} on this machine failed the seal check.` }),
         /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("span", { children: [
-          " ",
+          " Reasons it gave: ",
           audit.broken.slice(0, 3).map((b3) => `${b3.id} \u2014 ${b3.reason}`).join(" \xB7 ")
         ] }),
         audit.broken.length > 3 && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("span", { children: [
-          " \xB7 ",
+          " \xB7 and ",
           audit.broken.length - 3,
           " more"
         ] })
       ] }),
-      rows.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "empty", children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("h3", { children: all2.length ? "No matches" : "No receipts yet" }) }) : /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "ledger", children: [
+      rows.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "empty", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("h3", { children: all2.length ? `Nothing here matches \u201C${q2}\u201D` : "No receipts yet" }),
+        !all2.length && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "hint", children: "Finished runs, your gate decisions and files that came through a door are recorded here." })
+      ] }) : /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "ledger", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "legend", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { children: "The dot at the right of a row is its outcome:" }),
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("span", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("i", { className: "dot ok" }),
+            "recorded"
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("span", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("i", { className: "dot pending" }),
+            "waiting on you"
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("span", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("i", { className: "dot refused" }),
+            "refused"
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("span", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("i", { className: "dot error" }),
+            "failed"
+          ] })
+        ] }),
         /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "lh", children: [
           /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { children: "When" }),
           /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { children: "What" }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { children: "Signer" }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { children: "Digest" }),
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { children: "Source" }),
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { children: "Proof hash" }),
           /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", {})
         ] }),
-        rows.map((r3) => /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(import_react13.default.Fragment, { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("button", { className: `lr ${open2 === r3.id ? "open" : ""}`, "aria-expanded": open2 === r3.id, onClick: () => setOpen(open2 === r3.id ? null : r3.id), children: [
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "mono", children: fmt(r3.at) }),
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("span", { className: "t", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("b", { children: r3.title }),
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("small", { children: [
-                r3.kind,
-                STATE_WORD2[r3.state] ? ` \xB7 ${STATE_WORD2[r3.state]}` : ""
-              ] })
+        rows.map((r3) => {
+          const s = STATE2[r3.state];
+          const note = r3.state !== "pending" ? s.note : r3.kind === "gate" ? "It stops until you decide \u2014 answer it in Work." : "Still open \u2014 it records when the run finishes.";
+          return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(import_react13.default.Fragment, { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("button", { className: `lr ${open2 === r3.id ? "open" : ""}`, "aria-expanded": open2 === r3.id, onClick: () => setOpen(open2 === r3.id ? null : r3.id), children: [
+              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "mono", children: fmt(r3.at) }),
+              /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("span", { className: "t", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("b", { children: r3.title }),
+                /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("small", { children: [
+                  KIND[r3.kind] ?? r3.kind,
+                  " \xB7 ",
+                  /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: `pill ${s.pill}`, children: s.word })
+                ] })
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "mono", children: r3.signer }),
+              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "mono dig", children: r3.digest === "\u2014" ? "\u2014" : r3.digest.slice(0, 12) + "\u2026" }),
+              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: `dot ${r3.state}`, "aria-hidden": "true" })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "mono", children: r3.signer }),
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "mono dig", children: r3.digest === "\u2014" ? "\u2014" : r3.digest.slice(0, 12) + "\u2026" }),
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: `dot ${r3.state}` })
-          ] }),
-          open2 === r3.id && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "ld", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("code", { children: r3.digest }),
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "acts", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { className: "btn sm", onClick: () => void navigator.clipboard?.writeText(r3.digest), children: "Copy digest" }),
-              r3.state !== "ok" && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "hint", children: r3.state === "pending" ? "Waiting on your decision in Work." : r3.state === "error" ? "The run failed." : "Refused." })
+            open2 === r3.id && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "ld", children: [
+              r3.digest !== "\u2014" && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("code", { children: r3.digest }),
+              /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "acts", children: [
+                r3.digest !== "\u2014" && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { className: "btn sm", onClick: () => void navigator.clipboard?.writeText(r3.digest), children: "Copy proof hash" }),
+                note && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "hint", children: note })
+              ] })
             ] })
-          ] })
-        ] }, r3.id))
+          ] }, r3.id);
+        })
       ] })
     ] }) })
   ] });
@@ -161532,7 +161757,7 @@ function download(rows) {
   a.click();
   URL.revokeObjectURL(a.href);
 }
-var import_react13, import_jsx_runtime8, STATE_WORD2;
+var import_react13, import_jsx_runtime8, KIND, STATE2;
 var init_Receipts = __esm({
   "src/ui/screens/Receipts.tsx"() {
     "use strict";
@@ -161540,7 +161765,20 @@ var init_Receipts = __esm({
     init_store();
     init_receiptVault();
     import_jsx_runtime8 = __toESM(require_jsx_runtime(), 1);
-    STATE_WORD2 = { ok: "", pending: "waiting", refused: "refused", error: "error" };
+    KIND = {
+      run: "run",
+      tool: "tool call",
+      synthesis: "answer",
+      handoff: "peer handoff",
+      gate: "your decision",
+      ingest: "file"
+    };
+    STATE2 = {
+      ok: { pill: "ok", word: "Recorded", note: "" },
+      pending: { pill: "warn", word: "Waiting on you", note: "" },
+      refused: { pill: "bad", word: "Refused", note: "You or a control said no, so it stopped here." },
+      error: { pill: "bad", word: "Failed", note: "The run stopped with a failure and did not complete." }
+    };
   }
 });
 
@@ -161607,7 +161845,7 @@ function Federation() {
     /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("section", { className: "si-card", children: [
       /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("h3", { children: "Status" }),
       /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("p", { className: "si-sub", role: "status", "data-testid": "federation-detail", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("strong", { "data-testid": "federation-state", children: STATE_WORD3[st2.state] }),
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("strong", { "data-testid": "federation-state", children: STATE_WORD2[st2.state] }),
         " \u2014 ",
         st2.detail
       ] }),
@@ -161641,14 +161879,17 @@ function Federation() {
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("h3", { children: "Pair a peer" }),
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("p", { className: "si-mono si-big", "data-testid": "federation-pairing-code", children: st2.pairingCode }),
         /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("p", { className: "si-note", children: [
-          "Works once. Expires ",
+          "This code works ",
+          /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("strong", { children: "once" }),
+          ", and it expires ",
           st2.pairingExpires ?? "\u2014",
-          "."
+          " \u2014 after which it is dead. It is not the host\u2019s token: the code only mints a credential scoped to the one peer that redeems it, and it is destroyed by being used."
         ] })
       ] }) : null
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("section", { className: "si-card", children: [
       /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("h3", { children: "Listener" }),
+      /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("p", { className: "si-note", "data-testid": "federation-scope-note", children: "There is no \u201Ceverything\u201D option \u2014 every mount names one scope. Choose the loopback address and only this machine can reach it. Choose a network address and this becomes reachable: Anything else on the same network can reach what you mount while it is running, so mount for as long as you need it and stop it after." }),
       !st2.running ? /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("fieldset", { className: "si-fieldset", "data-testid": "federation-choose", children: [
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("legend", { children: "Who may reach this machine" }),
         /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("label", { className: "si-radio", children: [
@@ -161733,13 +161974,19 @@ function Federation() {
         ),
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("button", { className: "si-btn", onClick: () => void refresh(), "data-testid": "federation-refresh", children: "Re-check" })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("p", { className: "si-note", children: "This app does not start a federation listener on launch. Mounting publishes a signed agent card describing this machine; a peer must present an authorized credential to call it." }),
-      !st2.bundled ? /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("p", { className: "si-note", children: "This build has no A2A host bundle." }) : null,
+      /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("p", { className: "si-note", children: [
+        "SelfImpulse does ",
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("strong", { children: "not" }),
+        " start a federation listener on launch. Mounting opens one listener and publishes a ",
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("strong", { children: "signed agent card" }),
+        " describing this machine; a peer must present an authorized credential to call it, and nothing listens until you press the button above."
+      ] }),
+      !st2.bundled ? /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("p", { className: "si-note", children: "This build shipped without the A2A host bundle, so mounting is unavailable here \u2014 the control is disabled rather than failing silently on a press." }) : null,
       outcome ? /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("pre", { className: "si-mono si-small si-pre", role: "status", "data-testid": "federation-outcome", children: outcome }) : null
     ] })
   ] });
 }
-var import_react14, import_jsx_runtime9, IDLE, STATE_WORD3;
+var import_react14, import_jsx_runtime9, IDLE, STATE_WORD2;
 var init_Federation = __esm({
   "src/ui/screens/Federation.tsx"() {
     "use strict";
@@ -161766,7 +162013,7 @@ var init_Federation = __esm({
       files: false,
       detail: "Reading status\u2026"
     };
-    STATE_WORD3 = {
+    STATE_WORD2 = {
       stopped: "Not mounted",
       starting: "Starting\u2026",
       running: "Running",
@@ -163538,7 +163785,26 @@ function About() {
         /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("span", { children: "Egress" }),
         /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("span", { children: "Nothing leaves without a signed authority (requestEgress) and a receipt" })
       ] })
-    ] })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("h4", { className: "about-h", children: "Guardrail manifest" }),
+    /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("div", { className: "klist about", "data-testid": "guardrail-manifest", children: [
+      ["No root authority without a human principal", "code throws, not prose"],
+      ["No delegation that grows scope", "a hand-off can only narrow"],
+      ["No delegation that outlives its parent", "expiry is checked on both sides"],
+      ["No spend beyond the cap", "seats reserve before dispatch; a refusal names the ceiling"],
+      ["No agent writes doctrine", "agents propose, a human decides"],
+      ["No skill installed by an agent alone", "an experiment or a human approves it"],
+      ["No governed store write skips the matrix", "the check runs before persisting"],
+      ["No merge without a verifier who is not the author", "the author is never the checker"],
+      ["No invented prices", "token-only spend stays dollar-unknown"],
+      ["No artifact leaves this machine without a signed egress authority and a receipt", "requestEgress, then the receipt"],
+      ["Capability requests return answers only", "aggregate whitelist; raw rows never leave"],
+      ["Aggregates pass the Privacy Guard", "minimum cohort, hard query budget, bounded precision"],
+      ["The two-machine proof", "coordinator sees identity, request and receipt \u2014 never rows"]
+    ].map(([rule, note]) => /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("span", { children: rule }),
+      /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("span", { children: note })
+    ] }, rule)) })
   ] });
 }
 function Connectors() {

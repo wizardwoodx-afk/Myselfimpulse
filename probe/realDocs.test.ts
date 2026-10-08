@@ -40,6 +40,33 @@ async function file(name: string, rel: string) {
   return { name, bytes: new Uint8Array(fs.readFileSync(path.join(ROOT, rel))) };
 }
 
+/* ── A portable PDF with a real text layer ────────────────────────────────────────
+ * Built here, byte by byte, with a computed cross-reference table, so both readers
+ * (pdf.js for the text layer, the WASM renderer for pages) accept it on any machine.
+ * This suite used to read the author's own Downloads folder, which made it pass on
+ * exactly one computer and fail on every other with a "missing file" line. A test that names
+ * a personal path is not evidence, and a person's name does not belong in the tree. */
+function buildPdf(lines: string[]): Uint8Array {
+  const esc = (s: string) => s.replace(/([\\()])/g, "\\$1");
+  const body = lines.map((l, i) => (i === 0 ? `(${esc(l)}) Tj` : `0 -16 Td (${esc(l)}) Tj`)).join("\n");
+  const stream = `BT /F1 12 Tf 72 720 Td\n${body}\nET`;
+  const objs = [
+    "<< /Type /Catalog /Pages 2 0 R >>",
+    "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+    "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>",
+    `<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`,
+    "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
+  ];
+  let pdf = "%PDF-1.4\n";
+  const offsets: number[] = [];
+  objs.forEach((o, i) => { offsets.push(pdf.length); pdf += `${i + 1} 0 obj\n${o}\nendobj\n`; });
+  const xref = pdf.length;
+  pdf += `xref\n0 ${objs.length + 1}\n0000000000 65535 f \n`;
+  for (const off of offsets) pdf += `${String(off).padStart(10, "0")} 00000 n \n`;
+  pdf += `trailer\n<< /Size ${objs.length + 1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF\n`;
+  return new TextEncoder().encode(pdf);
+}
+
 async function main(): Promise<void> {
   section("0. what is actually on this machine");
   const real = ["demo/Synthetic-Industrial-FY26-RAW.xlsx", "demo/Synthetic-Industrial-FY26-CLASSIFIED.xlsx",
@@ -77,22 +104,24 @@ async function main(): Promise<void> {
   const ole = await ingestFile(createIngestRun(INGEST_LIMITS), { name: "legacy.doc", bytes: new Uint8Array([0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1, 0, 0, 0, 0]) });
   ok("the OLE header is recognised and refused politely", ole.ok === false && /modern format|\.docx/.test(ole.refusal.words), ole.ok ? "it accepted a fake .doc" : ole.refusal.words);
 
-  section("6. the operator's own documents, from the real Downloads folder");
-  const HOME = "D:/edge  downloads/";
-  const realPdf = HOME + "K.S.SreeHarshen Resume.pdf";
-  const emptyPdf = HOME + "K.S.SreeHarshen.Resume.pdf";
-  const guide = HOME + "00_Start_Here.pdf";
-  for (const [label, abs] of [["the real resume PDF", realPdf], ["a guide PDF", guide]] as const) {
-    if (!fs.existsSync(abs)) { ok(`${label} is present`, false, `missing: ${abs}`); continue; }
-    const r = await ingestFile(createIngestRun(INGEST_LIMITS), { name: path.basename(abs), bytes: new Uint8Array(fs.readFileSync(abs)) });
-    ok(`${label} (${fs.statSync(abs).size.toLocaleString()} bytes) ingests`, r.ok === true, words(r));
-    if (r.ok) ok(`…and produced real prose, not a stub`, r.content.length > 200, `${r.content.length} chars`);
+  section("6. an operator-style PDF, built on this machine");
+  const report = buildPdf([
+    "INVOICE 2026-Q3",
+    "Vendor: Northline Industrial",
+    "Total: 48200 INR",
+    "Reconcile against ledger AC-2201 before release.",
+    "Lead times: A-100 twelve days, B-77 five days.",
+    "Approved by: operations desk",
+  ]);
+  const reportIn = await ingestFile(createIngestRun(INGEST_LIMITS), { name: "quarterly-report.pdf", bytes: report });
+  ok("a born-digital PDF ingests", reportIn.ok === true, words(reportIn));
+  if (reportIn.ok) {
+    ok("…and produced real prose, not a stub", reportIn.content.length > 150, `${reportIn.content.length} chars`);
+    ok("…and the text layer is what was read", /ledger AC-2201/.test(reportIn.content), reportIn.content.slice(0, 120));
   }
-  if (fs.existsSync(emptyPdf)) {
-    const e = await ingestFile(createIngestRun(INGEST_LIMITS), { name: path.basename(emptyPdf), bytes: new Uint8Array(fs.readFileSync(emptyPdf)) });
-    ok("the 0-byte PDF is refused", e.ok === false, words(e));
-    ok("…and the refusal names the emptiness, not the format", e.ok === false && /0 bytes/.test(e.refusal.words) && !/not a format/.test(e.refusal.words), e.ok ? "" : e.refusal.words);
-  }
+  const blank = await ingestFile(createIngestRun(INGEST_LIMITS), { name: "blank.pdf", bytes: new Uint8Array(0) });
+  ok("a 0-byte PDF is refused", blank.ok === false, words(blank));
+  ok("…and the refusal names the emptiness, not the format", blank.ok === false && /0 bytes|empty/i.test(blank.refusal.words), blank.ok ? "" : blank.refusal.words);
 
   console.log(`\n${"=".repeat(40)}\nREAL-ARTEFACT DOOR: ${passed} passed, ${failed} failed.\n${"=".repeat(40)}`);
   if (failed > 0) process.exitCode = 1;

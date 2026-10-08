@@ -24,6 +24,7 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import * as fs from "node:fs";
+import * as os from "node:os";
 import * as path from "node:path";
 import { pathToFileURL } from "node:url";
 import JSZip from "jszip";
@@ -519,16 +520,36 @@ ok("an encrypted entry inside a container is refused by name and reason",
  * refusal is deterministic rather than machine-dependent. The path that actually READS a
  * scan is proven in probe/scannedPdf.test.ts (fake engines, in the pack) and
  * probe/scanDoor.spec.ts (real engines and a real image-only PDF, live). */
+/* Kept for readers of this block: which arm runs is answerable by looking here. */
+const scanDataShipped = fs.existsSync("public/ocr/tessdata/eng.traineddata") || fs.existsSync("public/ocr/tessdata/eng.traineddata.gz");
 const imagePdf = await ingestFile(createIngestRun(INGEST_LIMITS), { name: "scan.pdf", bytes: imageOnlyPdfFixture() });
 ok("a textless PDF is refused — never proposed as a document with nothing in it",
   !imagePdf.ok,
   imagePdf.ok ? `ACCEPTED ${imagePdf.content.length} chars` : "");
-ok("…refused as a scan, naming the reader it would have needed",
-  !imagePdf.ok && imagePdf.refusal.code === "ocr-unavailable" && /OCR|scan|image/i.test(imagePdf.refusal.words),
-  imagePdf.ok ? "accepted" : `${imagePdf.refusal.code}: ${imagePdf.refusal.words.slice(0, 90)}`);
-ok("…and the refusal says what is missing and that nothing was fetched",
-  !imagePdf.ok && /language data/i.test(imagePdf.refusal.words) && /nothing was fetched/i.test(imagePdf.refusal.words),
-  !imagePdf.ok ? imagePdf.refusal.words.slice(0, 120) : "");
+/* WHICH refusal depends on the machine, on purpose, and both are honest. When the OCR
+   language data is present — it ships with the app, so it is present in a checkout and in
+   the offline pack — the page is genuinely rasterised and read HERE, and a page with no
+   readable text is refused as empty-document with the words of what actually happened.
+   When no data is found anywhere, the older refusal stands and names the missing reader.
+   The guarantee asserted above is the one that matters in both arms. */
+/* WHICH refusal depends on what the machine can actually do, and every arm is honest:
+     • the language data and the rasteriser are both present (a checkout, the app) →
+       the page is rasterised and READ here; no text found is empty-document;
+     • no language data anywhere → the older ocr-unavailable refusal names the reader;
+     • the offline pack (zero install, no PDFium WASM) → the rasteriser cannot start,
+       and the words say exactly that.
+   The guarantee asserted above holds in all three: a page nobody could read is never
+   proposed as a document with nothing in it. */
+ok("…refused as a scan, in words that name what was missing or what the read found",
+  !imagePdf.ok && (
+    /rasteriser refused/i.test(imagePdf.refusal.words) ||
+    (imagePdf.refusal.code === "empty-document" && /read on this machine/i.test(imagePdf.refusal.words)) ||
+    (imagePdf.refusal.code === "ocr-unavailable" && /OCR|scan|image/i.test(imagePdf.refusal.words))
+  ),
+  imagePdf.ok ? "accepted" : `${imagePdf.refusal.code}: ${imagePdf.refusal.words.slice(0, 110)}`);
+ok("…and nothing was invented, read or fetched from anywhere off this machine",
+  !imagePdf.ok && /nothing was (invented|read|fetched)/i.test(imagePdf.refusal.words) && !/https?:\/\//.test(imagePdf.refusal.words),
+  !imagePdf.ok ? imagePdf.refusal.words.slice(0, 140) : "");
 
 const oleBytes = new Uint8Array([0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1, 0, 0, 0, 0]);
 const oleOut = await ingestFile(createIngestRun(INGEST_LIMITS), { name: "legacy.doc", bytes: oleBytes });
@@ -607,8 +628,12 @@ ok("htmlToMarkdown preserves heading DEPTH (h1→#, h3→###), not just 'has hea
    evidence, and the fixture cases above already carry each format's coverage on
    any machine, including one with no user documents at all. */
 const realCandidates = [
-  ["D:/edge downloads/K.S.Sree Harshen_Resume.pdf", "pdf"],
-  ["D:/selfimpulse-work/demo/Synthetic-Industrial-FY26-CLASSIFIED.xlsx", "xlsx"],
+  /* Portable paths only. This list used to name files from one author's own machine
+     (a personal Downloads folder), which made the slot impossible for anyone else to
+     run and put a person's name in the source tree. The first candidate is the folder
+     every platform has; the second ships with the repository. */
+  [path.join(os.homedir(), "Downloads", "resume.pdf"), "pdf"],
+  [path.resolve("demo/Synthetic-Industrial-FY26-CLASSIFIED.xlsx"), "xlsx"],
 ] as const;
 for (const [p, label] of realCandidates) {
   if (!fs.existsSync(p)) { console.log(`  —    ${label}: no real ${label} at ${p} on this machine — skipped, not passed`); continue; }

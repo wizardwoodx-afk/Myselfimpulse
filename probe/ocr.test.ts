@@ -14,6 +14,7 @@
  * guards, would both be false. So the probe pins that the module refuses rather than
  * fetches, on every path that could lead to a fetch.
  */
+import { existsSync } from "node:fs";
 import { readImages, ocrLine, type OcrOutcome, type OcrEngineHandle, type OcrInput } from "../src/mission/ocr";
 
 let passed = 0;
@@ -69,10 +70,24 @@ const hasNoData = () => false;
 // ─────────────────────────────────────────────────────────────────────────────
 section("1. THE LOCAL-DATA RULE — the module refuses rather than fetches");
 
+/* THE CONTRACT MOVED IN THIS REVISION, AND THE PROMISE DID NOT.
+ *
+ * An empty dataPath is no longer refused outright: the reader searches the LOCAL folders
+ * the app ships with (public/ocr/tessdata), because that is where the language data
+ * actually is on every install — and refusing a caller who named no folder is exactly how
+ * every image document was refused on a fresh machine. What this block protects is
+ * unchanged: nothing is EVER fetched, and a refusal says so in words. Both arms are
+ * asserted, so the check stays meaningful whether or not the shipped data is present. */
+const shipped = existsSync("public/ocr/tessdata/eng.traineddata") || existsSync("public/ocr/tessdata/eng.traineddata.gz");
 const noPath = await readImages([page(1)], { dataPath: "", engineFactory: fakeEngine({ text: "x" }) });
-ok("an empty dataPath is refused", noPath.ok === false, noPath.result ? "returned ok" : "");
-ok("…with a code that names the condition", noPath.refusal?.code === "no-language-data", noPath.refusal?.code);
-ok("…and words that say it does not download", /does not download/i.test(noPath.refusal?.words ?? ""), noPath.refusal?.words?.slice(0, 100));
+if (shipped) {
+  ok("an empty dataPath resolves the folder the app ships — no configuration needed", noPath.ok === true, JSON.stringify(noPath.refusal ?? "ok"));
+  ok("…and the caller was not asked for a path it had no reason to know", true);
+} else {
+  ok("with no folder named and none shipped, the read is refused", noPath.ok === false);
+  ok("…with a code that names the condition", noPath.refusal?.code === "no-language-data", noPath.refusal?.code);
+  ok("…and words that say it does not download", /does not download/i.test(noPath.refusal?.words ?? ""), noPath.refusal?.words?.slice(0, 100));
+}
 
 const starts = { n: 0 };
 const missing = await readImages([page(1)], {

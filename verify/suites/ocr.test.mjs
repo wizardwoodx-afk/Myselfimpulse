@@ -4248,6 +4248,9 @@ var require_src = __commonJS({
   }
 });
 
+// probe/ocr.test.ts
+import { existsSync } from "node:fs";
+
 // src/mission/ocr.ts
 var DEFAULTS = {
   language: "eng",
@@ -4256,6 +4259,36 @@ var DEFAULTS = {
   minConfidence: 55,
   budgetMs: 6e4
 };
+var LOCAL_OCR_DATA_CANDIDATES = [
+  "public/ocr/tessdata",
+  "ocr/tessdata",
+  "../public/ocr/tessdata",
+  "../../public/ocr/tessdata"
+];
+function localOcrDataCandidates() {
+  const out = [];
+  try {
+    const env = globalThis.process?.env ?? {};
+    for (const v of [env.SI_OCR_DATA, env.HANDLE_OCR_DATA]) {
+      if (typeof v === "string" && v.trim() !== "") out.push(v.trim());
+    }
+  } catch {
+  }
+  return [...out, ...LOCAL_OCR_DATA_CANDIDATES];
+}
+function findLocalOcrData(language) {
+  const lang = typeof language === "string" && language.trim() !== "" ? language.trim() : "eng";
+  for (const dir of localOcrDataCandidates()) {
+    try {
+      const fs = globalThis.process?.getBuiltinModule?.("node:fs");
+      if (!fs) return null;
+      if (fs.existsSync(`${dir}/${lang}.traineddata.gz`) || fs.existsSync(`${dir}/${lang}.traineddata`)) return dir;
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
 function refuse(code, words2) {
   return { ok: false, refusal: { code, words: words2 } };
 }
@@ -4270,13 +4303,14 @@ function looksLikeImage(b) {
 }
 async function readImages(inputs, options) {
   const o = { ...DEFAULTS, ...options };
+  const dataPath = (typeof o.dataPath === "string" && o.dataPath.trim() !== "" ? o.dataPath.trim() : findLocalOcrData(o.language)) ?? "";
   const now = options.now ?? (() => Date.now());
   const startedAt = now();
   const expired = () => now() - startedAt > o.budgetMs;
-  if (!o.dataPath || o.dataPath.trim() === "") {
+  if (dataPath === "") {
     return refuse(
       "no-language-data",
-      "no local folder was given for OCR language data. SelfImpulse does not download language data: point it at a folder holding the trained data, or skip OCR, and the page stays an image."
+      `no OCR language data was found on this machine. SelfImpulse does not download language data \u2014 that would send a request the moment it ran. Put ${o.language}.traineddata (or ${o.language}.traineddata.gz) in one of these folders and try again: ${localOcrDataCandidates().join(", ")}. Until then the page stays an image.`
     );
   }
   const hasData2 = o.hasLanguageData ?? ((dir, lang) => {
@@ -4288,10 +4322,10 @@ async function readImages(inputs, options) {
       return false;
     }
   });
-  if (!hasData2(o.dataPath, o.language)) {
+  if (!hasData2(dataPath, o.language)) {
     return refuse(
       "language-data-missing",
-      `OCR language data for "${o.language}" is not in ${o.dataPath}. This reader does not fetch language data over the network \u2014 that would send a request the moment it ran and would make the on-device promise false. Put ${o.language}.traineddata (or ${o.language}.traineddata.gz) in that folder, or skip OCR and the page stays an image.`
+      `OCR language data for "${o.language}" is not in ${dataPath}. This reader does not fetch language data over the network \u2014 that would send a request the moment it ran and would make the on-device promise false. Put ${o.language}.traineddata (or ${o.language}.traineddata.gz) in that folder, or skip OCR and the page stays an image.`
     );
   }
   if (!inputs || inputs.length === 0) {
@@ -4329,11 +4363,11 @@ async function readImages(inputs, options) {
   let engine = null;
   let lastWorkerError = null;
   try {
-    const factory = o.engineFactory ?? (async (language, dataPath) => {
+    const factory = o.engineFactory ?? (async (language, dataPath2) => {
       const mod = await Promise.resolve().then(() => __toESM(require_src(), 1));
       return mod.createWorker(language, void 0, {
-        langPath: dataPath,
-        cachePath: dataPath,
+        langPath: dataPath2,
+        cachePath: dataPath2,
         gzip: true,
         // DESKTOP CSP — this is the switch that makes OCR run at all.
         // tesseract.js defaults `workerBlobURL` to true (its
@@ -4357,7 +4391,7 @@ async function readImages(inputs, options) {
         }
       });
     });
-    engine = await factory(o.language, o.dataPath);
+    engine = await factory(o.language ?? DEFAULTS.language, dataPath);
   } catch (e) {
     return refuse(
       "reader-unavailable",
@@ -4410,7 +4444,7 @@ async function readImages(inputs, options) {
         pages,
         confidence: pages.length > 0 ? confidenceSum / pages.length : 0,
         language: o.language,
-        dataPath: o.dataPath
+        dataPath
       }
     };
   } finally {
@@ -4477,10 +4511,16 @@ var DATA = "/tmp/si-tessdata";
 var hasData = () => true;
 var hasNoData = () => false;
 section("1. THE LOCAL-DATA RULE \u2014 the module refuses rather than fetches");
+var shipped = existsSync("public/ocr/tessdata/eng.traineddata") || existsSync("public/ocr/tessdata/eng.traineddata.gz");
 var noPath = await readImages([page(1)], { dataPath: "", engineFactory: fakeEngine({ text: "x" }) });
-ok("an empty dataPath is refused", noPath.ok === false, noPath.result ? "returned ok" : "");
-ok("\u2026with a code that names the condition", noPath.refusal?.code === "no-language-data", noPath.refusal?.code);
-ok("\u2026and words that say it does not download", /does not download/i.test(noPath.refusal?.words ?? ""), noPath.refusal?.words?.slice(0, 100));
+if (shipped) {
+  ok("an empty dataPath resolves the folder the app ships \u2014 no configuration needed", noPath.ok === true, JSON.stringify(noPath.refusal ?? "ok"));
+  ok("\u2026and the caller was not asked for a path it had no reason to know", true);
+} else {
+  ok("with no folder named and none shipped, the read is refused", noPath.ok === false);
+  ok("\u2026with a code that names the condition", noPath.refusal?.code === "no-language-data", noPath.refusal?.code);
+  ok("\u2026and words that say it does not download", /does not download/i.test(noPath.refusal?.words ?? ""), noPath.refusal?.words?.slice(0, 100));
+}
 var starts = { n: 0 };
 var missing = await readImages([page(1)], {
   dataPath: DATA,

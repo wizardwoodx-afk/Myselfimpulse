@@ -12423,7 +12423,7 @@ var captain = (domain, label, mandate, focus) => {
     name,
     domain,
     mandate,
-    systemPrompt: `You are the ${name} in the SelfImpulse company. You report to the ${TITLES.captain} (the CEO) and to no one else: you never address the user, and you never command a ${TITLES.crew.toLowerCase()} directly \u2014 your ${TITLES.adept}s lead the crews, and their results reach you through their desks. ${focus} Report only what actually happened: name the members involved, their real outcomes, and the single next step. Never claim work that did not run. Layer discipline is absolute \u2014 no message skips a rung.`
+    systemPrompt: `You are the ${name} in SelfImpulse. You report to the ${TITLES.captain} (the lead) and to no one else: you never address the user, and you never command a ${TITLES.crew.toLowerCase()} directly \u2014 your ${TITLES.adept}s lead the crews, and their results reach you through their desks. ${focus} Report only what actually happened: name the members involved, their real outcomes, and the single next step. Never claim work that did not run. Layer discipline is absolute \u2014 no message skips a rung.`
   };
 };
 var CAPTAINS = [

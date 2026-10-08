@@ -87,7 +87,10 @@ describe("the shell is wired", () => {
 
   it("the design system is ONE stylesheet with the house tokens (no Tailwind runtime, no blue)", () => {
     const main = fs.readFileSync(path.join(ROOT, "src", "main.tsx"), "utf8");
-    assert.ok(main.includes("ui/vh.css"));
+    /* The design system in force: ink.css (geometry), si/si.css (the shell) and
+         theme.css (palette), all local. vh.css remains in the tree but is no longer
+         imported, so asserting on it asserted on nothing. */
+        assert.ok(main.includes("ui/ink.css") && main.includes("ui/si/si.css") && main.includes("ui/theme.css"));
     const css = fs.readFileSync(path.join(ROOT, "src", "ui", "vh.css"), "utf8");
       // The house palette is warm graphite with ONE ember accent. The
       // assertion's PURPOSE is unchanged: the house tokens are declared in the
@@ -117,6 +120,6 @@ describe("the shell is wired", () => {
     const work = fs.readFileSync(path.join(ROOT, "src", "ui", "screens", "Work.tsx"), "utf8");
     assert.ok(gate.includes("Your approval is needed") && gate.includes("receipt  issued on approve AND on refuse"));
     assert.ok(chat.includes("provenanceDigest"));
-    assert.ok(work.includes("Planned — connect a provider to execute"));
+    assert.ok(work.includes("Planned — plan only, nothing executes until you connect a provider"));
   });
 });

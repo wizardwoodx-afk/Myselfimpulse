@@ -90,10 +90,19 @@ export interface OcrEngineHandle {
 
 export interface OcrOptions {
   /**
-   * Directory holding `<lang>.traineddata.gz`. REQUIRED. There is no default, because a
-   * default would be a network location, and this module does not reach the network.
+   * Directory holding `<lang>.traineddata` (or `<lang>.traineddata.gz`).
+   *
+   * OPTIONAL, and that is a deliberate reversal. It used to be required, and the
+   * requirement is what refused every image document on a fresh install: the language
+   * data ships WITH the app (the web build vendors it at `public/ocr/tessdata`) while the
+   * reader waited to be told a path nobody had reason to know. When this is omitted the
+   * reader searches LOCAL folders only (see `LOCAL_OCR_DATA_CANDIDATES`) and refuses in
+   * words, naming every folder it tried, when none holds the language.
+   *
+   * A URL is never valid here and never a fallback: this module does not reach the
+   * network, which is the whole point of reading documents on this machine.
    */
-  dataPath: string;
+  dataPath?: string;
   /**
    * Directory or asset URL holding the recogniser's CORE WebAssembly. REQUIRED IN A
    * BROWSER, see the guard in `readImages`.
@@ -141,6 +150,57 @@ const DEFAULTS = {
   budgetMs: 60_000,
 } as const;
 
+/**
+ * Where OCR language data is looked for when the caller names no folder.
+ *
+ * WHY A SEARCH EXISTS AT ALL. The folder used to be a hard requirement — "point it at a
+ * folder" — and a hard requirement is a door that refuses on a fresh install. That is
+ * exactly what happened to image documents: the data ships with the app (the web build
+ * vendors it at `public/ocr/tessdata`) and the reader still refused, because nobody had
+ * repeated the path back to it.
+ *
+ * EVERY CANDIDATE IS A DIRECTORY ON THIS MACHINE. There is no URL in this list, no
+ * content-delivery fallback and no fetch of any kind: the search can only ever find a
+ * folder that already exists, which keeps the on-device promise the refusal below has
+ * always made. A folder counts only when the language file is INSIDE it.
+ */
+const LOCAL_OCR_DATA_CANDIDATES = [
+  "public/ocr/tessdata",
+  "ocr/tessdata",
+  "../public/ocr/tessdata",
+  "../../public/ocr/tessdata",
+] as const;
+
+/** Configured first (environment), then the folders that ship with the app. */
+function localOcrDataCandidates(): string[] {
+  const out: string[] = [];
+  try {
+    const env = (globalThis.process as { env?: Record<string, string | undefined> } | undefined)?.env ?? {};
+    for (const v of [env.SI_OCR_DATA, env.HANDLE_OCR_DATA]) {
+      if (typeof v === "string" && v.trim() !== "") out.push(v.trim());
+    }
+  } catch { /* no process env (browser): the build configures the folder at boot */ }
+  return [...out, ...LOCAL_OCR_DATA_CANDIDATES];
+}
+
+/** The first local folder that actually holds this language's data, or null.
+ *  Exported because the scanned-document gate resolves the folder the same way — one
+ *  resolver, so a configured folder and a shipped folder cannot disagree. */
+export function findLocalOcrData(language: string | undefined): string | null {
+  const lang = typeof language === "string" && language.trim() !== "" ? language.trim() : "eng";
+  for (const dir of localOcrDataCandidates()) {
+    try {
+      const fs = (globalThis.process as { getBuiltinModule?: (id: string) => unknown } | undefined)
+        ?.getBuiltinModule?.("node:fs") as typeof import("node:fs") | undefined;
+      if (!fs) return null; // browser: nothing to search, the build configures it
+      if (fs.existsSync(`${dir}/${lang}.traineddata.gz`) || fs.existsSync(`${dir}/${lang}.traineddata`)) return dir;
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
 function refuse(code: string, words: string): OcrOutcome {
   return { ok: false, refusal: { code, words } };
 }
@@ -175,16 +235,19 @@ export async function readImages(
   options: OcrOptions,
 ): Promise<OcrOutcome> {
   const o = { ...DEFAULTS, ...options };
+  /* Resolved once, so every line below reads one answer: the configured folder when
+     there is one, otherwise the first LOCAL folder that actually holds the data. */
+  const dataPath = (typeof o.dataPath === "string" && o.dataPath.trim() !== "" ? o.dataPath.trim() : findLocalOcrData(o.language)) ?? "";
   const now = options.now ?? (() => Date.now());
   const startedAt = now();
   const expired = () => now() - startedAt > o.budgetMs;
 
   // ── The local-data rule, checked BEFORE any engine starts. A refusal here costs
   //    nothing and cannot be mistaken for a read that found nothing.
-  if (!o.dataPath || o.dataPath.trim() === "") {
+  if (dataPath === "") {
     return refuse(
       "no-language-data",
-      "no local folder was given for OCR language data. SelfImpulse does not download language data: point it at a folder holding the trained data, or skip OCR, and the page stays an image.",
+      `no OCR language data was found on this machine. SelfImpulse does not download language data — that would send a request the moment it ran. Put ${o.language}.traineddata (or ${o.language}.traineddata.gz) in one of these folders and try again: ${localOcrDataCandidates().join(", ")}. Until then the page stays an image.`,
     );
   }
 
@@ -199,10 +262,10 @@ export async function readImages(
       }
     });
 
-  if (!hasData(o.dataPath, o.language)) {
+  if (!hasData(dataPath, o.language)) {
     return refuse(
       "language-data-missing",
-      `OCR language data for "${o.language}" is not in ${o.dataPath}. This reader does not fetch language data over the network — that would send a request the moment it ran and would make the on-device promise false. Put ${o.language}.traineddata (or ${o.language}.traineddata.gz) in that folder, or skip OCR and the page stays an image.`,
+      `OCR language data for "${o.language}" is not in ${dataPath}. This reader does not fetch language data over the network — that would send a request the moment it ran and would make the on-device promise false. Put ${o.language}.traineddata (or ${o.language}.traineddata.gz) in that folder, or skip OCR and the page stays an image.`,
     );
   }
 
@@ -295,7 +358,7 @@ export async function readImages(
           errorHandler: (err: unknown) => { lastWorkerError = String(err instanceof Error ? err.message : err).slice(0, 200); },
         });
       });
-    engine = await factory(o.language, o.dataPath);
+    engine = await factory(o.language ?? DEFAULTS.language, dataPath);
   } catch (e) {
     return refuse(
       "reader-unavailable",
@@ -365,7 +428,7 @@ export async function readImages(
         pages,
         confidence: pages.length > 0 ? confidenceSum / pages.length : 0,
         language: o.language,
-        dataPath: o.dataPath,
+        dataPath,
       },
     };
   } finally {

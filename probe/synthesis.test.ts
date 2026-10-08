@@ -33,7 +33,7 @@ const prov: ProviderConfig = { kind: "openai-compatible", baseUrl: "https://api.
 const MULTI_TEXT = "write unit tests for the typescript parser and review the code changes";
 const SYNTH_MARKER = "single synthesized domain result";
 
-test("consul synthesis — reasoned collaboration over real executions (19.3.0, company chain)", async () => {
+test("consul synthesis — reasoned collaboration over real executions (19.3.0, org chain)", async () => {
   let pass = 0, fail = 0;
   const check = (name: string, cond: boolean, detail?: unknown) => {
     cond ? pass++ : fail++;

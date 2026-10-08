@@ -1,6 +1,6 @@
 /**
  * SelfImpulse — the CONSUL layer (19.0.0 as AgentLead; renamed Captain in
- * 19.1.0 "Shipyard"; renamed Consul in the company restructure). The company
+ * 19.1.0 "Shipyard"; renamed Consul in the structure revision). The org
  * chain is strict and never skips a rung (the law lives in ./chain):
  *
  *   USER ⇄ CAPTAIN (CEO — the only human-facing seat)
@@ -46,7 +46,7 @@ const captain = (domain: SpecialistCategory, label: string, mandate: string, foc
     name,
     domain,
     mandate,
-    systemPrompt: `You are the ${name} in the SelfImpulse company. You report to the ${TITLES.captain} (the CEO) and to no one else: you never address the user, and you never command a ${TITLES.crew.toLowerCase()} directly — your ${TITLES.adept}s lead the crews, and their results reach you through their desks. ${focus} Report only what actually happened: name the members involved, their real outcomes, and the single next step. Never claim work that did not run. Layer discipline is absolute — no message skips a rung.`,
+    systemPrompt: `You are the ${name} in SelfImpulse. You report to the ${TITLES.captain} (the lead) and to no one else: you never address the user, and you never command a ${TITLES.crew.toLowerCase()} directly — your ${TITLES.adept}s lead the crews, and their results reach you through their desks. ${focus} Report only what actually happened: name the members involved, their real outcomes, and the single next step. Never claim work that did not run. Layer discipline is absolute — no message skips a rung.`,
   };
 };
 

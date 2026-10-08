@@ -37,6 +37,10 @@
  * mammoth and jszip notices already there.
  */
 
+/* Same guarantee at this seam: the WASM renderer and pdf.js both call
+   Promise.withResolvers(), absent on Node 20 and older webviews. */
+import "./promiseShim";
+
 /** A cap, or a refusal. Mirrors the shape `archiveScan`/`fileIngest` already use. */
 export interface RenderRefusal {
   code: string;

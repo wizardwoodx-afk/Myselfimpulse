@@ -28197,7 +28197,7 @@ var require_files = __commonJS({
   "node_modules/mammoth/lib/docx/files.js"(exports2) {
     var fs2 = __require("fs");
     var url = __require("url");
-    var os = __require("os");
+    var os2 = __require("os");
     var dirname = __require("path").dirname;
     var resolvePath = __require("path").resolve;
     var isAbsolutePath = require_path_is_absolute();
@@ -28239,7 +28239,7 @@ var require_files = __commonJS({
     var readFile = promises.promisify(fs2.readFile.bind(fs2));
     function uriToPath(uriString, platform) {
       if (!platform) {
-        platform = os.platform();
+        platform = os2.platform();
       }
       var uri = url.parse(uriString);
       if (isLocalFileUri(uri) || isRelativeUri(uri)) {
@@ -43960,8 +43960,8 @@ var init_pdf = __esm({
       5966(module2, __unused_webpack_exports, __webpack_require__2) {
         var aCallable = __webpack_require__2(9306);
         var isNullOrUndefined = __webpack_require__2(4117);
-        module2.exports = function(V, P) {
-          var func = V[P];
+        module2.exports = function(V, P2) {
+          var func = V[P2];
           return isNullOrUndefined(func) ? void 0 : aCallable(func);
         };
       },
@@ -44757,14 +44757,14 @@ var init_pdf = __esm({
         var ENUMERABLE = "enumerable";
         var CONFIGURABLE = "configurable";
         var WRITABLE = "writable";
-        exports2.f = DESCRIPTORS ? V8_PROTOTYPE_DEFINE_BUG ? function defineProperty(O, P, Attributes) {
+        exports2.f = DESCRIPTORS ? V8_PROTOTYPE_DEFINE_BUG ? function defineProperty(O, P2, Attributes) {
           anObject(O);
-          P = toPropertyKey(P);
+          P2 = toPropertyKey(P2);
           anObject(Attributes);
-          if (typeof O === "function" && P === "prototype" && "value" in Attributes && WRITABLE in Attributes && !Attributes[WRITABLE]) {
-            var current = $getOwnPropertyDescriptor(O, P);
+          if (typeof O === "function" && P2 === "prototype" && "value" in Attributes && WRITABLE in Attributes && !Attributes[WRITABLE]) {
+            var current = $getOwnPropertyDescriptor(O, P2);
             if (current && current[WRITABLE]) {
-              O[P] = Attributes.value;
+              O[P2] = Attributes.value;
               Attributes = {
                 configurable: CONFIGURABLE in Attributes ? Attributes[CONFIGURABLE] : current[CONFIGURABLE],
                 enumerable: ENUMERABLE in Attributes ? Attributes[ENUMERABLE] : current[ENUMERABLE],
@@ -44772,17 +44772,17 @@ var init_pdf = __esm({
               };
             }
           }
-          return $defineProperty(O, P, Attributes);
-        } : $defineProperty : function defineProperty(O, P, Attributes) {
+          return $defineProperty(O, P2, Attributes);
+        } : $defineProperty : function defineProperty(O, P2, Attributes) {
           anObject(O);
-          P = toPropertyKey(P);
+          P2 = toPropertyKey(P2);
           anObject(Attributes);
           if (IE8_DOM_DEFINE) try {
-            return $defineProperty(O, P, Attributes);
+            return $defineProperty(O, P2, Attributes);
           } catch (error) {
           }
           if ("get" in Attributes || "set" in Attributes) throw new $TypeError("Accessors not supported");
-          if ("value" in Attributes) O[P] = Attributes.value;
+          if ("value" in Attributes) O[P2] = Attributes.value;
           return O;
         };
       },
@@ -44797,14 +44797,14 @@ var init_pdf = __esm({
         var hasOwn = __webpack_require__2(9297);
         var IE8_DOM_DEFINE = __webpack_require__2(5917);
         var $getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
-        exports2.f = DESCRIPTORS ? $getOwnPropertyDescriptor : function getOwnPropertyDescriptor(O, P) {
+        exports2.f = DESCRIPTORS ? $getOwnPropertyDescriptor : function getOwnPropertyDescriptor(O, P2) {
           O = toIndexedObject(O);
-          P = toPropertyKey(P);
+          P2 = toPropertyKey(P2);
           if (IE8_DOM_DEFINE) try {
-            return $getOwnPropertyDescriptor(O, P);
+            return $getOwnPropertyDescriptor(O, P2);
           } catch (error) {
           }
-          if (hasOwn(O, P)) return createPropertyDescriptor(!call(propertyIsEnumerableModule.f, O, P), O[P]);
+          if (hasOwn(O, P2)) return createPropertyDescriptor(!call(propertyIsEnumerableModule.f, O, P2), O[P2]);
         };
       },
       /***/
@@ -46276,7 +46276,7 @@ var init_pdf = __esm({
           var val = holder[name];
           var unmodified = node && val === node.value;
           var context = unmodified && typeof node.source == "string" ? { source: node.source } : {};
-          var elementRecordsLen, keys2, len, i, P;
+          var elementRecordsLen, keys2, len, i, P2;
           if (isObject3(val)) {
             var nodeIsArray = isArray(val);
             var nodes = unmodified ? node.nodes : nodeIsArray ? [] : {};
@@ -46290,8 +46290,8 @@ var init_pdf = __esm({
               keys2 = enumerableOwnProperties(val);
               len = lengthOfArrayLike(keys2);
               for (i = 0; i < len; i++) {
-                P = keys2[i];
-                internalizeProperty(val, P, internalize(val, P, reviver, hasOwn(nodes, P) ? nodes[P] : void 0));
+                P2 = keys2[i];
+                internalizeProperty(val, P2, internalize(val, P2, reviver, hasOwn(nodes, P2) ? nodes[P2] : void 0));
               }
             }
           }
@@ -73954,6 +73954,7 @@ var import_jszip3 = __toESM(require_lib3(), 1);
 import assert2 from "node:assert/strict";
 import { createHash } from "node:crypto";
 import * as fs from "node:fs";
+import * as os from "node:os";
 import * as path from "node:path";
 import { pathToFileURL } from "node:url";
 
@@ -74175,6 +74176,21 @@ function findByName(zip, wanted) {
   return found;
 }
 
+// src/mission/promiseShim.ts
+var P = Promise;
+if (typeof P.withResolvers !== "function") {
+  P.withResolvers = function() {
+    let resolve2;
+    let reject2;
+    const promise = new Promise((res, rej) => {
+      resolve2 = res;
+      reject2 = rej;
+    });
+    return { promise, resolve: resolve2, reject: reject2 };
+  };
+}
+var PROMISE_WITH_RESOLVERS_AVAILABLE = typeof Promise.withResolvers === "function";
+
 // src/mission/documentParsers.ts
 var import_jszip2 = __toESM(require_lib3(), 1);
 var mammoth = __toESM(require_lib6(), 1);
@@ -74326,6 +74342,36 @@ var DEFAULTS2 = {
   minConfidence: 55,
   budgetMs: 6e4
 };
+var LOCAL_OCR_DATA_CANDIDATES = [
+  "public/ocr/tessdata",
+  "ocr/tessdata",
+  "../public/ocr/tessdata",
+  "../../public/ocr/tessdata"
+];
+function localOcrDataCandidates() {
+  const out = [];
+  try {
+    const env2 = globalThis.process?.env ?? {};
+    for (const v of [env2.SI_OCR_DATA, env2.HANDLE_OCR_DATA]) {
+      if (typeof v === "string" && v.trim() !== "") out.push(v.trim());
+    }
+  } catch {
+  }
+  return [...out, ...LOCAL_OCR_DATA_CANDIDATES];
+}
+function findLocalOcrData(language2) {
+  const lang = typeof language2 === "string" && language2.trim() !== "" ? language2.trim() : "eng";
+  for (const dir of localOcrDataCandidates()) {
+    try {
+      const fs2 = globalThis.process?.getBuiltinModule?.("node:fs");
+      if (!fs2) return null;
+      if (fs2.existsSync(`${dir}/${lang}.traineddata.gz`) || fs2.existsSync(`${dir}/${lang}.traineddata`)) return dir;
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
 function refuse3(code, words) {
   return { ok: false, refusal: { code, words } };
 }
@@ -74340,13 +74386,14 @@ function looksLikeImage(b) {
 }
 async function readImages(inputs, options) {
   const o = { ...DEFAULTS2, ...options };
+  const dataPath2 = (typeof o.dataPath === "string" && o.dataPath.trim() !== "" ? o.dataPath.trim() : findLocalOcrData(o.language)) ?? "";
   const now = options.now ?? (() => Date.now());
   const startedAt = now();
   const expired = () => now() - startedAt > o.budgetMs;
-  if (!o.dataPath || o.dataPath.trim() === "") {
+  if (dataPath2 === "") {
     return refuse3(
       "no-language-data",
-      "no local folder was given for OCR language data. SelfImpulse does not download language data: point it at a folder holding the trained data, or skip OCR, and the page stays an image."
+      `no OCR language data was found on this machine. SelfImpulse does not download language data \u2014 that would send a request the moment it ran. Put ${o.language}.traineddata (or ${o.language}.traineddata.gz) in one of these folders and try again: ${localOcrDataCandidates().join(", ")}. Until then the page stays an image.`
     );
   }
   const hasData = o.hasLanguageData ?? ((dir, lang) => {
@@ -74358,10 +74405,10 @@ async function readImages(inputs, options) {
       return false;
     }
   });
-  if (!hasData(o.dataPath, o.language)) {
+  if (!hasData(dataPath2, o.language)) {
     return refuse3(
       "language-data-missing",
-      `OCR language data for "${o.language}" is not in ${o.dataPath}. This reader does not fetch language data over the network \u2014 that would send a request the moment it ran and would make the on-device promise false. Put ${o.language}.traineddata (or ${o.language}.traineddata.gz) in that folder, or skip OCR and the page stays an image.`
+      `OCR language data for "${o.language}" is not in ${dataPath2}. This reader does not fetch language data over the network \u2014 that would send a request the moment it ran and would make the on-device promise false. Put ${o.language}.traineddata (or ${o.language}.traineddata.gz) in that folder, or skip OCR and the page stays an image.`
     );
   }
   if (!inputs || inputs.length === 0) {
@@ -74399,11 +74446,11 @@ async function readImages(inputs, options) {
   let engine = null;
   let lastWorkerError = null;
   try {
-    const factory = o.engineFactory ?? (async (language2, dataPath2) => {
+    const factory = o.engineFactory ?? (async (language2, dataPath3) => {
       const mod = await Promise.resolve().then(() => __toESM(require_src(), 1));
       return mod.createWorker(language2, void 0, {
-        langPath: dataPath2,
-        cachePath: dataPath2,
+        langPath: dataPath3,
+        cachePath: dataPath3,
         gzip: true,
         // DESKTOP CSP — this is the switch that makes OCR run at all.
         // tesseract.js defaults `workerBlobURL` to true (its
@@ -74427,7 +74474,7 @@ async function readImages(inputs, options) {
         }
       });
     });
-    engine = await factory(o.language, o.dataPath);
+    engine = await factory(o.language ?? DEFAULTS2.language, dataPath2);
   } catch (e) {
     return refuse3(
       "reader-unavailable",
@@ -74480,7 +74527,7 @@ async function readImages(inputs, options) {
         pages,
         confidence: pages.length > 0 ? confidenceSum / pages.length : 0,
         language: o.language,
-        dataPath: o.dataPath
+        dataPath: dataPath2
       }
     };
   } finally {
@@ -74543,12 +74590,12 @@ async function assetState(url, fetchImpl) {
 }
 async function ensureLocalAssets(options, deps) {
   const language2 = options.language ?? ocrLanguage();
-  const dataPath2 = options.dataPath === void 0 ? ocrDataPath() : options.dataPath;
+  const dataPath2 = options.dataPath === void 0 ? ocrDataPath() ?? findLocalOcrData(ocrLanguage()) : options.dataPath;
   if (!dataPath2) {
     return {
       ok: false,
       code: "ocr-unavailable",
-      words: "this document has no text layer, so it would have to be read as an image \u2014 and this build has no OCR language data configured. Nothing was read, and nothing was fetched: the language data must be present on this machine. Add it, then drop the file again."
+      words: "this document has no text layer, so it would have to be read as an image \u2014 and no OCR language data was found on this machine: not in the folder this build was configured with, and not in the folders the app ships with. Nothing was read and nothing was fetched \u2014 SelfImpulse does not download language data. Add eng.traineddata (or eng.traineddata.gz) to one of those folders, then drop the file again."
     };
   }
   if (options.hasLanguageData) {
@@ -74681,7 +74728,7 @@ async function readScannedPdf(bytes, options) {
     );
   }
   const read3 = await readImages(images, {
-    dataPath: options.dataPath === void 0 ? ocrDataPath() : options.dataPath,
+    dataPath: (options.dataPath === void 0 ? ocrDataPath() : options.dataPath) ?? void 0,
     language: language2,
     maxPages: options.capPages,
     maxTextChars: options.maxChars,
@@ -74730,7 +74777,7 @@ async function readImageDocument(bytes, options) {
   const now = options.now ?? (() => Date.now());
   const deadlineAt = options.deadlineAt ?? Number.POSITIVE_INFINITY;
   const read3 = await readImages([{ page: 1, png: bytes }], {
-    dataPath: options.dataPath === void 0 ? ocrDataPath() : options.dataPath,
+    dataPath: (options.dataPath === void 0 ? ocrDataPath() : options.dataPath) ?? void 0,
     language: language2,
     maxTextChars: options.maxChars,
     minConfidence: options.minConfidence,
@@ -76192,6 +76239,7 @@ ok(
   !encEntryScan.ok && encEntryScan.refusal.code === "encrypted" && /a\.txt/.test(encEntryScan.refusal.words),
   encEntryScan.ok ? "accepted" : encEntryScan.refusal.code
 );
+var scanDataShipped = fs.existsSync("public/ocr/tessdata/eng.traineddata") || fs.existsSync("public/ocr/tessdata/eng.traineddata.gz");
 var imagePdf = await ingestFile(createIngestRun(INGEST_LIMITS), { name: "scan.pdf", bytes: imageOnlyPdfFixture() });
 ok(
   "a textless PDF is refused \u2014 never proposed as a document with nothing in it",
@@ -76199,14 +76247,14 @@ ok(
   imagePdf.ok ? `ACCEPTED ${imagePdf.content.length} chars` : ""
 );
 ok(
-  "\u2026refused as a scan, naming the reader it would have needed",
-  !imagePdf.ok && imagePdf.refusal.code === "ocr-unavailable" && /OCR|scan|image/i.test(imagePdf.refusal.words),
-  imagePdf.ok ? "accepted" : `${imagePdf.refusal.code}: ${imagePdf.refusal.words.slice(0, 90)}`
+  "\u2026refused as a scan, in words that name what was missing or what the read found",
+  !imagePdf.ok && (/rasteriser refused/i.test(imagePdf.refusal.words) || imagePdf.refusal.code === "empty-document" && /read on this machine/i.test(imagePdf.refusal.words) || imagePdf.refusal.code === "ocr-unavailable" && /OCR|scan|image/i.test(imagePdf.refusal.words)),
+  imagePdf.ok ? "accepted" : `${imagePdf.refusal.code}: ${imagePdf.refusal.words.slice(0, 110)}`
 );
 ok(
-  "\u2026and the refusal says what is missing and that nothing was fetched",
-  !imagePdf.ok && /language data/i.test(imagePdf.refusal.words) && /nothing was fetched/i.test(imagePdf.refusal.words),
-  !imagePdf.ok ? imagePdf.refusal.words.slice(0, 120) : ""
+  "\u2026and nothing was invented, read or fetched from anywhere off this machine",
+  !imagePdf.ok && /nothing was (invented|read|fetched)/i.test(imagePdf.refusal.words) && !/https?:\/\//.test(imagePdf.refusal.words),
+  !imagePdf.ok ? imagePdf.refusal.words.slice(0, 140) : ""
 );
 var oleBytes = new Uint8Array([208, 207, 17, 224, 161, 177, 26, 225, 0, 0, 0, 0]);
 var oleOut = await ingestFile(createIngestRun(INGEST_LIMITS), { name: "legacy.doc", bytes: oleBytes });
@@ -76298,8 +76346,12 @@ ok(
   /^# one/m.test(htmlToMarkdown("<h1>one</h1><h3>three</h3>")) && /^### three/m.test(htmlToMarkdown("<h1>one</h1><h3>three</h3>"))
 );
 var realCandidates = [
-  ["D:/edge downloads/K.S.Sree Harshen_Resume.pdf", "pdf"],
-  ["D:/selfimpulse-work/demo/Synthetic-Industrial-FY26-CLASSIFIED.xlsx", "xlsx"]
+  /* Portable paths only. This list used to name files from one author's own machine
+     (a personal Downloads folder), which made the slot impossible for anyone else to
+     run and put a person's name in the source tree. The first candidate is the folder
+     every platform has; the second ships with the repository. */
+  [path.join(os.homedir(), "Downloads", "resume.pdf"), "pdf"],
+  [path.resolve("demo/Synthetic-Industrial-FY26-CLASSIFIED.xlsx"), "xlsx"]
 ];
 for (const [p, label] of realCandidates) {
   if (!fs.existsSync(p)) {

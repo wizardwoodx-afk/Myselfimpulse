@@ -6050,6 +6050,21 @@ var init_dist = __esm({
   }
 });
 
+// src/mission/promiseShim.ts
+var P = Promise;
+if (typeof P.withResolvers !== "function") {
+  P.withResolvers = function() {
+    let resolve;
+    let reject;
+    const promise = new Promise((res, rej) => {
+      resolve = res;
+      reject = rej;
+    });
+    return { promise, resolve, reject };
+  };
+}
+var PROMISE_WITH_RESOLVERS_AVAILABLE = typeof Promise.withResolvers === "function";
+
 // src/mission/pdfRender.ts
 var DEFAULTS = {
   renderScannedPages: false,

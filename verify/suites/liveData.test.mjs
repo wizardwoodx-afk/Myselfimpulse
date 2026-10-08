@@ -35811,7 +35811,7 @@ var captain = (domain2, label, mandate, focus) => {
     name,
     domain: domain2,
     mandate,
-    systemPrompt: `You are the ${name} in the SelfImpulse company. You report to the ${TITLES.captain} (the CEO) and to no one else: you never address the user, and you never command a ${TITLES.crew.toLowerCase()} directly \u2014 your ${TITLES.adept}s lead the crews, and their results reach you through their desks. ${focus} Report only what actually happened: name the members involved, their real outcomes, and the single next step. Never claim work that did not run. Layer discipline is absolute \u2014 no message skips a rung.`
+    systemPrompt: `You are the ${name} in SelfImpulse. You report to the ${TITLES.captain} (the lead) and to no one else: you never address the user, and you never command a ${TITLES.crew.toLowerCase()} directly \u2014 your ${TITLES.adept}s lead the crews, and their results reach you through their desks. ${focus} Report only what actually happened: name the members involved, their real outcomes, and the single next step. Never claim work that did not run. Layer discipline is absolute \u2014 no message skips a rung.`
   };
 };
 var CAPTAINS = [
@@ -46532,7 +46532,8 @@ function musterWorkspace(request) {
     };
   });
   const consulCount = new Set(desks.map((d) => d.consul.id)).size;
-  const line = `${WORKSPACE_NAME}: ${TITLES.captain} opened ${desks.length} desk(s) under ${consulCount} ${TITLES.consul}(s) \xB7 floor ${floor.length}/${FLOOR_CAP} ${TITLES.crew.toLowerCase()}s of ${ESTABLISHED_SPECIALISTS.length} \xB7 ${ORG_SPECIALIST_COUNT} domain specialists (${TITLES.adept}+HR) across ${ORG_DESK_COUNT} desks \xB7 MoE tier=${selection.gate.tier}. Autonomous \u2014 no team was picked by the user.`;
+  const line = `${floor.length}/${FLOOR_CAP} sub-agents working on this task \xB7 each one chosen automatically \u2014 no team was picked by the user.`;
+  const machineLine = `${WORKSPACE_NAME}: ${TITLES.captain} opened ${desks.length} desk(s) under ${consulCount} ${TITLES.consul}(s) \xB7 floor ${floor.length}/${FLOOR_CAP} ${TITLES.crew.toLowerCase()}s of ${ESTABLISHED_SPECIALISTS.length} \xB7 ${ORG_SPECIALIST_COUNT} domain specialists (${TITLES.adept}+HR) across ${ORG_DESK_COUNT} desks \xB7 MoE tier=${selection.gate.tier}. Autonomous \u2014 no team was picked by the user.`;
   return {
     name: WORKSPACE_NAME,
     captain: "Captain",
@@ -46541,7 +46542,8 @@ function musterWorkspace(request) {
     floor,
     selection,
     considered: pool.considered,
-    line
+    line,
+    machineLine
   };
 }
 function floorAsCrew(office) {
@@ -46562,7 +46564,8 @@ function officeSnapshot(office) {
     })),
     floor: office.floor.map((s) => ({ id: s.id, desk: s.desk, name: s.name })),
     cap: FLOOR_CAP,
-    line: office.line
+    line: office.line,
+    machineLine: office.machineLine
   };
 }
 
@@ -47768,7 +47771,7 @@ ${routed.selected.length} of ${routed.considered} specialists were weighed for t
          tell a self-assembled crew from one they picked. What left is the machine
          register it used to be stated in ("floor 3/25 sub-agents of 1500 · 60
          domain specialists (Adept+HR) across 30 desks"). */
-      (officeSnap ? ` The Captain assembled this crew itself: 11WORKSPACE opened ${officeSnap.desks.length} desk${officeSnap.desks.length === 1 ? "" : "s"} and put ${officeSnap.floor.length} on the floor \u2014 you did not pick the team.` : "") + (routed.fallbackReason ? ` One note: ${routed.fallbackReason}.` : ""),
+      (officeSnap ? ` ${officeSnap.line}` : "") + (routed.fallbackReason ? ` One note: ${routed.fallbackReason}.` : ""),
       routed,
       executed: false,
       outcome: "planned",
@@ -47776,7 +47779,7 @@ ${routed.selected.length} of ${routed.considered} specialists were weighed for t
       /* The machine record goes here instead: `note` is rendered as a hint line on
          the Work door's answer step, which is where a person goes to inspect a run,
          not the bubble they read for an answer. */
-      note: `provider not configured \u2014 plan only, nothing executed. Routing: ${routed.strategy} via ${routed.routedBy}. ` + (moeV2 ? moeV2Line(moeV2) : moeReport ? moeLine(moeReport) : "") + (officeSnap ? ` ${officeSnap.line}` : "")
+      note: `provider not configured \u2014 plan only, nothing executed. Routing: ${routed.strategy} via ${routed.routedBy}. ` + (moeV2 ? moeV2Line(moeV2) : moeReport ? moeLine(moeReport) : "") + (officeSnap ? ` ${officeSnap.machineLine}` : "")
     });
   }
   const gateLine = "You operate behind a human gate; risky actions are paused for approval. Never claim work you did not do.";
@@ -47938,7 +47941,7 @@ ${synthesisFailure ? `${synthesisFailure}
     });
   }
   const composedSystem = [
-    `You are the SelfImpulse ${TITLES.captain} (engine: MJ) \u2014 the company's CEO and the only voice the user hears. Answer directly and concisely. Work travels strictly down the chain \u2014 ${TITLES.captain} \u2192 ${TITLES.consul}s \u2192 ${TITLES.adept}s \u2192 ${TITLES.crew.toLowerCase()}s \u2014 and reports travel up it; no layer ever speaks past its neighbour.`,
+    `You are the SelfImpulse ${TITLES.captain} (engine: MJ) \u2014 the lead, and the only voice the user hears. Answer directly and concisely. Work travels strictly down the chain \u2014 ${TITLES.captain} \u2192 ${TITLES.consul}s \u2192 ${TITLES.adept}s \u2192 ${TITLES.crew.toLowerCase()}s \u2014 and reports travel up it; no layer ever speaks past its neighbour.`,
     gateLine,
     ...briefing
   ].join("\n\n");

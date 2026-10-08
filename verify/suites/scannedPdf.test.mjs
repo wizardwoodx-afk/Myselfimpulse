@@ -20042,6 +20042,21 @@ function refuse(code, words) {
   return { ok: false, refusal: { code, words } };
 }
 
+// src/mission/promiseShim.ts
+var P = Promise;
+if (typeof P.withResolvers !== "function") {
+  P.withResolvers = function() {
+    let resolve;
+    let reject;
+    const promise = new Promise((res, rej) => {
+      resolve = res;
+      reject = rej;
+    });
+    return { promise, resolve, reject };
+  };
+}
+var PROMISE_WITH_RESOLVERS_AVAILABLE = typeof Promise.withResolvers === "function";
+
 // src/mission/pdfRender.ts
 var DEFAULTS = {
   renderScannedPages: false,
@@ -20189,6 +20204,36 @@ var DEFAULTS2 = {
   minConfidence: 55,
   budgetMs: 6e4
 };
+var LOCAL_OCR_DATA_CANDIDATES = [
+  "public/ocr/tessdata",
+  "ocr/tessdata",
+  "../public/ocr/tessdata",
+  "../../public/ocr/tessdata"
+];
+function localOcrDataCandidates() {
+  const out = [];
+  try {
+    const env = globalThis.process?.env ?? {};
+    for (const v of [env.SI_OCR_DATA, env.HANDLE_OCR_DATA]) {
+      if (typeof v === "string" && v.trim() !== "") out.push(v.trim());
+    }
+  } catch {
+  }
+  return [...out, ...LOCAL_OCR_DATA_CANDIDATES];
+}
+function findLocalOcrData(language2) {
+  const lang = typeof language2 === "string" && language2.trim() !== "" ? language2.trim() : "eng";
+  for (const dir of localOcrDataCandidates()) {
+    try {
+      const fs = globalThis.process?.getBuiltinModule?.("node:fs");
+      if (!fs) return null;
+      if (fs.existsSync(`${dir}/${lang}.traineddata.gz`) || fs.existsSync(`${dir}/${lang}.traineddata`)) return dir;
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
 function refuse3(code, words) {
   return { ok: false, refusal: { code, words } };
 }
@@ -20203,13 +20248,14 @@ function looksLikeImage(b2) {
 }
 async function readImages(inputs, options) {
   const o = { ...DEFAULTS2, ...options };
+  const dataPath2 = (typeof o.dataPath === "string" && o.dataPath.trim() !== "" ? o.dataPath.trim() : findLocalOcrData(o.language)) ?? "";
   const now = options.now ?? (() => Date.now());
   const startedAt = now();
   const expired = () => now() - startedAt > o.budgetMs;
-  if (!o.dataPath || o.dataPath.trim() === "") {
+  if (dataPath2 === "") {
     return refuse3(
       "no-language-data",
-      "no local folder was given for OCR language data. SelfImpulse does not download language data: point it at a folder holding the trained data, or skip OCR, and the page stays an image."
+      `no OCR language data was found on this machine. SelfImpulse does not download language data \u2014 that would send a request the moment it ran. Put ${o.language}.traineddata (or ${o.language}.traineddata.gz) in one of these folders and try again: ${localOcrDataCandidates().join(", ")}. Until then the page stays an image.`
     );
   }
   const hasData2 = o.hasLanguageData ?? ((dir, lang) => {
@@ -20221,10 +20267,10 @@ async function readImages(inputs, options) {
       return false;
     }
   });
-  if (!hasData2(o.dataPath, o.language)) {
+  if (!hasData2(dataPath2, o.language)) {
     return refuse3(
       "language-data-missing",
-      `OCR language data for "${o.language}" is not in ${o.dataPath}. This reader does not fetch language data over the network \u2014 that would send a request the moment it ran and would make the on-device promise false. Put ${o.language}.traineddata (or ${o.language}.traineddata.gz) in that folder, or skip OCR and the page stays an image.`
+      `OCR language data for "${o.language}" is not in ${dataPath2}. This reader does not fetch language data over the network \u2014 that would send a request the moment it ran and would make the on-device promise false. Put ${o.language}.traineddata (or ${o.language}.traineddata.gz) in that folder, or skip OCR and the page stays an image.`
     );
   }
   if (!inputs || inputs.length === 0) {
@@ -20262,11 +20308,11 @@ async function readImages(inputs, options) {
   let engine = null;
   let lastWorkerError = null;
   try {
-    const factory = o.engineFactory ?? (async (language2, dataPath2) => {
+    const factory = o.engineFactory ?? (async (language2, dataPath3) => {
       const mod = await Promise.resolve().then(() => __toESM(require_src(), 1));
       return mod.createWorker(language2, void 0, {
-        langPath: dataPath2,
-        cachePath: dataPath2,
+        langPath: dataPath3,
+        cachePath: dataPath3,
         gzip: true,
         // DESKTOP CSP — this is the switch that makes OCR run at all.
         // tesseract.js defaults `workerBlobURL` to true (its
@@ -20290,7 +20336,7 @@ async function readImages(inputs, options) {
         }
       });
     });
-    engine = await factory(o.language, o.dataPath);
+    engine = await factory(o.language ?? DEFAULTS2.language, dataPath2);
   } catch (e) {
     return refuse3(
       "reader-unavailable",
@@ -20343,7 +20389,7 @@ async function readImages(inputs, options) {
         pages,
         confidence: pages.length > 0 ? confidenceSum / pages.length : 0,
         language: o.language,
-        dataPath: o.dataPath
+        dataPath: dataPath2
       }
     };
   } finally {
@@ -20406,12 +20452,12 @@ async function assetState(url, fetchImpl) {
 }
 async function ensureLocalAssets(options, deps) {
   const language2 = options.language ?? ocrLanguage();
-  const dataPath2 = options.dataPath === void 0 ? ocrDataPath() : options.dataPath;
+  const dataPath2 = options.dataPath === void 0 ? ocrDataPath() ?? findLocalOcrData(ocrLanguage()) : options.dataPath;
   if (!dataPath2) {
     return {
       ok: false,
       code: "ocr-unavailable",
-      words: "this document has no text layer, so it would have to be read as an image \u2014 and this build has no OCR language data configured. Nothing was read, and nothing was fetched: the language data must be present on this machine. Add it, then drop the file again."
+      words: "this document has no text layer, so it would have to be read as an image \u2014 and no OCR language data was found on this machine: not in the folder this build was configured with, and not in the folders the app ships with. Nothing was read and nothing was fetched \u2014 SelfImpulse does not download language data. Add eng.traineddata (or eng.traineddata.gz) to one of those folders, then drop the file again."
     };
   }
   if (options.hasLanguageData) {
@@ -20544,7 +20590,7 @@ async function readScannedPdf(bytes, options) {
     );
   }
   const read2 = await readImages(images, {
-    dataPath: options.dataPath === void 0 ? ocrDataPath() : options.dataPath,
+    dataPath: (options.dataPath === void 0 ? ocrDataPath() : options.dataPath) ?? void 0,
     language: language2,
     maxPages: options.capPages,
     maxTextChars: options.maxChars,
@@ -20593,7 +20639,7 @@ async function readImageDocument(bytes, options) {
   const now = options.now ?? (() => Date.now());
   const deadlineAt = options.deadlineAt ?? Number.POSITIVE_INFINITY;
   const read2 = await readImages([{ page: 1, png: bytes }], {
-    dataPath: options.dataPath === void 0 ? ocrDataPath() : options.dataPath,
+    dataPath: (options.dataPath === void 0 ? ocrDataPath() : options.dataPath) ?? void 0,
     language: language2,
     maxTextChars: options.maxChars,
     minConfidence: options.minConfidence,
@@ -20865,7 +20911,7 @@ section("9a. THE PREFLIGHT ASKS THE QUESTION THAT FITS THE RUNTIME");
   ok("an injected presence answer overrides both probes", injected.ok === true, injected.ok ? "" : injected.words);
   const unconfigured = await ensureLocalAssets({ maxChars: 1e3, dataPath: null }, { fetchImpl: null });
   ok("an unconfigured build refuses", unconfigured.ok === false, unconfigured.ok ? "allowed" : "");
-  ok("\u2026with words that name the situation", unconfigured.ok === false && /no OCR language data configured/.test(unconfigured.words), "");
+  ok("\u2026with words that name the situation", unconfigured.ok === false && /no OCR language data/i.test(unconfigured.words), "");
 }
 function notDiskWords(r) {
   return r.ok ? "ALLOWED" : (r.words ?? "").slice(0, 90);

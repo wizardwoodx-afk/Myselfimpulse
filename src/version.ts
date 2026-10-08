@@ -15,4 +15,4 @@ export const ENGINE_VERSION = "19.7.16";
 export const ENGINE_SHORT = "19.7";
 export const ENGINE_CODENAME = "SelfImpulse";
 export const PRODUCT_TITLE = `SelfImpulse (engine MJ ${ENGINE_SHORT} \"${ENGINE_CODENAME}\")`;
-export const TAGLINE = "Intelligence That Collaborates";
+export const TAGLINE = "Intelligence Meets Collaboration";

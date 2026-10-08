@@ -1,6 +1,6 @@
 # SelfImpulse
 
-**Intelligence That Collaborates.**
+**Intelligence Meets Collaboration.**
 
 SelfImpulse is an on-device AI captain. You describe the outcome you want; a
 crew of specialists does the work on your machine, under your own provider

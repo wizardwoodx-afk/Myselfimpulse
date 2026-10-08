@@ -56,7 +56,10 @@ export interface ElevenWorkspace {
   /** MoE selection this floor was built from — probes pin the cap. */
   selection: CrewSelection;
   considered: number;
+  /** Person-facing, plain words. */
   line: string;
+  /** Machine register, for the run record and the receipts. */
+  machineLine: string;
 }
 
 function scoreDesk(d: DeskDef, tokens: string[], lower: string): number {
@@ -132,7 +135,23 @@ export function musterWorkspace(request: string): ElevenWorkspace {
   });
 
   const consulCount = new Set(desks.map((d) => d.consul.id)).size;
+  /* TWO LINES, ON PURPOSE, AND THEY GO TO DIFFERENT PLACES.
+   *
+   *   line        — read by a PERSON, in the answer. It says what happened in the
+   *                 words a person uses: how many sub-agents are working, and that
+   *                 none of them were chosen by hand. No desk names, no rung titles,
+   *                 no tier codes: internal vocabulary is not an answer.
+   *   machineLine — the same facts in the register an operator audits and a receipt
+   *                 commits to (occupancy against the cap, the rungs, the tier). It
+   *                 rides the run record on the Work door, where inspecting a run is
+   *                 the point — not the bubble someone reads for the result.
+   *
+   * Both are computed from the same muster, so they cannot disagree; only the
+   * audience differs. */
   const line =
+    `${floor.length}/${FLOOR_CAP} sub-agents working on this task · ` +
+    `each one chosen automatically — no team was picked by the user.`;
+  const machineLine =
     `${WORKSPACE_NAME}: ${TITLES.captain} opened ${desks.length} desk(s) under ${consulCount} ${TITLES.consul}(s) · ` +
     `floor ${floor.length}/${FLOOR_CAP} ${TITLES.crew.toLowerCase()}s of ${ESTABLISHED_SPECIALISTS.length} · ` +
     `${ORG_SPECIALIST_COUNT} domain specialists (${TITLES.adept}+HR) across ${ORG_DESK_COUNT} desks · ` +
@@ -147,6 +166,7 @@ export function musterWorkspace(request: string): ElevenWorkspace {
     selection,
     considered: pool.considered,
     line,
+    machineLine,
   };
 }
 
@@ -190,6 +210,7 @@ export function officeSnapshot(office: ElevenWorkspace): ElevenOfficeSnapshot {
     floor: office.floor.map((s) => ({ id: s.id, desk: s.desk, name: s.name })),
     cap: FLOOR_CAP,
     line: office.line,
+    machineLine: office.machineLine,
   };
 }
 
@@ -198,5 +219,8 @@ export interface ElevenOfficeSnapshot {
   desks: Array<{ id: string; label: string; consulId: string; consul: string; lead: string; hr: string; pooled: number; onFloor: number }>;
   floor: Array<{ id: string; desk: string; name: string }>;
   cap: number;
+  /** What a person reads. */
   line: string;
+  /** The same facts in the register a receipt commits to — the Work door shows this. */
+  machineLine: string;
 }

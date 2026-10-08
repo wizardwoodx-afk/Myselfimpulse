@@ -48,10 +48,49 @@ function section(name: string): void {
   console.log(`\n== ${name}\n`);
 }
 
+/* ── 0. the pack is a BUILD ARTIFACT, and a source tree may need not to carry it ─
+ *
+ * verify/suites/ ships prebuilt esbuild bundles for every suite except this one, so a
+ * fresh checkout can run the whole gate with zero node_modules: node verify/run.mjs.
+ *
+ * But because it is also 85 MB of generated output, an absence is a legitimate state,
+ * not a broken one: a source-only archive, a clean extract from a delivery zip, a
+ * machine that needed the space back. Everything below — coverage against the suite
+ * list, freshness against a fresh rebuild, MANIFEST hashes, the recorded counts, the
+ * zero-install run itself — is a fact ABOUT the pack. With no pack there is nothing
+ * here to verify, and the one thing this suite may never do is call an unrun check a
+ * pass. So it says what happened, in words, names the single command that fixes it,
+ * and declares SKIPPED; the dev runner counts that apart from both passed and failed.
+ */
+const packDir = path.join(root, "verify", "suites");
+if (!fs.existsSync(packDir)) {
+  console.log([
+    "",
+    "  SKIPPED — this tree carries no offline pack, so this suite verified nothing.",
+    "",
+    "  verify/suites/ holds the prebuilt bundles for every probe suite except this one.",
+    "  It is committed so that any checkout, with no npm install at all, can run:",
+    "",
+    "      node verify/run.mjs",
+    "",
+    "  It is also a build artifact, so a tree without one is a supported state — a",
+    "  source-only archive, a clean extract, a disk that needed the room back.",
+    "",
+    "  One command rebuilds it, re-runs BOTH gates, and rewrites the record:",
+    "",
+    "      node tools/rebuild-pack.mjs        (about 2-5 min; needs npm install once)",
+    "",
+    "  A pass cannot be earned here either way, and the dev runner reports SKIPPED",
+    "  separately from passed precisely so this line cannot be mistaken for one.",
+    "",
+  ].join("\n"));
+  console.log("SI-SKIP: offlinePack — no pack in this tree (verify/suites/ is absent)");
+  process.exit(0);
+}
+
 /* ── 1. the pack exists and the runner is dependency-free ─────────────────────── */
 section("1. the offline runner exists and needs nothing but Node");
 
-const packDir = path.join(root, "verify", "suites");
 const runnerPath = path.join(root, "verify", "run.mjs");
 ok("verify/run.mjs exists", fs.existsSync(runnerPath), runnerPath);
 const runnerSrc = fs.readFileSync(runnerPath, "utf8");

@@ -494,7 +494,7 @@ export async function askSelfImpulse19(args: AskArgs, deps: GeneralistDeps = {})
            tell a self-assembled crew from one they picked. What left is the machine
            register it used to be stated in ("floor 3/25 sub-agents of 1500 · 60
            domain specialists (Adept+HR) across 30 desks"). */
-        (officeSnap ? ` The Captain assembled this crew itself: 11WORKSPACE opened ${officeSnap.desks.length} desk${officeSnap.desks.length === 1 ? "" : "s"} and put ${officeSnap.floor.length} on the floor — you did not pick the team.` : "") +
+        (officeSnap ? ` ${officeSnap.line}` : "") +
         (routed.fallbackReason ? ` One note: ${routed.fallbackReason}.` : ""),
       routed,
       executed: false,
@@ -506,7 +506,7 @@ export async function askSelfImpulse19(args: AskArgs, deps: GeneralistDeps = {})
       note: `provider not configured — plan only, nothing executed. ` +
         `Routing: ${routed.strategy} via ${routed.routedBy}. ` +
         (moeV2 ? moeV2Line(moeV2) : moeReport ? moeLine(moeReport) : "") +
-        (officeSnap ? ` ${officeSnap.line}` : ""),
+        (officeSnap ? ` ${officeSnap.machineLine}` : ""),
     });
   }
 
@@ -712,7 +712,7 @@ export async function askSelfImpulse19(args: AskArgs, deps: GeneralistDeps = {})
   }
 
   const composedSystem = [
-    `You are the SelfImpulse ${TITLES.captain} (engine: MJ) — the company's CEO and the only voice the user hears. Answer directly and concisely. Work travels strictly down the chain — ${TITLES.captain} → ${TITLES.consul}s → ${TITLES.adept}s → ${TITLES.crew.toLowerCase()}s — and reports travel up it; no layer ever speaks past its neighbour.`,
+    `You are the SelfImpulse ${TITLES.captain} (engine: MJ) — the lead, and the only voice the user hears. Answer directly and concisely. Work travels strictly down the chain — ${TITLES.captain} → ${TITLES.consul}s → ${TITLES.adept}s → ${TITLES.crew.toLowerCase()}s — and reports travel up it; no layer ever speaks past its neighbour.`,
     gateLine,
     ...briefing,
   ].join("\n\n");

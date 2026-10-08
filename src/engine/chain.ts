@@ -1,7 +1,7 @@
 /**
  * SelfImpulse — THE COMPANY CHAIN. One place, no duplicates.
  *
- * The product is organised like a company: five rungs and one law.
+ * The product is organised like a working team: five rungs and one law.
  *
  *   USER  ⇄  CAPTAIN  ⇄  CONSUL   ⇄  ADEPT      ⇄  CREW
  *   owner    the CEO     domain       desk's        the sub-agents

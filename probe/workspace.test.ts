@@ -1,5 +1,5 @@
 /**
- * probe/workspace.test.ts — 11WORKSPACE and the company org.
+ * probe/workspace.test.ts — 11WORKSPACE and the org.
  *
  * Pins: 30 desks × Adept+HR = 60 domain specialists; every established
  * worker maps to a desk; leads are NOT in the routed catalog; Captain
@@ -96,8 +96,11 @@ async function main(): Promise<void> {
   ok("floorAsCrew ids match the floor and stay inside the registry",
     floorAsCrew(office).every((c) => getSpecialist(c.id) !== null)
     && floorAsCrew(office).length === office.floor.length);
-  ok("the accounting line names the office, the cap, and autonomy",
-    office.line.includes("11WORKSPACE") && office.line.includes("Autonomous") && office.line.includes(`${FLOOR_CAP}`));
+  ok("the line a person reads stays plain — the sub-agent count and the cap, nothing internal",
+    /\d+\/\d+ sub-agents working on this task/.test(office.line) && office.line.includes(`${FLOOR_CAP}`) &&
+    !office.line.includes("Consul") && !office.line.includes("tier=") && !office.line.includes("11WORKSPACE"));
+  ok("the machine line keeps the audit facts — the office, the cap, and autonomy",
+    office.machineLine.includes("11WORKSPACE") && office.machineLine.includes("Autonomous") && office.machineLine.includes(`${FLOOR_CAP}`));
 
   const view = officeViewFromMuster(office);
   ok("the office view reports occupancy against the cap",
@@ -111,8 +114,8 @@ async function main(): Promise<void> {
   ok("a single-fact ask still musters without a picker",
     single.name === WORKSPACE_NAME && single.floor.length <= 1);
 
-  /* ───────── the company chain: no rung is ever skipped ───────── */
-  console.log("\n== the company chain: USER ⇄ Captain ⇄ Consul ⇄ Adept ⇄ sub-agents ==");
+  /* ───────── the org chain: no rung is ever skipped ───────── */
+  console.log("\n== the org chain: USER ⇄ Captain ⇄ Consul ⇄ Adept ⇄ sub-agents ==");
   ok("five rungs, in command order", RUNGS.join(">") === "user>captain>consul>adept>crew");
   ok("the renamed rungs carry short, premium titles (Consul, Adept)",
     TITLES.consul === "Consul" && TITLES.adept === "Adept" && TITLES.consul.length <= 7 && TITLES.adept.length <= 7);
@@ -169,8 +172,8 @@ async function main(): Promise<void> {
     office.desks.length > 0
     && office.desks.every((d) => d.consul.id === consulForDesk(d.id)!.id)
     && snap.desks.every((d) => d.consulId.startsWith("captain.") && d.consul.startsWith(`${TITLES.consul} of `)));
-  ok("the accounting line says who is above the desks (Captain → N Consul(s))",
-    office.line.includes(`${TITLES.captain} opened`) && office.line.includes(`${TITLES.consul}(s)`) && office.line.includes(`${TITLES.adept}+HR`));
+  ok("the machine line says who is above the desks (Captain → N Consul(s))",
+    office.machineLine.includes(`${TITLES.captain} opened`) && office.machineLine.includes(`${TITLES.consul}(s)`) && office.machineLine.includes(`${TITLES.adept}+HR`));
 
   ok("seating a desk with no Consul is REFUSED — LayerSkipError, not a quiet seat", (() => {
     const saved = CAPTAINS.slice();
@@ -224,8 +227,10 @@ async function main(): Promise<void> {
        domain specialists (Adept+HR) across 30 desks". The PROPERTY worth pinning is
        that a plan says which workspace ran and that the crew was not user-picked;
        the words it said it in were a proxy. */
-    ok("the plan names 11WORKSPACE in words and says who picked the crew",
-      planned.reply.includes("11WORKSPACE") && /you did not pick the team/i.test(planned.reply));
+    ok("the plan says, in plain words, how many sub-agents and who picked the crew",
+      /\d+\/\d+ sub-agents working on this task/.test(planned.reply) && /no team was picked by the user/i.test(planned.reply));
+    ok("…and the machine register (office, desks, tier) stays on the run note, not in the answer",
+      planned.note.includes("11WORKSPACE") && planned.note.includes("MoE tier=") && !/tier=|Consul/.test(planned.reply));
     ok("the office rides inside the provenance digest",
       JSON.parse(responseCanonical({ ...planned, provenanceDigest: "" })).office?.name === "11WORKSPACE");
     ok("the filesystem workspace seam is a different field",

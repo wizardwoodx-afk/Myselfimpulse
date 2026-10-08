@@ -712,6 +712,31 @@ function About() {
         <div><span>Honesty contract</span><span>Executes only with a provider · pauses at the gate · refuses in words · receipts everything</span></div>
         <div><span>Egress</span><span>Nothing leaves without a signed authority (requestEgress) and a receipt</span></div>
       </div>
+
+      {/* Guardrail manifest — the promises the engine enforces, in one place a person
+          can read without opening the source. Each row is a rule that exists in code
+          (probe/guardrailAlign keeps this list and the engine in step); nothing here is
+          aspiration. */}
+      <h4 className="about-h">Guardrail manifest</h4>
+      <div className="klist about" data-testid="guardrail-manifest">
+        {[
+          ["No root authority without a human principal", "code throws, not prose"],
+          ["No delegation that grows scope", "a hand-off can only narrow"],
+          ["No delegation that outlives its parent", "expiry is checked on both sides"],
+          ["No spend beyond the cap", "seats reserve before dispatch; a refusal names the ceiling"],
+          ["No agent writes doctrine", "agents propose, a human decides"],
+          ["No skill installed by an agent alone", "an experiment or a human approves it"],
+          ["No governed store write skips the matrix", "the check runs before persisting"],
+          ["No merge without a verifier who is not the author", "the author is never the checker"],
+          ["No invented prices", "token-only spend stays dollar-unknown"],
+          ["No artifact leaves this machine without a signed egress authority and a receipt", "requestEgress, then the receipt"],
+          ["Capability requests return answers only", "aggregate whitelist; raw rows never leave"],
+          ["Aggregates pass the Privacy Guard", "minimum cohort, hard query budget, bounded precision"],
+          ["The two-machine proof", "coordinator sees identity, request and receipt — never rows"],
+        ].map(([rule, note]) => (
+          <div key={rule}><span>{rule}</span><span>{note}</span></div>
+        ))}
+      </div>
     </section>
   );
 }

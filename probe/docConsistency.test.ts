@@ -33,9 +33,29 @@ function section(name: string): void { console.log(`\n== ${name}`); }
 
 /** Measured truth, straight from the tree — never from prose. */
 const probeSuites = fs.readdirSync(path.join(ROOT, "probe")).filter((f) => (f.endsWith(".test.ts") || f.endsWith(".test.tsx")) && !f.startsWith(".")).length;
-const offlineBundles = fs.readdirSync(path.join(ROOT, "verify", "suites")).filter((f) => f.endsWith(".mjs") && !f.endsWith(".spec.mjs")).length;
+/* THE PACK IS A BUILD ARTIFACT, AND A SOURCE TREE MAY NOT CARRY ONE.
+ *
+ * This line used to read verify/suites unconditionally, so a tree without the pack did
+ * not fail on a count mismatch — it threw ENOENT and the whole suite died before a
+ * single check ran. The pack is committed, so that only bit a tree that had dropped it:
+ * a source-only download, a clean extract, or a machine that needed the space back.
+ *
+ * When the pack is absent the bundle count is UNKNOWABLE here, and the honest answer is
+ * to say so and check the counts it can check — not to invent a number, and not to
+ * pretend the check passed. The line prints SKIP, marked, and the suite continues.
+ * Regenerate the pack with:  node tools/rebuild-pack.mjs   (~2-5 min; it also runs the
+ * full gate and writes the PASS line into verify/BUILD-INFO.txt). */
+const packDir = path.join(ROOT, "verify", "suites");
+const packPresent = fs.existsSync(packDir);
+const offlineBundles = packPresent
+  ? fs.readdirSync(packDir).filter((f) => f.endsWith(".mjs") && !f.endsWith(".spec.mjs")).length
+  : 0;
 ok("the tree has at least one probe suite", probeSuites > 0, `${probeSuites}`);
-ok("the tree has at least one offline bundle", offlineBundles > 0, `${offlineBundles}`);
+if (!packPresent) {
+  console.log("  SKIP the tree has at least one offline bundle — the pack is not present in this tree (run node tools/rebuild-pack.mjs to build it, then this check runs for real)");
+} else {
+  ok("the tree has at least one offline bundle", offlineBundles > 0, `${offlineBundles}`);
+}
 
 /** Live docs: everything under docs/ except the historical release log. */
 function liveDocs(): string[] {
@@ -80,6 +100,14 @@ section("1. every suite count stated in live documentation is the measured one")
         // "171 self-contained bundles" / "170 offline bundles" are the pack
         // counts; everything else is the dev-gate suite count.
         const isBundle = /self-contained|offline bundles/.test(m[0]);
+        /* With no pack in the tree there is no measured bundle count to hold a document
+           to, and a document is not wrong because an artifact is absent. The claim is
+           SKIPPED, printed, and counted as neither right nor wrong — the same rule the
+           bundle-count check above follows. */
+        if (isBundle && !packPresent) {
+          console.log(`  SKIP ${doc} states ${m[0].trim()} — no pack in this tree to measure it against`);
+          continue;
+        }
         const expected = isBundle ? offlineBundles : probeSuites;
         if (n === expected) {
           checked += 1;
