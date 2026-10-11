@@ -29,11 +29,11 @@ var pkg = JSON.parse(read("package.json"));
 ok("root resolves to SelfImpulse", pkg.name === "selfimpulse", `name=${String(pkg.name)}`);
 ok("App renders the shell and nothing else", /import\s*\{\s*Shell\s*\}\s*from\s*["']\.\/ui\/Shell["']/.test(appSrc) && /<Shell\s*\/>/.test(appSrc), "App must be the shell door");
 ok("the multi-dock shell and the console are gone from the app entry", !/Sidebar|Helm|VIEWS|NextConsole/.test(appSrc), "stale shell chrome in App.tsx");
-var NAV_KEYS = ["steward", "work", "specialists", "federation", "receipts", "docs", "memory", "settings"];
+var NAV_KEYS = ["steward", "work", "specialists", "channels", "federation", "receipts", "docs", "memory", "settings"];
 var navEntries = shellSrc.match(/\{ key: "([a-z]+)", label: "[A-Za-z ]+", icon: "[a-z]+" \}/g) ?? [];
-ok("the sidebar lists exactly eight doors", navEntries.length === 8, `door count drifted: ${navEntries.length}`);
+ok("the sidebar lists exactly nine doors", navEntries.length === 9, `door count drifted: ${navEntries.length}`);
 ok(
-  "the eight doors are Steward \xC2\xB7 Work \xC2\xB7 Specialists \xC2\xB7 Federation \xC2\xB7 Receipts \xC2\xB7 Docs \xC2\xB7 Memory \xC2\xB7 Settings",
+  "the nine doors are Steward \xC2\xB7 Work \xC2\xB7 Specialists \xC2\xB7 Federation \xC2\xB7 Receipts \xC2\xB7 Docs \xC2\xB7 Memory \xC2\xB7 Settings",
   NAV_KEYS.every((k) => new RegExp(`key: "${k}", label:`).test(shellSrc)) && NAV_KEYS.every((k) => new RegExp(`screen === "${k}"`).test(shellSrc)),
   "a door is listed but not rendered, or vice versa"
 );

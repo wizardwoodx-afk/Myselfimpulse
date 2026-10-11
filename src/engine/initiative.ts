@@ -35,11 +35,38 @@ import { loadGoals, nextPendingStep } from "./goals";
 export type AutonomyLevel = 0 | 1 | 2 | 3;
 
 export const AUTONOMY_LEVEL_NAMES: Record<AutonomyLevel, string> = {
-  0: "manual — acts only on your command",
-  1: "scheduled — heartbeat wakes the crew on an interval",
-  2: "self-set — the crew may schedule its own follow-ups (capped)",
-  3: "adaptive — follow-ups adapt to observed state (still capped)",
+  0: "Manual — nothing runs until you send it; risky steps still ask you",
+  1: "Semi-Autonomous — a schedule wakes the crew for safe, capped work; risky steps still ask you",
+  2: "Semi-Autonomous — the crew sets its own safe follow-ups (capped)",
+  3: "FIA — Fully Integrated Automation: the crew adapts and self-schedules inside hard caps",
 };
+
+/* ── MODES — the three ways a person runs the crew (the operator-facing face) ──
+ * The engine keeps four fine levels (0-3). The product names them as three
+ * modes, because that is the decision an owner actually makes: nothing runs
+ * unless asked (Manual), some proactive work inside caps (Semi-Autonomous), or
+ * full self-scheduling within hard limits (FIA). Every mode still routes risky
+ * and critical work to the human gate — a mode only sets the level, it never
+ * widens the gate. The engine never raises a level on its own. */
+export type AutonomyMode = "manual" | "semi" | "fia";
+export interface AutonomyModeSpec {
+  mode: AutonomyMode;
+  label: string;
+  short: string;
+  level: AutonomyLevel;
+  blurb: string;
+}
+export const AUTONOMY_MODES: AutonomyModeSpec[] = [
+  { mode: "manual", label: "Manual", short: "MANUAL", level: 0, blurb: "Nothing runs until you send it. Risky steps still ask." },
+  { mode: "semi", label: "Semi-Autonomous", short: "SEMI", level: 1, blurb: "A schedule wakes the crew for safe, capped work; risky steps still ask." },
+  { mode: "fia", label: "Fully Integrated Automation", short: "FIA", level: 3, blurb: "The crew self-schedules and adapts inside hard caps; risky steps still ask." },
+];
+export function modeForLevel(level: AutonomyLevel): AutonomyMode {
+  return level === 0 ? "manual" : level >= 3 ? "fia" : "semi";
+}
+export function levelForMode(mode: AutonomyMode): AutonomyLevel {
+  return AUTONOMY_MODES.find((m) => m.mode === mode)?.level ?? 0;
+}
 
 export const INITIATIVE_KEY = "engine.initiative.v1";
 export const HEARTBEAT_DEFAULT_MS = 15 * 60 * 1000;

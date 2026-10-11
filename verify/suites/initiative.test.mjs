@@ -376,8 +376,15 @@ var init_guardrail = __esm({
 });
 
 // src/app/desktop.ts
+function electronBridge() {
+  if (typeof window === "undefined") return null;
+  const b2 = window.selfImpulseDesktop;
+  if (!b2 || b2.host !== "electron" || typeof b2.minimize !== "function") return null;
+  return b2;
+}
 function detectHost() {
   if (typeof window === "undefined") return "web";
+  if (electronBridge()) return "electron";
   const w = window;
   if (w.__TAURI_INTERNALS__) return "tauri";
   if (w.__TAURI__) return "tauri";
@@ -34749,10 +34756,10 @@ function nextPendingStep(goal) {
 
 // src/engine/initiative.ts
 var AUTONOMY_LEVEL_NAMES = {
-  0: "manual \u2014 acts only on your command",
-  1: "scheduled \u2014 heartbeat wakes the crew on an interval",
-  2: "self-set \u2014 the crew may schedule its own follow-ups (capped)",
-  3: "adaptive \u2014 follow-ups adapt to observed state (still capped)"
+  0: "Manual \u2014 nothing runs until you send it; risky steps still ask you",
+  1: "Semi-Autonomous \u2014 a schedule wakes the crew for safe, capped work; risky steps still ask you",
+  2: "Semi-Autonomous \u2014 the crew sets its own safe follow-ups (capped)",
+  3: "FIA \u2014 Fully Integrated Automation: the crew adapts and self-schedules inside hard caps"
 };
 var INITIATIVE_KEY = "engine.initiative.v1";
 var HEARTBEAT_DEFAULT_MS = 15 * 60 * 1e3;
@@ -37065,8 +37072,17 @@ async function execNetFetch(input2, ctx) {
   if (!doFetch) return { outcome: "error", output: "no fetch available in this runtime" };
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  const HEADERS = { accept: "text/html,application/json;q=0.9,*/*;q=0.8", "user-agent": "SelfImpulse/19.7 (+evidence-fetch)" };
   try {
-    const res = await doFetch(url2, { signal: controller.signal, headers: { accept: "text/html,application/json;q=0.9,*/*;q=0.8", "user-agent": "SelfImpulse/19.7 (+evidence-fetch)" } });
+    let res = await doFetch(url2, { signal: controller.signal, redirect: "manual", headers: HEADERS });
+    if (res && (res.status === 301 || res.status === 302 || res.status === 303 || res.status === 307 || res.status === 308)) {
+      const loc = res.headers?.get?.("location") ?? "";
+      const next = loc ? new URL(loc, url2).href : "";
+      if (!next) return { outcome: "refused", output: "egress refused (redirect): no target" };
+      const chk = checkEgressUrl(next);
+      if (!chk.ok) return { outcome: "refused", output: `egress refused (redirect): ${chk.reason}` };
+      res = await doFetch(next, { signal: controller.signal, redirect: "manual", headers: HEADERS });
+    }
     if (!res.ok) return { outcome: "error", output: `HTTP ${res.status} from ${url2}` };
     const text = (await res.text()).slice(0, MAX_FETCH_CHARS);
     return { outcome: "ok", output: text };
@@ -48302,7 +48318,7 @@ function freshState() {
 }
 async function main() {
   const T0 = 17e11;
-  ok("four autonomy levels named honestly", AUTONOMY_LEVEL_NAMES[0].startsWith("manual") && AUTONOMY_LEVEL_NAMES[2].includes("capped") && AUTONOMY_LEVEL_NAMES[3].includes("capped"));
+  ok("autonomy levels named honestly (three modes)", AUTONOMY_LEVEL_NAMES[0].toLowerCase().startsWith("manual") && AUTONOMY_LEVEL_NAMES[2].includes("capped") && AUTONOMY_LEVEL_NAMES[3].includes("caps"));
   const s0 = freshState();
   s0.level = 0;
   const wake0 = evaluateWake({ now: T0, level: 0, providerReady: true, vaultUnlocked: true, memoryOn: false }, s0, { newFacts: 99 });

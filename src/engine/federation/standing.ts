@@ -6,7 +6,7 @@
  * on EACH side, EVERY time. That is correct for the first crossing and for
  * anything unusual, and it is untenable for the tenth crossing of the same kind
  * in the same day — which is the case that actually exists in a working pair of
- * selfimpulses. The request was: let both owners approve ONCE, then let the pair work
+ * agents. The request was: let both owners approve ONCE, then let the pair work
  * autonomously, with the same security.
  *
  * WHAT IS REMOVED, EXACTLY. The human is removed from the loop. The EVIDENCE is

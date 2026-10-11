@@ -101,13 +101,13 @@ ok("New mission resets the store", /onClick=\{newMission\}/.test(shell) && /newM
    shell without failing it. The doors are now DERIVED from the shell source and the
    count is pinned, so the set can only change deliberately. */
 // 20.1: read the real shell (src/ui/si/SiShell.tsx); src/ui/Shell.tsx is now a
-// re-export and carries no door list. Same eight doors, same keys.
+// re-export and carries no door list. Same nine doors, same keys.
 const shellDoors = [...shell.matchAll(/\{ key: "([a-z]+)", label: "([A-Za-z ]+)", icon: "[a-z]+" \}/g)].map((m) => m[1] as string);
-ok("the shell declares eight doors, Docs, Specialists and Federation among them",
-  shellDoors.length === 8 && shellDoors.includes("docs") && shellDoors.includes("specialists") && shellDoors.includes("federation"),
+ok("the shell declares nine doors, Docs, Specialists, Channels and Federation among them",
+  shellDoors.length === 9 && shellDoors.includes("docs") && shellDoors.includes("specialists") && shellDoors.includes("channels") && shellDoors.includes("federation"),
   `declared ${shellDoors.length}: ${shellDoors.join(" Â· ")}`);
 ok("every door is Steward Â· Work Â· Specialists Â· Federation Â· Receipts Â· Docs Â· Memory Â· Settings",
-  ["steward", "work", "specialists", "federation", "receipts", "docs", "memory", "settings"].every((k) => shellDoors.includes(k)),
+  ["steward", "work", "specialists", "channels", "federation", "receipts", "docs", "memory", "settings"].every((k) => shellDoors.includes(k)),
   shellDoors.join(" Â· "));
 ok("the crew never faces the user by name â€” Work renders AGENT nn tags", /AGENT \$\{String\(i \+ 1\)\.padStart\(2, "0"\)\}/.test(read("src/ui/screens/Work.tsx")));
 const composer = read("src/ui/screens/Composer.tsx");

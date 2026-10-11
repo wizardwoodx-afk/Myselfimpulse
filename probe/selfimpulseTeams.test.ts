@@ -6,7 +6,7 @@
  * signing + verification, selfimpulse-link identity checks, and the FULL
  * autonomy ladder — safe tiers run autonomous with dual digests, risky
  * tiers need BOTH humans, either denial executes nothing, poisoned content
- * never crosses selfimpulses, and every outcome lands in the record.
+ * never crosses agents, and every outcome lands in the record.
  */
 import {
   addTeammate,
@@ -41,7 +41,7 @@ function memStore(): CrossSelfImpulseStore {
   return { get: (k) => m.get(k) ?? null, set: (k, v) => void m.set(k, v) };
 }
 
-/* ── 1. the teammate model (persistent, named, selfimpulseed) ───────────────────── */
+/* ── 1. the teammate model (persistent, named, attested) ───────────────────── */
 section("1. teammates — named, described, GuardRail-clean");
 
 let team1 = createTeam("USER 1");
@@ -114,7 +114,7 @@ section("4. selfimpulse links — identity is the trust anchor");
 
 const id1 = await loadOrCreateCrossSelfImpulseIdentity(memStore(), "user-one-selfimpulse");
 const id2 = await loadOrCreateCrossSelfImpulseIdentity(memStore(), "user-two-selfimpulse");
-ok("both selfimpulses hold real ECDSA identities", id1.ok === true && id2.ok === true);
+ok("both agents hold real ECDSA identities", id1.ok === true && id2.ok === true);
 
 let link12ok = false;
 let verified = false;
@@ -218,7 +218,7 @@ if (id1.ok && id2.ok) {
     });
     ok("a sender denial transmits NOTHING", senderDenied.ok === false && senderDenied.record.status === "denied" && senderDenied.record.note.includes("SENDER gate"));
 
-    /* 5e. poisoned task content never crosses selfimpulses. */
+    /* 5e. poisoned task content never crosses agents. */
     let gateTried = false;
     const poisonedTask = await delegateAcrossSelfImpulses({
       fromTeam: team1, link, remoteTeam: team2,

@@ -129,12 +129,12 @@ test("5 · usage advances and is persisted where the next crossing reads it", ()
 test("6 · jointly-held rows compound the pair's standing up the mesh ladder", async () => {
   const second = await runLiveCrossing({ capability: "repo.read", task: "read back the joint rows", ownerA: OWNER_A, ownerB: OWNER_B });
   assert.equal(second.outcome.status, "crossed", second.outcome.detail);
-  assert.equal(liveStandingFor(PAIR, OWNER_A, OWNER_B), "selfimpulseed",
-    "grant unit + two jointly-held crossed rows = three trust units = selfimpulseed");
+  assert.equal(liveStandingFor(PAIR, OWNER_A, OWNER_B), "attested",
+    "grant unit + two jointly-held crossed rows = three trust units = attested");
 });
 
 test("7 · a capability the grant omits escalates to a human and spends nothing", async () => {
-  // re-issue a narrow grant; the pair keeps its earned selfimpulseed standing
+  // re-issue a narrow grant; the pair keeps its earned attested standing
   const narrow = await issueLiveGrant({
     capabilities: ["data.aggregate"],
     maxCrossings: 6,
@@ -145,9 +145,9 @@ test("7 · a capability the grant omits escalates to a human and spends nothing"
     responderHuman: OWNER_B,
   });
   assert.equal(narrow.ok, true);
-  assert.equal(liveStandingFor(PAIR, OWNER_A, OWNER_B), "selfimpulseed", "earned standing survives a re-issued grant");
+  assert.equal(liveStandingFor(PAIR, OWNER_A, OWNER_B), "attested", "earned standing survives a re-issued grant");
   const before = liveUsage(liveGrant())!.initiator.crossings;
-  // net.fetch is lent at selfimpulseed, but this grant does not name it
+  // net.fetch is lent at attested, but this grant does not name it
   const r = await runLiveCrossing({ capability: "net.fetch", task: "fetch outside the grant", ownerA: OWNER_A, ownerB: OWNER_B });
   const o = r.outcome;
   assert.equal(o.status, "refused");
@@ -161,7 +161,7 @@ test("7 · a capability the grant omits escalates to a human and spends nothing"
 });
 
 test("8 · a grant never overrides earned pair standing", async () => {
-  // repo.write is ON this grant, but the pair is selfimpulseed, not proven —
+  // repo.write is ON this grant, but the pair is attested, not proven —
   // the local trust floor decides what the selfimpulse lends, not the grant.
   const wide = await issueLiveGrant({
     capabilities: ["data.aggregate", "repo.write"],

@@ -41,7 +41,7 @@ import { ENGINE_VERSION } from "../version";
 import { runInboundDelegation, type BridgeConfig, type BridgeExecution } from "./a2aBridge";
 import type { ProofReceipt } from "./receipts";
 
-/* ── teammates (persistent, named, selfimpulseed) ──────────────────────────────── */
+/* ── teammates (persistent, named, attested) ──────────────────────────────── */
 
 export interface Teammate {
   id: string;
@@ -881,7 +881,7 @@ export interface DelegationPacketV10 {
   declaredAuthority?: DeclaredAuthority;
   /**
    * Which delegation chain this is, how deep the sender says it is, and which
-   * selfimpulses have already handled it. Inside `packetDigest`, so it cannot be
+   * agents have already handled it. Inside `packetDigest`, so it cannot be
    * edited in flight — and still only a CLAIM. The receiver counts its own hops;
    * see the federation-depth section above before changing anything here.
    */

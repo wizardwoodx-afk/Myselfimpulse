@@ -14,7 +14,7 @@
  * Why this is the last and most sensitive milestone of the roadmap:
  * a self-improving agent that can edit its own governance rules is either
  * a loop or a feature, depending on whether EVERY edit is (a) proposed in
- * words, (b) dry-run simulated, (c) human-gated, (d) receipt-selfimpulseed, and
+ * words, (b) dry-run simulated, (c) human-gated, (d) receipt-attested, and
  * (e) reversible. M6 is all five, pinned by probe/metaLoop.
  *
  * The targets (deliberately small and honest):
@@ -22,7 +22,7 @@
  *                        the gate. The meta-loop may never LOOSEN: a
  *                        risky→safe demotion is refused in words. Loosening
  *                        happens only by reverting a change that tightened
- *                        (and the revert is itself gated + selfimpulseed).
+ *                        (and the revert is itself gated + attested).
  *   - preference.set   — add a standing preference (applied by RECALL to
  *                        future runs); revert removes it.
  *
@@ -138,7 +138,7 @@ export function currentGatedTools(): string[] {
   return [...RISKY_TOOLS].sort();
 }
 
-/* ── receipts: every decision is selfimpulseed ────────────────────────────────── */
+/* ── receipts: every decision is attested ────────────────────────────────── */
 interface MetaReceiptEvents {
   origin: "meta";
   changeId: string;
@@ -239,7 +239,7 @@ function validateProposal(kindRaw: string, targetRaw: string, reasonRaw: string,
       simulation: {
         prediction,
         sideEffects: [isRevert ? `risk.tier(${target}) restored to safe` : `risk.tier(${target}) moved to risky`],
-        warnings: isRevert ? ["this LOOSENS the gate — it is itself human-gated and selfimpulseed"] : ["future calls to this tool will pause for approval"],
+        warnings: isRevert ? ["this LOOSENS the gate — it is itself human-gated and attested"] : ["future calls to this tool will pause for approval"],
       },
     };
   }
@@ -309,7 +309,7 @@ export interface MetaResult {
 /**
  * Propose a change to the control plane. Non-blocking: returns pending with
  * handles; the human decides (SelfImpulse face gate or MCP approve/deny); the
- * continuation applies + selfimpulsees. Refusals are immediate and still selfimpulseed.
+ * continuation applies + attests. Refusals are immediate and still attested.
  */
 export async function proposeMetaChange(kind: string, target: string, reason: string): Promise<MetaResult> {
   return runMetaFlow(kind, target, reason, false);
@@ -317,7 +317,7 @@ export async function proposeMetaChange(kind: string, target: string, reason: st
 
 /**
  * Revert an applied, non-revert change. The revert is ITSELF gated and
- * selfimpulseed; reverts are terminal (a revert cannot be reverted — propose a
+ * attested; reverts are terminal (a revert cannot be reverted — propose a
  * new change instead).
  */
 export async function revertMetaChange(changeId: string): Promise<MetaResult> {
@@ -341,7 +341,7 @@ function reason0(): string {
   return "revert attempt";
 }
 
-/** A refusal that never reaches the gate is still selfimpulseed. */
+/** A refusal that never reaches the gate is still attested. */
 async function refuseImmediate(kind: string, target: string, words: string, reason: string): Promise<MetaResult> {
   const c: MetaChange = {
     id: newId("mc"),

@@ -12,11 +12,14 @@
 export const PRODUCT_NAME = "SelfImpulse";
 /* Owner's revision, 2026-10-08: the tagline is about intelligences working
  * together — one owner's agent with another owner's. The line they wrote was
- * "Intelligences meet Collaboration"; the grammatical form of that idea is the
+ * "Intelligence Meets Collaboration"; the grammatical form of that idea is the
  * one below (singular subject, "Meets"). Two alternatives, if the plural is
  * wanted: "Where Intelligences Collaborate" or "Intelligences in Collaboration".
  * One line to change, and this is the only copy of it. */
 export const PRODUCT_TAGLINE = "Intelligence Meets Collaboration";
+/* The engine's own name stays here for manifests and receipts. It is not
+ * product copy: no screen says it, because the engine is not a thing the
+ * person using this app has to think about. */
 export const ENGINE_NAME = "MJ";
-export const ENGINE_CREDIT = `Built on the ${ENGINE_NAME} engine`;
+export const ENGINE_CREDIT = "On this machine, under your own key";
 export const CAPTAIN_TITLE = "Captain";

@@ -51,10 +51,10 @@ ok("the multi-dock shell and the console are gone from the app entry", !/Sidebar
    the list, the count AND the wiring pin in the same change that shipped it, and
    the Federation door did the same â€” a new door that is not simultaneously wired
    is a door that navigates nowhere. */
-const NAV_KEYS = ["steward", "work", "specialists", "federation", "receipts", "docs", "memory", "settings"];
+const NAV_KEYS = ["steward", "work", "specialists", "channels", "federation", "receipts", "docs", "memory", "settings"];
 const navEntries = shellSrc.match(/\{ key: "([a-z]+)", label: "[A-Za-z ]+", icon: "[a-z]+" \}/g) ?? [];
-ok("the sidebar lists exactly eight doors", navEntries.length === 8, `door count drifted: ${navEntries.length}`);
-ok("the eight doors are Steward Â· Work Â· Specialists Â· Federation Â· Receipts Â· Docs Â· Memory Â· Settings",
+ok("the sidebar lists exactly nine doors", navEntries.length === 9, `door count drifted: ${navEntries.length}`);
+ok("the nine doors are Steward Â· Work Â· Specialists Â· Federation Â· Receipts Â· Docs Â· Memory Â· Settings",
   NAV_KEYS.every((k) => new RegExp(`key: "${k}", label:`).test(shellSrc)) &&
   NAV_KEYS.every((k) => new RegExp(`screen === "${k}"`).test(shellSrc)),
   "a door is listed but not rendered, or vice versa");

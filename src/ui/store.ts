@@ -50,6 +50,9 @@ import { loopHostDeps } from "../mission/missionLoop";
 import { loadRunJournal, resumeRunFrom } from "../mission/runCheckpoints";
 import { mountFederation, type FederationHandle } from "../mission/a2aFederation";
 import { dueChannels, recordFire } from "../engine/channels";
+import { ChannelGateway } from "../engine/channelGateway";
+import type { ChannelDoor } from "../engine/channelDoors";
+import { ROOT_NAMESPACE } from "../engine/namespaces";
 import { withPlanningLine } from "./voice";
 /* 19.8 — the local crash ledger. A throw on the live path is shown in the
  * transcript AND recorded, because the transcript does not survive a reload. */
@@ -90,7 +93,7 @@ const THEME_KEY = "vh.theme.v2";
  *  the door count stays at eight. The owner card is a question about WHO you
  *  are; Settings is a question about how the app is configured. They were wired
  *  to the same place, so asking "who am I" answered "here are your settings". */
-export type Screen = "steward" | "work" | "specialists" | "federation" | "receipts" | "docs" | "memory" | "settings" | "chat" | "profile";
+export type Screen = "steward" | "work" | "specialists" | "federation" | "receipts" | "docs" | "memory" | "channels" | "settings" | "chat" | "profile";
 /** Six finishes in two families: four dark, two light. The attribute name is
  *  the persisted value, and it must stay in lockstep with the `[data-theme=…]`
  *  blocks in src/ui/theme.css and with THEMES below. The inline boot script in
@@ -190,6 +193,15 @@ interface UiState {
   go: (s: Screen) => void;
   setTheme: (t: Theme) => void;
   send: (text: string) => Promise<void>;
+  /** A channel (Slack/Telegram/…) inbound delivery: authenticate → normalise →
+   *  open the door → resolve compute → snapshot a revision → hand admitted text
+   *  to the SAME governed engine path a typed message takes. Returns the verdict
+   *  in words so the caller can log or surface a refusal. */
+  channelInbound: (input: {
+    raw: unknown; headers: Record<string, string | undefined>; rawBody: string;
+    authenticate: (raw: unknown) => boolean; normalize: (raw: unknown) => import("../engine/channelDoors").ChannelMessage | null;
+    doorId: string; kind: import("../engine/channelDoors").ChannelKind; namespaceId?: string;
+  }) => Promise<{ ok: boolean; note: string }>;
   decideGate: (d: GateDecision) => void;
   setProvider: (cfg: ProviderConfig | null, persist: boolean) => Promise<{ ok: boolean; note: string }>;
   forgetProvider: () => void;
@@ -307,6 +319,25 @@ function armHeartbeat(get: GetFn): void {
   }, HEARTBEAT_DEFAULT_MS);
 }
 const nowIso = () => new Date().toISOString();
+
+/**
+ * The senders a channel door admits — the owner's own declared list, read from
+ * the same localStorage surface as the other owner settings. It is fail-closed:
+ * no configured list means the door admits nobody, and the caller (the gateway)
+ * refuses in words rather than opening to the world. Values are owner ids
+ * ("U0123" for Slack), never credentials.
+ */
+function channelAllowList(doorId: string): string[] {
+  try {
+    if (typeof localStorage === "undefined") return [];
+    const raw = localStorage.getItem(`si.channel.allow.${doorId}`);
+    if (!raw) return [];
+    const arr = JSON.parse(raw);
+    return Array.isArray(arr) ? arr.filter((x): x is string => typeof x === "string" && x.length > 0) : [];
+  } catch {
+    return [];
+  }
+}
 /** Validate a persisted theme id against THEMES. A value from the retired
  *  four-finish era ("dark", "light", "petrol", "fog") is NOT migrated to a
  *  named successor — those names described palettes that no longer exist, and
@@ -410,6 +441,37 @@ export const useVh = create<UiState>((set, get) => ({
         set({ sessions: listSessions() });
       }
     }
+  },
+
+  channelInbound: async (input) => {
+    /* One inbound channel delivery. The order is the whole point and it is
+       fail-closed at every step: authenticate (transport's own signature) →
+       normalise → open the door (who may speak) → resolve compute → snapshot a
+       revision → hand the admitted text to `send`, the SAME governed path a
+       typed message takes (identity gate, recall, human gate, receipts). A
+       refusal at any step returns words and NEVER touches the engine. */
+    const authed = input.authenticate(input.raw);
+    if (!authed) return { ok: false, note: "ingress failed authentication — the payload is not trusted, so nothing was delivered" };
+    const message = input.normalize(input.raw);
+    if (!message) return { ok: false, note: "the delivery carried no actionable text (bot echo, edit, or non-text event) — nothing to do" };
+    if (get().busy) return { ok: false, note: "the crew is mid-mission — this delivery is held, not queued behind a running turn" };
+
+    const gw = new ChannelGateway();
+    const door: ChannelDoor = {
+      id: input.doorId, kind: input.kind, enabled: true,
+      access: { allow: channelAllowList(input.doorId), groupPolicy: "isolated", requireMention: input.kind !== "email" },
+    };
+    const result = gw.admit({
+      agentId: "selfimpulse",
+      namespaceId: input.namespaceId ?? ROOT_NAMESPACE,
+      doors: [door],
+      message,
+      computeMode: "in-process",
+      hostEndpoint: null,
+      deliver: (h) => { void get().send(h.text); },
+    });
+    if (!result.ok) return { ok: false, note: result.reason };
+    return { ok: true, note: `admitted on the ${input.doorId} door → session ${result.session} (rev ${result.rev}); the Captain is on it` };
   },
 
   decideGate: (d) => {

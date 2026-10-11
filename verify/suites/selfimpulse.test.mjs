@@ -48,8 +48,15 @@ var init_id = __esm({
 });
 
 // src/app/desktop.ts
+function electronBridge() {
+  if (typeof window === "undefined") return null;
+  const b = window.selfImpulseDesktop;
+  if (!b || b.host !== "electron" || typeof b.minimize !== "function") return null;
+  return b;
+}
 function detectHost() {
   if (typeof window === "undefined") return "web";
+  if (electronBridge()) return "electron";
   const w = window;
   if (w.__TAURI_INTERNALS__) return "tauri";
   if (w.__TAURI__) return "tauri";
@@ -28561,7 +28568,7 @@ function workspaceWrite(name, content) {
   return { name: safeName, chars: safeContent.length };
 }
 var KB = [
-  { title: "Grok Bot (xAI, Aug 11 2026)", snippet: "Always-on AI selfimpulses on a vendor cloud computer that sign into your apps; multi-bot group chats; watch-and-learn routines; gated behind SuperGrok/Cursor top tiers. The critique: your credentials live on their VM.", source: "local knowledge base" },
+  { title: "Grok Bot (xAI, Aug 11 2026)", snippet: "Always-on AI agents on a vendor cloud computer that sign into your apps; multi-bot group chats; watch-and-learn routines; gated behind SuperGrok/Cursor top tiers. The critique: your credentials live on their VM.", source: "local knowledge base" },
   { title: "Grok 4.6 (xAI, Aug 2026)", snippet: "Flagship model for long-running agents; 500k context; reasoning effort tiers; $2/$0.50/$6 per 1M tokens under 200k prompt.", source: "local knowledge base" },
   { title: "EU AI Act enforcement (Aug 2 2026)", snippet: "High-risk obligations enforced: tamper-evident logging (Art. 12), human oversight (Art. 14); penalties to 7% of global revenue. Agents need receipts, not logs.", source: "local knowledge base" },
   { title: "The execution core (mission loop)", snippet: "One loop \u2014 COMPOSE \u2192 DISPATCH \u2192 COMMUNICATE \u2192 EXECUTE \u2192 GATE \u2192 ADAPT \u2014 with an allowlisted set of agent CLIs, adversarial arena, budget ledger, Ed25519-signed hash-chained receipts, Assurance Score, FinOps chargeback. The SelfImpulse door dispatches real missions to it.", source: "local knowledge base" },
@@ -28569,7 +28576,7 @@ var KB = [
   { title: "Tauri 2 (desktop shell)", snippet: "Rust core + system webview; small binaries, real OS keychain and stdio child processes; the same frontend runs as a browser edition.", source: "local knowledge base" },
   { title: "Agent funding, H1 2026", snippet: "The 'agent governance' theme is the clearest funded theme of H1 2026: JetStream $34M seed, Guild.ai $30M A, Geordie $30M A, WitnessAI $85M+. The verifiable, local-first quadrant is the empty one.", source: "local knowledge base" },
   { title: "Chennai, Tamil Nadu", snippet: "India's fourth-largest city; the IT and aerospace hub of the south (Omi Vedu, Navi Kempegowda's southern twin in reputation). IST = UTC+5:30.", source: "local knowledge base" },
-  { title: "SelfImpulse (this product)", snippet: "One product: the SelfImpulse door (the accountable colleague) + the execution core (the mission loop) + one proof standard. Every job selfimpulseed \u2014 signed receipts on every run, on your machine.", source: "local knowledge base" },
+  { title: "SelfImpulse (this product)", snippet: "One product: the SelfImpulse door (the accountable colleague) + the execution core (the mission loop) + one proof standard. Every job attested \u2014 signed receipts on every run, on your machine.", source: "local knowledge base" },
   { title: "DeepSearch (Grok feature)", snippet: "Iterative retrieval loop: split query into sub-queries, parallel web + X search, summarize batches in a scratchpad, repeat to a step limit, cross-check before drafting.", source: "local knowledge base" }
 ];
 function searchKnowledge(query) {
@@ -28989,7 +28996,7 @@ function councilDeliberate(plan, input2) {
       {
         seat: "Critic",
         role: "audits risk",
-        section: risky.length > 0 ? `Risk audit: ${risky.map((a) => actionToolName(a)).join(", ")} \u2014 each requires a signed simulation and a human gate. Worst case is contained: nothing executes before approval.` : "No risky actions. Worst case: a wasted run \u2014 still selfimpulseed."
+        section: risky.length > 0 ? `Risk audit: ${risky.map((a) => actionToolName(a)).join(", ")} \u2014 each requires a signed simulation and a human gate. Worst case is contained: nothing executes before approval.` : "No risky actions. Worst case: a wasted run \u2014 still attested."
       },
       {
         seat: "Verifier",
@@ -28999,9 +29006,9 @@ function councilDeliberate(plan, input2) {
     ],
     synthesis: {
       proposal: plan.plan.length > 0 ? plan.plan.join("; ") : input2.slice(0, 100),
-      critique: risky.length > 0 ? `${risky.length} gated action(s) \u2014 simulate first, human decides` : "no gate required \u2014 the fast path stays selfimpulseed",
+      critique: risky.length > 0 ? `${risky.length} gated action(s) \u2014 simulate first, human decides` : "no gate required \u2014 the fast path stays attested",
       verdict: conf === "low" ? "low confidence \u2014 deliberate fully before any act" : "plan stands as proposed",
-      resolution: `route SLOW \xB7 ${risky.length} gated \xB7 3-seat rule-based council (deliberation selfimpulseed)`
+      resolution: `route SLOW \xB7 ${risky.length} gated \xB7 3-seat rule-based council (deliberation attested)`
     },
     ruleBased: true
   };
@@ -29081,14 +29088,14 @@ Start one and I'll hold it: \u201Ccontinue <thread name>\u201D picks it back up.
       if (!args) continue;
       const isDispatch = sk.tool === "dispatch_mission";
       return {
-        thoughts: [`Slow\u2192fast: executing my selfimpulseed skill "${sk.name}" v${sk.version} \u2014 test-gated, ${sk.wins} proven win(s), distilled from a selfimpulseed run. The procedure is proven, so no re-planning.`],
-        plan: [`${sk.name} v${sk.version} \u2014 single selfimpulseed step`],
+        thoughts: [`Slow\u2192fast: executing my attested skill "${sk.name}" v${sk.version} \u2014 test-gated, ${sk.wins} proven win(s), distilled from a attested run. The procedure is proven, so no re-planning.`],
+        plan: [`${sk.name} v${sk.version} \u2014 single attested step`],
         actions: isDispatch ? [{ kind: "dispatch", objective: String(args.objective ?? "") }] : [{ kind: "tool", tool: sk.tool, args }],
         confidence: "high",
         skillId: sk.id,
         skillVersion: sk.version,
         final: (r) => tone(
-          r[0]?.ok ? `Done \u2014 via my selfimpulseed skill **${sk.name}** v${sk.version} (slow\u2192fast; test-gated, ${sk.wins} proven win${sk.wins === 1 ? "" : "s"}). The receipt binds the skill and verifies offline like every other job.` : `My selfimpulseed skill **${sk.name}** FAILED on live replay \u2014 I've flagged it, filed the failure to memory, and here is the honest record: ${r[0]?.output ?? ""}`,
+          r[0]?.ok ? `Done \u2014 via my attested skill **${sk.name}** v${sk.version} (slow\u2192fast; test-gated, ${sk.wins} proven win${sk.wins === 1 ? "" : "s"}). The receipt binds the skill and verifies offline like every other job.` : `My attested skill **${sk.name}** FAILED on live replay \u2014 I've flagged it, filed the failure to memory, and here is the honest record: ${r[0]?.output ?? ""}`,
           ctx.persona
         )
       };
@@ -29123,7 +29130,7 @@ Brain: **${brain.label}**. The real-model planning seam ships in this runtime \u
           `I'm **${BOT_NAME}** \u2014 a standalone, persistent, named colleague on this machine, running the **SelfImpulse Cycle**: recall \u2192 plan \u2192 think \u2192 simulate \u2192 act \u2192 selfimpulse \u2192 learn.
 
 - **Tools:** calculator (real parser), clock, local knowledge base, live web evidence (keyless providers), memory + preferences (yours to inspect/delete), a local workspace (writes are simulated + approval-gated), system info
-- **Dispatch:** \u201Cdispatch a mission: \u2026\u201D \u2014 hands the objective to the real execution core (the mission loop) under one mission ID; the whole trail lands in one selfimpulseed chain
+- **Dispatch:** \u201Cdispatch a mission: \u2026\u201D \u2014 hands the objective to the real execution core (the mission loop) under one mission ID; the whole trail lands in one attested chain
 - **Learning:** successful runs become test-gated skills you can inspect; your feedback binds to receipts
 - **Proof:** every completed run mints a ${`mj-proof-receipt/2`} \u2014 SHA-256 chain, HMAC seal, Ed25519 issuer signature when this runtime can sign \u2014 verifiable offline, zero runtime state
 
@@ -29839,7 +29846,7 @@ WARNINGS: ${simNow.warnings.join("; ")}` : ""}`;
             failures: [...session.failures.slice(-49), { id: `x${Date.now()}${Math.random().toString(36).slice(2, 6)}`, ts: nowIso2(), what: `skill "${failedSkill?.name ?? activePlan.skillId}" replay failed live`, reason: output2.slice(0, 200) }]
           };
           commit();
-          patchMsg((m) => ({ ...m, trace: [...m.trace, { kind: "thought", text: `My selfimpulseed skill ${failedSkill ? `"${failedSkill.name}"` : ""} FAILED on live replay \u2014 flagged it, filed it to failure memory, and re-planning the full cycle (skills off).` }] }));
+          patchMsg((m) => ({ ...m, trace: [...m.trace, { kind: "thought", text: `My attested skill ${failedSkill ? `"${failedSkill.name}"` : ""} FAILED on live replay \u2014 flagged it, filed it to failure memory, and re-planning the full cycle (skills off).` }] }));
           const fb = await brainNow.decide(text, { mode: session.mode, persona: session.persona, facts: session.facts, recall: { ...recall, skills: [] } });
           activePlan = fb;
           actions = fb.actions;
@@ -30191,7 +30198,7 @@ describe3("selfimpulse \u2014 the tools are real, not vibes", () => {
     assert2.ok(/local knowledge base/i.test(JSON.stringify(hits)), "hits are labeled as the local knowledge base");
   });
 });
-describe3("selfimpulse \u2014 receipts: every job selfimpulseed", () => {
+describe3("selfimpulse \u2014 receipts: every job attested", () => {
   it("a minted selfimpulse receipt verifies offline (chain + seal, and signature honesty)", { timeout: 2e4 }, async () => {
     const rc = await probeReceipt();
     assert2.equal(rc.header.version, ENGINE_VERSION, "the receipt carries the current release");
@@ -30263,7 +30270,7 @@ describe3("selfimpulse \u2014 the run loop (node-safe e2e)", () => {
     const actionEvent = selfimpulseSession().receipts[selfimpulseSession().receipts.length - 1].receipt.events.find((e) => e.kind === "selfimpulse.action");
     assert2.ok(actionEvent && actionEvent.data.approved === false && actionEvent.data.ok === false, "the receipt records the denial honestly");
   });
-  it("dispatch drives the REAL VH mission loop end-to-end, honestly, and selfimpulsees it", { timeout: 2e4 }, async () => {
+  it("dispatch drives the REAL VH mission loop end-to-end, honestly, and attests it", { timeout: 2e4 }, async () => {
     const team = {
       id: "team.selfimpulse-probe",
       name: "SelfImpulse probe crew",
@@ -30482,7 +30489,7 @@ describe3("selfimpulse \u2014 selfimpulse cycle 2.0: threads", () => {
     const finalMsg = selfimpulseSession().threads.find((t) => t.id === selfimpulseSession().activeThreadId)?.messages;
     const text = finalMsg && finalMsg.length > 0 ? finalMsg[finalMsg.length - 1].text : "";
     assert2.ok(/don'?t have a thread/i.test(text), "it admits no such thread instead of inventing one");
-    assert2.ok(last.receipt.events.length >= 2, "the honest answer is still selfimpulseed");
+    assert2.ok(last.receipt.events.length >= 2, "the honest answer is still attested");
   });
 });
 describe3("selfimpulse \u2014 selfimpulse cycle 2.0: preferences + memory export", () => {
@@ -30505,7 +30512,7 @@ describe3("selfimpulse \u2014 selfimpulse cycle 2.0: preferences + memory export
   });
 });
 describe3("selfimpulse \u2014 SelfImpulse Cycle 2.0: confidence routing, council, slow\u2192fast", () => {
-  it("confidence is a routing input: a low-confidence plan routes slow and the council selfimpulsees it", async () => {
+  it("confidence is a routing input: a low-confidence plan routes slow and the council attests it", async () => {
     const run = sendSelfImpulseMessage("asdfqwer plumb the zephyr");
     await run;
     const last = lastReceipt();
@@ -30533,17 +30540,17 @@ describe3("selfimpulse \u2014 SelfImpulse Cycle 2.0: confidence routing, council
     setSelfImpulseMode("quick");
     const last = lastReceipt();
     assert2.ok(last.receipt.events.some((e) => e.kind === "selfimpulse.deliberation"), "deep + risky = hard step \u2192 council");
-    assert2.ok(selfimpulseWorkspaceFiles().some((f) => f.name === "council-deep.txt"), "the act still happened \u2014 selfimpulseed, not blocked");
+    assert2.ok(selfimpulseWorkspaceFiles().some((f) => f.name === "council-deep.txt"), "the act still happened \u2014 attested, not blocked");
     const r2 = sendSelfImpulseMessage("Calculate 7 * 6");
     await r2;
     assert2.ok(!lastReceipt().receipt.events.some((e) => e.kind === "selfimpulse.deliberation"), "a fast run skips the council");
   });
-  it("slow\u2192fast: a selfimpulseed skill executes on the fast path, bound into the receipt", { timeout: 2e4 }, async () => {
+  it("slow\u2192fast: a attested skill executes on the fast path, bound into the receipt", { timeout: 2e4 }, async () => {
     for (const f of selfimpulseSession().skills.filter((sk2) => sk2.tool === "calculator")) removeSelfImpulseSkill(f.id);
     const r0 = sendSelfImpulseMessage("Calculate 100 + 23");
     await r0;
     const s1 = selfimpulseSession().skills.find((sk2) => sk2.tool === "calculator");
-    assert2.ok(s1 && !s1.flagged, "a fresh, healthy calculator skill was distilled from a selfimpulseed run");
+    assert2.ok(s1 && !s1.flagged, "a fresh, healthy calculator skill was distilled from a attested run");
     const r1 = sendSelfImpulseMessage("Calculate 24 * 5");
     await r1;
     const last = lastReceipt();
@@ -30570,7 +30577,7 @@ describe3("selfimpulse \u2014 SelfImpulse Cycle 2.0: confidence routing, council
         if ((ctx.recall?.skills ?? []).length > 0) {
           return {
             thoughts: ["double: execute the recalled skill (its live args cannot parse)"],
-            plan: ["replay-fail-probe v1 \u2014 single selfimpulseed step"],
+            plan: ["replay-fail-probe v1 \u2014 single attested step"],
             actions: [{ kind: "tool", tool: "calculator", args: { expression: "1 +" } }],
             confidence: "high",
             skillId,
@@ -30583,7 +30590,7 @@ describe3("selfimpulse \u2014 SelfImpulse Cycle 2.0: confidence routing, council
           plan: [],
           actions: [],
           confidence: "low",
-          final: () => "Fallback complete: the selfimpulseed skill failed on replay; the run re-planned without it."
+          final: () => "Fallback complete: the attested skill failed on replay; the run re-planned without it."
         };
       }
     });
@@ -30758,9 +30765,9 @@ describe3("M4 \u2014 the learning bridge: trajectory \u2192 test-gated skill \u2
       const ref2 = selfimpulseSession().receipts[selfimpulseSession().receipts.length - 1];
       const act2 = ref2.receipt.events.find((e) => e.kind === "selfimpulse.action" || e.kind === "selfimpulse.dispatch");
       const bound = act2?.data.skill;
-      assert2.equal(bound?.id, sk.id, "run 2's receipt binds the selfimpulseed skill");
+      assert2.equal(bound?.id, sk.id, "run 2's receipt binds the attested skill");
       const msgs2 = selfimpulseSession().threads.find((t) => t.id === selfimpulseSession().activeThreadId)?.messages;
-      assert2.ok((msgs2?.[msgs2.length - 1]?.text ?? "").includes("selfimpulseed skill"), "the reply names the selfimpulseed skill path");
+      assert2.ok((msgs2?.[msgs2.length - 1]?.text ?? "").includes("attested skill"), "the reply names the attested skill path");
       assert2.ok(selfimpulseSession().skills.find((k) => k.id === sk.id).runs >= 2, "the skill earned its run");
       const v = await verifySelfImpulseReceipt(ref2.id);
       assert2.equal(v.ok, true, "the fast-path run's receipt verifies offline");

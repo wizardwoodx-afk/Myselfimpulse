@@ -18,7 +18,7 @@
  *   the refusal still moves pair trust down through the same ledger, so a
  *   peer that keeps failing the seam cannot quietly build standing.
  *
- * Standing ("probation" → "selfimpulseed" → "proven") is persisted per pair in
+ * Standing ("probation" → "attested" → "proven") is persisted per pair in
  * localStorage and compounds across sessions.
  *
  * Honesty statements:
@@ -26,7 +26,7 @@
  *    portable authority across instances. Both sides of every handoff are
  *    minted and co-signed inside this one runtime — no remote VH instance is
  *    contacted and no cross-instance cryptographic handshake is claimed.
- *  - Co-signatures are HMAC co-selfimpulsees with session-scoped secrets: they make
+ *  - Co-signatures are HMAC co-attests with session-scoped secrets: they make
  *    the joint artifact tamper-evident inside this selfimpulse.
  *  - Peer endpoints here are trust-anchor identifiers minted from the peer's
  *    declared name; no network call is made by the mesh itself.

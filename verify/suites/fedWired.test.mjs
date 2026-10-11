@@ -138,7 +138,7 @@ function pureSha256(text) {
 
 // src/engine/selfimpulseMesh.ts
 var pairKey = (a, b2) => [a, b2].sort().join("\u2194");
-var meshStanding = (t) => !t ? "unknown" : t.trust < 3 ? "probation" : t.trust < 10 ? "selfimpulseed" : "proven";
+var meshStanding = (t) => !t ? "unknown" : t.trust < 3 ? "probation" : t.trust < 10 ? "attested" : "proven";
 
 // src/engine/meshRuntime.ts
 var TRUST_KEY = "engine.mesh.trust.v1";
@@ -175,7 +175,7 @@ var DELEGATION_CAPABILITIES = [
 var CAPABILITIES_BY_STANDING = {
   unknown: [],
   probation: ["repo.read", "data.aggregate"],
-  selfimpulseed: ["repo.read", "data.aggregate", "test.run", "net.fetch", "egress.share"],
+  attested: ["repo.read", "data.aggregate", "test.run", "net.fetch", "egress.share"],
   proven: [
     "repo.read",
     "data.aggregate",
@@ -201,7 +201,7 @@ function grantCanonical(g) {
   return [g.id, g.pair, g.tier, g.at, String(g.humanFirst), g.granted.join(","), refusals].join("");
 }
 function tiersFor(capability) {
-  return ["probation", "selfimpulseed", "proven"].filter((t) => CAPABILITIES_BY_STANDING[t].includes(capability));
+  return ["probation", "attested", "proven"].filter((t) => CAPABILITIES_BY_STANDING[t].includes(capability));
 }
 function narrowGrant(input) {
   const tier = input.standing ?? "unknown";
@@ -1264,7 +1264,7 @@ async function crossFederation(parties, wiring = {}) {
   return finish(
     "crossed",
     "crossed",
-    `${envelope.capability} crossed between ${envelope.pair}: the owner key of each selfimpulse approved it, naming who authorised it, both selfimpulses lend the capability at their own standing, and both approvals are now spent`,
+    `${envelope.capability} crossed between ${envelope.pair}: the owner key of each selfimpulse approved it, naming who authorised it, both agents lend the capability at their own standing, and both approvals are now spent`,
     filed,
     { receipts: { initiator: filed[0]?.digest ?? "", responder: filed[1]?.digest ?? "" } }
   );
@@ -22307,8 +22307,8 @@ test("6 \xB7 jointly-held rows compound the pair's standing up the mesh ladder",
   assert.equal(second.outcome.status, "crossed", second.outcome.detail);
   assert.equal(
     liveStandingFor(PAIR, OWNER_A, OWNER_B),
-    "selfimpulseed",
-    "grant unit + two jointly-held crossed rows = three trust units = selfimpulseed"
+    "attested",
+    "grant unit + two jointly-held crossed rows = three trust units = attested"
   );
 });
 test("7 \xB7 a capability the grant omits escalates to a human and spends nothing", async () => {
@@ -22322,7 +22322,7 @@ test("7 \xB7 a capability the grant omits escalates to a human and spends nothin
     responderHuman: OWNER_B
   });
   assert.equal(narrow.ok, true);
-  assert.equal(liveStandingFor(PAIR, OWNER_A, OWNER_B), "selfimpulseed", "earned standing survives a re-issued grant");
+  assert.equal(liveStandingFor(PAIR, OWNER_A, OWNER_B), "attested", "earned standing survives a re-issued grant");
   const before = liveUsage(liveGrant()).initiator.crossings;
   const r2 = await runLiveCrossing({ capability: "net.fetch", task: "fetch outside the grant", ownerA: OWNER_A, ownerB: OWNER_B });
   const o = r2.outcome;

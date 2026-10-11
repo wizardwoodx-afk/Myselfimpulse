@@ -36,8 +36,15 @@ var init_id = __esm({
 });
 
 // src/app/desktop.ts
+function electronBridge() {
+  if (typeof window === "undefined") return null;
+  const b = window.selfImpulseDesktop;
+  if (!b || b.host !== "electron" || typeof b.minimize !== "function") return null;
+  return b;
+}
 function detectHost() {
   if (typeof window === "undefined") return "web";
+  if (electronBridge()) return "electron";
   const w = window;
   if (w.__TAURI_INTERNALS__) return "tauri";
   if (w.__TAURI__) return "tauri";
@@ -28547,7 +28554,7 @@ function workspaceWrite(name, content) {
   return { name: safeName, chars: safeContent.length };
 }
 var KB = [
-  { title: "Grok Bot (xAI, Aug 11 2026)", snippet: "Always-on AI selfimpulses on a vendor cloud computer that sign into your apps; multi-bot group chats; watch-and-learn routines; gated behind SuperGrok/Cursor top tiers. The critique: your credentials live on their VM.", source: "local knowledge base" },
+  { title: "Grok Bot (xAI, Aug 11 2026)", snippet: "Always-on AI agents on a vendor cloud computer that sign into your apps; multi-bot group chats; watch-and-learn routines; gated behind SuperGrok/Cursor top tiers. The critique: your credentials live on their VM.", source: "local knowledge base" },
   { title: "Grok 4.6 (xAI, Aug 2026)", snippet: "Flagship model for long-running agents; 500k context; reasoning effort tiers; $2/$0.50/$6 per 1M tokens under 200k prompt.", source: "local knowledge base" },
   { title: "EU AI Act enforcement (Aug 2 2026)", snippet: "High-risk obligations enforced: tamper-evident logging (Art. 12), human oversight (Art. 14); penalties to 7% of global revenue. Agents need receipts, not logs.", source: "local knowledge base" },
   { title: "The execution core (mission loop)", snippet: "One loop \u2014 COMPOSE \u2192 DISPATCH \u2192 COMMUNICATE \u2192 EXECUTE \u2192 GATE \u2192 ADAPT \u2014 with an allowlisted set of agent CLIs, adversarial arena, budget ledger, Ed25519-signed hash-chained receipts, Assurance Score, FinOps chargeback. The SelfImpulse door dispatches real missions to it.", source: "local knowledge base" },
@@ -28555,7 +28562,7 @@ var KB = [
   { title: "Tauri 2 (desktop shell)", snippet: "Rust core + system webview; small binaries, real OS keychain and stdio child processes; the same frontend runs as a browser edition.", source: "local knowledge base" },
   { title: "Agent funding, H1 2026", snippet: "The 'agent governance' theme is the clearest funded theme of H1 2026: JetStream $34M seed, Guild.ai $30M A, Geordie $30M A, WitnessAI $85M+. The verifiable, local-first quadrant is the empty one.", source: "local knowledge base" },
   { title: "Chennai, Tamil Nadu", snippet: "India's fourth-largest city; the IT and aerospace hub of the south (Omi Vedu, Navi Kempegowda's southern twin in reputation). IST = UTC+5:30.", source: "local knowledge base" },
-  { title: "SelfImpulse (this product)", snippet: "One product: the SelfImpulse door (the accountable colleague) + the execution core (the mission loop) + one proof standard. Every job selfimpulseed \u2014 signed receipts on every run, on your machine.", source: "local knowledge base" },
+  { title: "SelfImpulse (this product)", snippet: "One product: the SelfImpulse door (the accountable colleague) + the execution core (the mission loop) + one proof standard. Every job attested \u2014 signed receipts on every run, on your machine.", source: "local knowledge base" },
   { title: "DeepSearch (Grok feature)", snippet: "Iterative retrieval loop: split query into sub-queries, parallel web + X search, summarize batches in a scratchpad, repeat to a step limit, cross-check before drafting.", source: "local knowledge base" }
 ];
 function searchKnowledge(query) {
@@ -28970,7 +28977,7 @@ function councilDeliberate(plan, input2) {
       {
         seat: "Critic",
         role: "audits risk",
-        section: risky.length > 0 ? `Risk audit: ${risky.map((a) => actionToolName(a)).join(", ")} \u2014 each requires a signed simulation and a human gate. Worst case is contained: nothing executes before approval.` : "No risky actions. Worst case: a wasted run \u2014 still selfimpulseed."
+        section: risky.length > 0 ? `Risk audit: ${risky.map((a) => actionToolName(a)).join(", ")} \u2014 each requires a signed simulation and a human gate. Worst case is contained: nothing executes before approval.` : "No risky actions. Worst case: a wasted run \u2014 still attested."
       },
       {
         seat: "Verifier",
@@ -28980,9 +28987,9 @@ function councilDeliberate(plan, input2) {
     ],
     synthesis: {
       proposal: plan.plan.length > 0 ? plan.plan.join("; ") : input2.slice(0, 100),
-      critique: risky.length > 0 ? `${risky.length} gated action(s) \u2014 simulate first, human decides` : "no gate required \u2014 the fast path stays selfimpulseed",
+      critique: risky.length > 0 ? `${risky.length} gated action(s) \u2014 simulate first, human decides` : "no gate required \u2014 the fast path stays attested",
       verdict: conf === "low" ? "low confidence \u2014 deliberate fully before any act" : "plan stands as proposed",
-      resolution: `route SLOW \xB7 ${risky.length} gated \xB7 3-seat rule-based council (deliberation selfimpulseed)`
+      resolution: `route SLOW \xB7 ${risky.length} gated \xB7 3-seat rule-based council (deliberation attested)`
     },
     ruleBased: true
   };
@@ -29062,14 +29069,14 @@ Start one and I'll hold it: \u201Ccontinue <thread name>\u201D picks it back up.
       if (!args) continue;
       const isDispatch = sk.tool === "dispatch_mission";
       return {
-        thoughts: [`Slow\u2192fast: executing my selfimpulseed skill "${sk.name}" v${sk.version} \u2014 test-gated, ${sk.wins} proven win(s), distilled from a selfimpulseed run. The procedure is proven, so no re-planning.`],
-        plan: [`${sk.name} v${sk.version} \u2014 single selfimpulseed step`],
+        thoughts: [`Slow\u2192fast: executing my attested skill "${sk.name}" v${sk.version} \u2014 test-gated, ${sk.wins} proven win(s), distilled from a attested run. The procedure is proven, so no re-planning.`],
+        plan: [`${sk.name} v${sk.version} \u2014 single attested step`],
         actions: isDispatch ? [{ kind: "dispatch", objective: String(args.objective ?? "") }] : [{ kind: "tool", tool: sk.tool, args }],
         confidence: "high",
         skillId: sk.id,
         skillVersion: sk.version,
         final: (r) => tone(
-          r[0]?.ok ? `Done \u2014 via my selfimpulseed skill **${sk.name}** v${sk.version} (slow\u2192fast; test-gated, ${sk.wins} proven win${sk.wins === 1 ? "" : "s"}). The receipt binds the skill and verifies offline like every other job.` : `My selfimpulseed skill **${sk.name}** FAILED on live replay \u2014 I've flagged it, filed the failure to memory, and here is the honest record: ${r[0]?.output ?? ""}`,
+          r[0]?.ok ? `Done \u2014 via my attested skill **${sk.name}** v${sk.version} (slow\u2192fast; test-gated, ${sk.wins} proven win${sk.wins === 1 ? "" : "s"}). The receipt binds the skill and verifies offline like every other job.` : `My attested skill **${sk.name}** FAILED on live replay \u2014 I've flagged it, filed the failure to memory, and here is the honest record: ${r[0]?.output ?? ""}`,
           ctx.persona
         )
       };
@@ -29104,7 +29111,7 @@ Brain: **${brain.label}**. The real-model planning seam ships in this runtime \u
           `I'm **${BOT_NAME}** \u2014 a standalone, persistent, named colleague on this machine, running the **SelfImpulse Cycle**: recall \u2192 plan \u2192 think \u2192 simulate \u2192 act \u2192 selfimpulse \u2192 learn.
 
 - **Tools:** calculator (real parser), clock, local knowledge base, live web evidence (keyless providers), memory + preferences (yours to inspect/delete), a local workspace (writes are simulated + approval-gated), system info
-- **Dispatch:** \u201Cdispatch a mission: \u2026\u201D \u2014 hands the objective to the real execution core (the mission loop) under one mission ID; the whole trail lands in one selfimpulseed chain
+- **Dispatch:** \u201Cdispatch a mission: \u2026\u201D \u2014 hands the objective to the real execution core (the mission loop) under one mission ID; the whole trail lands in one attested chain
 - **Learning:** successful runs become test-gated skills you can inspect; your feedback binds to receipts
 - **Proof:** every completed run mints a ${`mj-proof-receipt/2`} \u2014 SHA-256 chain, HMAC seal, Ed25519 issuer signature when this runtime can sign \u2014 verifiable offline, zero runtime state
 
@@ -29783,7 +29790,7 @@ WARNINGS: ${simNow.warnings.join("; ")}` : ""}`;
             failures: [...session.failures.slice(-49), { id: `x${Date.now()}${Math.random().toString(36).slice(2, 6)}`, ts: nowIso2(), what: `skill "${failedSkill?.name ?? activePlan.skillId}" replay failed live`, reason: output2.slice(0, 200) }]
           };
           commit();
-          patchMsg((m) => ({ ...m, trace: [...m.trace, { kind: "thought", text: `My selfimpulseed skill ${failedSkill ? `"${failedSkill.name}"` : ""} FAILED on live replay \u2014 flagged it, filed it to failure memory, and re-planning the full cycle (skills off).` }] }));
+          patchMsg((m) => ({ ...m, trace: [...m.trace, { kind: "thought", text: `My attested skill ${failedSkill ? `"${failedSkill.name}"` : ""} FAILED on live replay \u2014 flagged it, filed it to failure memory, and re-planning the full cycle (skills off).` }] }));
           const fb = await brainNow.decide(text, { mode: session.mode, persona: session.persona, facts: session.facts, recall: { ...recall, skills: [] } });
           activePlan = fb;
           actions = fb.actions;
@@ -30040,7 +30047,7 @@ describe3("merge \u2014 one mission ID, one chain, one state (16.0)", () => {
       const badRc = receiptFromJsonl(tampered);
       assert2.ok(badRc, "the tampered jsonl is still parseable (one byte, inside the hash)");
       const bad = await verifyProofReceipt2(badRc);
-      assert2.equal(bad.ok, false, "the tampered chain FAILS verification \u2014 every job selfimpulseed");
+      assert2.equal(bad.ok, false, "the tampered chain FAILS verification \u2014 every job attested");
     } finally {
       setBridgeDeps(null);
     }

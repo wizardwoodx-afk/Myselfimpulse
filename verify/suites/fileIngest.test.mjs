@@ -94,16 +94,16 @@ var require_isarray = __commonJS({
   }
 });
 
-// node_modules/jszip/node_modules/readable-stream/lib/internal/streams/stream.js
+// node_modules/readable-stream/lib/internal/streams/stream.js
 var require_stream = __commonJS({
-  "node_modules/jszip/node_modules/readable-stream/lib/internal/streams/stream.js"(exports2, module2) {
+  "node_modules/readable-stream/lib/internal/streams/stream.js"(exports2, module2) {
     module2.exports = __require("stream");
   }
 });
 
-// node_modules/jszip/node_modules/safe-buffer/index.js
+// node_modules/safe-buffer/index.js
 var require_safe_buffer = __commonJS({
-  "node_modules/jszip/node_modules/safe-buffer/index.js"(exports2, module2) {
+  "node_modules/safe-buffer/index.js"(exports2, module2) {
     var buffer = __require("buffer");
     var Buffer2 = buffer.Buffer;
     function copyProps(src, dst) {
@@ -274,9 +274,9 @@ var require_inherits = __commonJS({
   }
 });
 
-// node_modules/jszip/node_modules/readable-stream/lib/internal/streams/BufferList.js
+// node_modules/readable-stream/lib/internal/streams/BufferList.js
 var require_BufferList = __commonJS({
-  "node_modules/jszip/node_modules/readable-stream/lib/internal/streams/BufferList.js"(exports2, module2) {
+  "node_modules/readable-stream/lib/internal/streams/BufferList.js"(exports2, module2) {
     "use strict";
     function _classCallCheck(instance, Constructor) {
       if (!(instance instanceof Constructor)) {
@@ -352,9 +352,9 @@ var require_BufferList = __commonJS({
   }
 });
 
-// node_modules/jszip/node_modules/readable-stream/lib/internal/streams/destroy.js
+// node_modules/readable-stream/lib/internal/streams/destroy.js
 var require_destroy = __commonJS({
-  "node_modules/jszip/node_modules/readable-stream/lib/internal/streams/destroy.js"(exports2, module2) {
+  "node_modules/readable-stream/lib/internal/streams/destroy.js"(exports2, module2) {
     "use strict";
     var pna = require_process_nextick_args();
     function destroy(err, cb2) {
@@ -428,9 +428,9 @@ var require_node = __commonJS({
   }
 });
 
-// node_modules/jszip/node_modules/readable-stream/lib/_stream_writable.js
+// node_modules/readable-stream/lib/_stream_writable.js
 var require_stream_writable = __commonJS({
-  "node_modules/jszip/node_modules/readable-stream/lib/_stream_writable.js"(exports2, module2) {
+  "node_modules/readable-stream/lib/_stream_writable.js"(exports2, module2) {
     "use strict";
     var pna = require_process_nextick_args();
     module2.exports = Writable;
@@ -868,9 +868,9 @@ var require_stream_writable = __commonJS({
   }
 });
 
-// node_modules/jszip/node_modules/readable-stream/lib/_stream_duplex.js
+// node_modules/readable-stream/lib/_stream_duplex.js
 var require_stream_duplex = __commonJS({
-  "node_modules/jszip/node_modules/readable-stream/lib/_stream_duplex.js"(exports2, module2) {
+  "node_modules/readable-stream/lib/_stream_duplex.js"(exports2, module2) {
     "use strict";
     var pna = require_process_nextick_args();
     var objectKeys = Object.keys || function(obj2) {
@@ -945,9 +945,9 @@ var require_stream_duplex = __commonJS({
   }
 });
 
-// node_modules/jszip/node_modules/string_decoder/lib/string_decoder.js
+// node_modules/string_decoder/lib/string_decoder.js
 var require_string_decoder = __commonJS({
-  "node_modules/jszip/node_modules/string_decoder/lib/string_decoder.js"(exports2) {
+  "node_modules/string_decoder/lib/string_decoder.js"(exports2) {
     "use strict";
     var Buffer2 = require_safe_buffer().Buffer;
     var isEncoding = Buffer2.isEncoding || function(encoding) {
@@ -1183,9 +1183,9 @@ var require_string_decoder = __commonJS({
   }
 });
 
-// node_modules/jszip/node_modules/readable-stream/lib/_stream_readable.js
+// node_modules/readable-stream/lib/_stream_readable.js
 var require_stream_readable = __commonJS({
-  "node_modules/jszip/node_modules/readable-stream/lib/_stream_readable.js"(exports2, module2) {
+  "node_modules/readable-stream/lib/_stream_readable.js"(exports2, module2) {
     "use strict";
     var pna = require_process_nextick_args();
     module2.exports = Readable;
@@ -1869,9 +1869,9 @@ var require_stream_readable = __commonJS({
   }
 });
 
-// node_modules/jszip/node_modules/readable-stream/lib/_stream_transform.js
+// node_modules/readable-stream/lib/_stream_transform.js
 var require_stream_transform = __commonJS({
-  "node_modules/jszip/node_modules/readable-stream/lib/_stream_transform.js"(exports2, module2) {
+  "node_modules/readable-stream/lib/_stream_transform.js"(exports2, module2) {
     "use strict";
     module2.exports = Transform;
     var Duplex = require_stream_duplex();
@@ -1969,9 +1969,9 @@ var require_stream_transform = __commonJS({
   }
 });
 
-// node_modules/jszip/node_modules/readable-stream/lib/_stream_passthrough.js
+// node_modules/readable-stream/lib/_stream_passthrough.js
 var require_stream_passthrough = __commonJS({
-  "node_modules/jszip/node_modules/readable-stream/lib/_stream_passthrough.js"(exports2, module2) {
+  "node_modules/readable-stream/lib/_stream_passthrough.js"(exports2, module2) {
     "use strict";
     module2.exports = PassThrough;
     var Transform = require_stream_transform();
@@ -1988,9 +1988,9 @@ var require_stream_passthrough = __commonJS({
   }
 });
 
-// node_modules/jszip/node_modules/readable-stream/readable.js
+// node_modules/readable-stream/readable.js
 var require_readable = __commonJS({
-  "node_modules/jszip/node_modules/readable-stream/readable.js"(exports2, module2) {
+  "node_modules/readable-stream/readable.js"(exports2, module2) {
     var Stream = __require("stream");
     if (process.env.READABLE_STREAM === "disable" && Stream) {
       module2.exports = Stream;

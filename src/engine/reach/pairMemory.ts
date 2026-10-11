@@ -1,5 +1,5 @@
 /**
- * REACH · PAIR MEMORY — what two selfimpulses learned together, and what an
+ * REACH · PAIR MEMORY — what two agents learned together, and what an
  * organisation learned alone.
  *
  * WHY THIS EXISTS NEXT TO §20/§21 MEMORY. `src/mission/memory.ts` owns six

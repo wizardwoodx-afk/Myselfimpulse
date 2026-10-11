@@ -318,7 +318,7 @@ export const callRateGate = new RateGate(120, 60_000);
 /**
  * The GuardRail's verdict on one proposed tool call. Applied BEFORE schema
  * validation and the human gate: a refusal here means the pipeline never
- * even simulates the action, and the refusal is still receipt-selfimpulseed by
+ * even simulates the action, and the refusal is still receipt-attested by
  * the caller — the audit trail records guardrail denials like every other.
  */
 export function scanToolCall(tool: string, args: Record<string, unknown>): GuardrailVerdict {

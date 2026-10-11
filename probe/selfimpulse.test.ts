@@ -8,7 +8,7 @@
  *   2. The selfimpulse module is the one place that reaches the proof layer and the
  *      web-evidence layer — through their APIs. The mission engine is a SEAM,
  *      NOW CONNECTED: exactly one file (bridge.ts) reaches VH's mission loop;
- *      the dispatch test drives the REAL loop and selfimpulsees its events.
+ *      the dispatch test drives the REAL loop and attests its events.
  *      (16.0 merge — Step 3 of the SelfImpulse plan.)
  *   3. Risky actions are approval-gated, and the gate is real: a run PAUSES
  *      until the human resolves it; a denial executes nothing.
@@ -250,7 +250,7 @@ describe("selfimpulse — the tools are real, not vibes", () => {
   });
 });
 
-describe("selfimpulse — receipts: every job selfimpulseed", () => {
+describe("selfimpulse — receipts: every job attested", () => {
   it("a minted selfimpulse receipt verifies offline (chain + seal, and signature honesty)", { timeout: 20000 }, async () => {
     const rc = await probeReceipt();
     assert.equal(rc.header.version, ENGINE_VERSION, "the receipt carries the current release");
@@ -327,7 +327,7 @@ describe("selfimpulse — the run loop (node-safe e2e)", () => {
     assert.ok(actionEvent && actionEvent.data.approved === false && actionEvent.data.ok === false, "the receipt records the denial honestly");
   });
 
-  it("dispatch drives the REAL VH mission loop end-to-end, honestly, and selfimpulsees it", { timeout: 20000 }, async () => {
+  it("dispatch drives the REAL VH mission loop end-to-end, honestly, and attests it", { timeout: 20000 }, async () => {
     // Seed a crew, inject deterministic runner deps (node probe: no host CLI),
     // then let the full SelfImpulse Cycle run the real engine.
     const team = {
@@ -561,7 +561,7 @@ describe("selfimpulse — selfimpulse cycle 2.0: threads", () => {
     const finalMsg = selfimpulseSession().threads.find((t) => t.id === selfimpulseSession().activeThreadId)?.messages;
     const text = finalMsg && finalMsg.length > 0 ? finalMsg[finalMsg.length - 1].text : "";
     assert.ok(/don'?t have a thread/i.test(text), "it admits no such thread instead of inventing one");
-    assert.ok(last.receipt.events.length >= 2, "the honest answer is still selfimpulseed");
+    assert.ok(last.receipt.events.length >= 2, "the honest answer is still attested");
   });
 });
 
@@ -588,7 +588,7 @@ describe("selfimpulse — selfimpulse cycle 2.0: preferences + memory export", (
 });
 
 describe("selfimpulse — SelfImpulse Cycle 2.0: confidence routing, council, slow→fast", () => {
-  it("confidence is a routing input: a low-confidence plan routes slow and the council selfimpulsees it", async () => {
+  it("confidence is a routing input: a low-confidence plan routes slow and the council attests it", async () => {
     const run = sendSelfImpulseMessage("asdfqwer plumb the zephyr");
     await run;
     const last = lastReceipt();
@@ -614,20 +614,20 @@ describe("selfimpulse — SelfImpulse Cycle 2.0: confidence routing, council, sl
     setSelfImpulseMode("quick");
     const last = lastReceipt();
     assert.ok(last.receipt.events.some((e) => e.kind === "selfimpulse.deliberation"), "deep + risky = hard step → council");
-    assert.ok(selfimpulseWorkspaceFiles().some((f) => f.name === "council-deep.txt"), "the act still happened — selfimpulseed, not blocked");
+    assert.ok(selfimpulseWorkspaceFiles().some((f) => f.name === "council-deep.txt"), "the act still happened — attested, not blocked");
     const r2 = sendSelfImpulseMessage("Calculate 7 * 6");
     await r2;
     assert.ok(!lastReceipt().receipt.events.some((e) => e.kind === "selfimpulse.deliberation"), "a fast run skips the council");
   });
 
-  it("slow→fast: a selfimpulseed skill executes on the fast path, bound into the receipt", { timeout: 20000 }, async () => {
+  it("slow→fast: a attested skill executes on the fast path, bound into the receipt", { timeout: 20000 }, async () => {
     /* clean slate: the earlier feedback test flagged the calculation skill
      * (that's what it's for) — remove it so this test exercises a healthy one. */
     for (const f of selfimpulseSession().skills.filter((sk) => sk.tool === "calculator")) removeSelfImpulseSkill(f.id);
     const r0 = sendSelfImpulseMessage("Calculate 100 + 23");
     await r0;
     const s1 = selfimpulseSession().skills.find((sk) => sk.tool === "calculator");
-    assert.ok(s1 && !s1.flagged, "a fresh, healthy calculator skill was distilled from a selfimpulseed run");
+    assert.ok(s1 && !s1.flagged, "a fresh, healthy calculator skill was distilled from a attested run");
     const r1 = sendSelfImpulseMessage("Calculate 24 * 5");
     await r1;
     const last = lastReceipt();
@@ -661,7 +661,7 @@ describe("selfimpulse — SelfImpulse Cycle 2.0: confidence routing, council, sl
         if ((ctx.recall?.skills ?? []).length > 0) {
           return {
             thoughts: ["double: execute the recalled skill (its live args cannot parse)"],
-            plan: ["replay-fail-probe v1 — single selfimpulseed step"],
+            plan: ["replay-fail-probe v1 — single attested step"],
             actions: [{ kind: "tool", tool: "calculator", args: { expression: "1 +" } }],
             confidence: "high",
             skillId,
@@ -674,7 +674,7 @@ describe("selfimpulse — SelfImpulse Cycle 2.0: confidence routing, council, sl
           plan: [],
           actions: [],
           confidence: "low",
-          final: () => "Fallback complete: the selfimpulseed skill failed on replay; the run re-planned without it.",
+          final: () => "Fallback complete: the attested skill failed on replay; the run re-planned without it.",
         };
       },
     });
@@ -857,9 +857,9 @@ describe("M4 — the learning bridge: trajectory → test-gated skill → fast p
       const ref2 = selfimpulseSession().receipts[selfimpulseSession().receipts.length - 1];
       const act2 = ref2.receipt.events.find((e) => e.kind === "selfimpulse.action" || e.kind === "selfimpulse.dispatch");
       const bound = act2?.data.skill as { id?: string } | null;
-      assert.equal(bound?.id, sk!.id, "run 2's receipt binds the selfimpulseed skill");
+      assert.equal(bound?.id, sk!.id, "run 2's receipt binds the attested skill");
       const msgs2 = selfimpulseSession().threads.find((t) => t.id === selfimpulseSession().activeThreadId)?.messages;
-      assert.ok((msgs2?.[msgs2.length - 1]?.text ?? "").includes("selfimpulseed skill"), "the reply names the selfimpulseed skill path");
+      assert.ok((msgs2?.[msgs2.length - 1]?.text ?? "").includes("attested skill"), "the reply names the attested skill path");
       assert.ok(selfimpulseSession().skills.find((k) => k.id === sk!.id)!.runs >= 2, "the skill earned its run");
       const v = await verifySelfImpulseReceipt(ref2.id);
       assert.equal(v.ok, true, "the fast-path run's receipt verifies offline");

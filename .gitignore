@@ -8,6 +8,14 @@ web-build/
 src-tauri/target/
 *.tsbuildinfo
 
+# Desktop release output. electron-builder writes the unpacked app plus the
+# NSIS installer and the portable .exe here - 684 MB of build artifacts that
+# must never enter a repository. `npm run electron:build` regenerates them.
+release/
+
+# Electron's own transient runtime files
+electron/dist/
+
 # Tauri
 src-tauri/browser-service/profiles/
 

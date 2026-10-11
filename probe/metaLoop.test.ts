@@ -5,7 +5,7 @@
  * The acceptance bar is deliberately strict, because a self-modifying
  * governance layer is a loop or a feature depending on these five:
  *
- *   1. PROPOSED IN WORDS  — a reason is mandatory; refusals are selfimpulseed
+ *   1. PROPOSED IN WORDS  — a reason is mandatory; refusals are attested
  *   2. SIMULATED          — a dry-run prediction before the gate
  *   3. HUMAN-GATED        — the same gate primitive as every risky action;
  *                           the REVERT is gated too
@@ -14,7 +14,7 @@
  *   5. REVERSIBLE         — revert restores the exact previous state
  *
  * plus the tightening-only rule (the meta loop may add gates, never remove
- * them — loosening happens only via a gated, selfimpulseed revert).
+ * them — loosening happens only via a gated, attested revert).
  *
  * The strongest assertions are BEHAVIORAL: after a risk.tier tightening is
  * applied, a call to that tool through the governed executor ACTUALLY
@@ -64,7 +64,7 @@ async function pollMeta(changeId: string, timeoutMs = 15000): Promise<ReturnType
 
 /* ── engine: the five properties, in-process ─────────────────────────────── */
 describe("M6 engine — propose → simulate → gate → apply → selfimpulse → revert", () => {
-  it("a tightening is gated, applies the REAL control change, and is selfimpulseed", async () => {
+  it("a tightening is gated, applies the REAL control change, and is attested", async () => {
     assert.equal(RISKY_TOOLS.has("search"), false, "precondition: search starts safe");
     const p = await proposeMetaChange("risk.tier", "search", "probe: tighten search to prove the loop");
     assert.equal(p.pending, true, "meta changes are non-blocking at the gate");
@@ -88,7 +88,7 @@ describe("M6 engine — propose → simulate → gate → apply → selfimpulse 
     await sleep(400);
   });
 
-  it("the revert is itself gated, restores the exact state, and selfimpulsees itself", async () => {
+  it("the revert is itself gated, restores the exact state, and attests itself", async () => {
     const origId = metaChanges().find((c) => c.status === "applied")!.id;
     const rv = await revertMetaChange(origId);
     assert.equal(rv.pending, true, "a revert is gated — it changes governance too");
@@ -108,16 +108,16 @@ describe("M6 engine — propose → simulate → gate → apply → selfimpulse 
     assert.equal(v.ok, true, "the revert receipt verifies offline");
   });
 
-  it("the tightening-only rule: no demotions, no double reverts, no unknowns — all refused in words and selfimpulseed", async () => {
+  it("the tightening-only rule: no demotions, no double reverts, no unknowns — all refused in words and attested", async () => {
     const d1 = await proposeMetaChange("risk.tier", "workspace_write", "try to loosen the gate");
     assert.equal(d1.ok, false);
     assert.ok(/already at the maximum gate/i.test(d1.output), d1.output);
-    assert.ok(d1.receiptId, "the refusal is selfimpulseed");
+    assert.ok(d1.receiptId, "the refusal is attested");
 
     const d2 = await revertMetaChange("mc-does-not-exist");
     assert.equal(d2.ok, false);
     assert.ok(/unknown meta change/.test(d2.output));
-    assert.ok(d2.receiptId, "the refusal is selfimpulseed");
+    assert.ok(d2.receiptId, "the refusal is attested");
 
     const appliedId = metaChanges().find((c) => c.status === "reverted")!.id;
     const d3 = await revertMetaChange(appliedId);
@@ -141,7 +141,7 @@ describe("M6 engine — propose → simulate → gate → apply → selfimpulse 
     assert.equal(RISKY_TOOLS.has("search"), false);
   });
 
-  it("preference.set: applied to the real session, reverted from it, both selfimpulseed", async () => {
+  it("preference.set: applied to the real session, reverted from it, both attested", async () => {
     const p = await proposeMetaChange("preference.set", "always prefer concise answers in probes", "probe: standing preference");
     assert.equal(p.pending, true);
     resolveSelfImpulseApproval(p.approvalId!, true);
@@ -156,13 +156,13 @@ describe("M6 engine — propose → simulate → gate → apply → selfimpulse 
     assert.ok(!selfimpulseSession().preferences.some((x) => x.text === "always prefer concise answers in probes"), "the revert removed it from the session");
   });
 
-  it("a DENIED meta change changes nothing and is still selfimpulseed", async () => {
+  it("a DENIED meta change changes nothing and is still attested", async () => {
     const p = await proposeMetaChange("preference.set", "a preference the human will refuse", "probe: denial path");
     resolveSelfImpulseApproval(p.approvalId!, false);
     const c = await pollMeta(p.changeId!);
     assert.equal(c.status, "denied");
     assert.equal(c.decision, "denied");
-    assert.ok(c.receiptId, "the denial is selfimpulseed");
+    assert.ok(c.receiptId, "the denial is attested");
     assert.ok(!selfimpulseSession().preferences.some((x) => x.text === "a preference the human will refuse"), "nothing was applied");
     const v = await verifySelfImpulseReceipt(c.receiptId!);
     assert.equal(v.ok, true);
@@ -179,7 +179,7 @@ describe("M6 engine — propose → simulate → gate → apply → selfimpulse 
         verified++;
       }
     }
-    assert.ok(verified >= 8, `at least the decisions selfimpulseed: ${verified}`);
+    assert.ok(verified >= 8, `at least the decisions attested: ${verified}`);
   });
 });
 

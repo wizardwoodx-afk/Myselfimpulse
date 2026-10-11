@@ -118,6 +118,19 @@ function isSealed(e: object): boolean {
  * with a different name.
  */
 export async function rehydrateEnvelope(e: AuthorityEnvelope): Promise<{ ok: boolean; reason?: string }> {
+  /* Fail-closed at the re-admission throat. An envelope that crossed a process
+     or persistence boundary arrives as untrusted input and MUST be signed: a
+     digest alone is a checksum, not authority — anyone can recompute it over
+     fields they choose. Without a signature we refuse in words rather than
+     sealing an unsigned envelope into full authority. */
+  if (!e.signature) {
+    return {
+      ok: false,
+      reason:
+        `envelope ${e.id} arrived without a signature — a boundary-crossing envelope must be signed to be re-admitted. ` +
+        `Refused (fail-closed); nothing was trusted.`,
+    };
+  }
   const v = await verifyEnvelope(e);
   if (!v.ok) return v;
   return { ok: true, reason: `envelope ${e.id} re-verified and re-admitted` , ...(markSealed(e), {}) };

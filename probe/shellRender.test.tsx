@@ -53,6 +53,7 @@ async function main(): Promise<void> {
   const { Docs } = await import("../src/ui/screens/Docs");
   const { Specialists } = await import("../src/ui/screens/Specialists");
   const { default: Federation } = await import("../src/ui/screens/Federation");
+  const { default: Channels } = await import("../src/ui/screens/Channels");
   const { Settings } = await import("../src/ui/screens/Settings");
   const { Chat } = await import("../src/ui/screens/Chat");
 
@@ -71,7 +72,7 @@ async function main(): Promise<void> {
      among them) joined as the seventh on exactly those terms, and Federation joined
      as the eighth on the same terms: a door with no render target fails here. */
   const doors = shellDoors();
-  ok("the shell declares eight doors", doors.length === 8, `declared ${doors.length}: ${doors.map((d) => d.label).join(" · ")}`);
+  ok("the shell declares nine doors", doors.length === 9, `declared ${doors.length}: ${doors.map((d) => d.label).join(" · ")}`);
   ok("every declared door is on screen", doors.every((d) => text.includes(d.label)), `missing: ${doors.filter((d) => !text.includes(d.label)).map((d) => d.label).join(", ") || "none"}`);
   ok("the Docs door is among them", doors.some((d) => d.key === "docs" && d.label === "Docs"));
   ok("the Specialists door is among them", doors.some((d) => d.key === "specialists" && d.label === "Specialists"));
@@ -98,6 +99,7 @@ async function main(): Promise<void> {
     receipts: Receipts as unknown as () => JSX.Element,
     docs: Docs as unknown as () => JSX.Element,
     specialists: Specialists as unknown as () => JSX.Element,
+    channels: Channels as unknown as () => JSX.Element,
     federation: Federation as unknown as () => JSX.Element,
     memory: Memory as unknown as () => JSX.Element,
     settings: Settings as unknown as () => JSX.Element,

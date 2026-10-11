@@ -65,7 +65,7 @@ export function DrillPage() {
     toast(`Drill ${scenarioId} submitted — it is a mission, so it pauses at the human gate (decide it on the SelfImpulse face or via MCP).`);
     try {
       const r = await runDrill(scenarioId);
-      toast(r.ok ? `Drill ${scenarioId} PASSED — selfimpulseed.` : `Drill ${scenarioId}: ${r.report ? r.report.status.toUpperCase() : "no report"} — selfimpulseed either way.`);
+      toast(r.ok ? `Drill ${scenarioId} PASSED — attested.` : `Drill ${scenarioId}: ${r.report ? r.report.status.toUpperCase() : "no report"} — attested either way.`);
     } finally {
       setRunning(null);
       force((n) => n + 1);
@@ -78,7 +78,7 @@ export function DrillPage() {
         The drill is the product proving itself on <b>real missions</b>: each scenario is a fresh, real git
         repository whose OWN test command decides the outcome, dispatched through the real mission loop
         (real governance arena, real git, real verification, one cycle receipt, one mission-ledger entry,
-        one selfimpulseed drill report with an attestation digest). The seats are the <b>labeled built-in
+        one attested drill report with an attestation digest). The seats are the <b>labeled built-in
         drill seat</b> — the swappable-brain seam; on a host with real agent CLIs, real crews run real
         missions. The <code>impossible</code> scenario exists to prove the negative: it must come back{" "}
         <b>FAILED</b>, never a fake pass.
@@ -107,7 +107,7 @@ export function DrillPage() {
       </div>
       {reports.length === 0 && (
         <div style={{ fontSize: 12, opacity: 0.5, padding: "8px 2px" }}>
-          No drills run yet — the product ships with its own acceptance test. Run one; it is selfimpulseed either way.
+          No drills run yet — the product ships with its own acceptance test. Run one; it is attested either way.
         </div>
       )}
       {reports.slice(-8).reverse().map((r) => (

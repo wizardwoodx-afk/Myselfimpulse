@@ -6,7 +6,7 @@ import { Mcp } from "./Mcp";
 import { PROVIDER_DEFAULTS } from "../../engine/providers";
 import { CrewMatrixButton } from "./CrewMatrix";
 import { knownCategories, categorySizes, policySummary } from "../../engine/crewPolicy";
-import { AUTONOMY_LEVEL_NAMES, HEARTBEAT_DEFAULT_MS, type AutonomyLevel } from "../../engine/initiative";
+import { AUTONOMY_MODES, modeForLevel, HEARTBEAT_DEFAULT_MS } from "../../engine/initiative";
 import type { ProviderKind } from "../../engine/types";
 import { mcpRuntimeServers } from "../../engine/mcpRuntime";
 import { PRODUCT_NAME, ENGINE_CREDIT } from "../../brand";
@@ -526,7 +526,7 @@ function Autonomy() {
     <>
       <section className="sgroup">
         <h3>Autonomy</h3>
-        <div className="radios">{([0, 1, 2, 3] as AutonomyLevel[]).map((l) => <label key={l} className="check"><input type="radio" name="auto" checked={initiative.level === l} onChange={() => setAutonomy(l)} /><span>{AUTONOMY_LEVEL_NAMES[l].split(" — ")[0]}<small>{AUTONOMY_LEVEL_NAMES[l].split(" — ")[1]}</small></span></label>)}</div>
+        <div className="radios">{AUTONOMY_MODES.map((m) => <label key={m.mode} className="check"><input type="radio" name="auto" checked={modeForLevel(initiative.level) === m.mode} onChange={() => setAutonomy(m.level)} /><span>{m.label}<small>{m.blurb}</small></span></label>)}</div>
         <div className="row"><span className="faint">Heartbeat</span><b>{Math.round(HEARTBEAT_DEFAULT_MS / 60000)} min</b><span className="faint" style={{ marginLeft: 16 }}>Scheduled follow-ups</span><b>{initiative.followUps.length}</b><span className="faint" style={{ marginLeft: 16 }}>Breaker</span><b>{initiative.breakerUntil && initiative.breakerUntil > Date.now() ? "tripped" : "closed"}</b>{initiative.level > 0 && <button className="btn ghost" style={{ marginLeft: "auto" }} onClick={() => void wakeNow()}>Run a heartbeat now</button>}</div>
       </section>
       <section className="sgroup">

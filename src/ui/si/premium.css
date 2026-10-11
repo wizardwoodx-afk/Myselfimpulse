@@ -1,0 +1,821 @@
+/* ============================================================================
+   SELFIMPULSE — the merged design system.
+
+   This layer is transcribed from the three supplied reference designs, not
+   approximated from their names. The values below are their real tokens.
+
+   MERIDIAN (revenue console + chat console) supplies the STRUCTURE and the
+   light editorial palette: a cream canvas with white surfaces, paired against
+   a DARK GREEN navigation rail. That rail/canvas split is the defining move of
+   the design and it is reproduced literally.
+
+   VELA supplies the ACCENT and the warmth: the saturated action orange, the
+   warm cream ground, and the grain/shimmer working states.
+
+   MERIDIAN + VELA type pairing: Fraunces (editorial serif) for display, Inter
+   for UI, JetBrains Mono for figures. Those three faces are mapped onto the
+   three the build already ships in /public/fonts - Switzer, Gambetta and
+   Fragment Mono - because the app runs under a `font-src 'self' data:` CSP and
+   a webfont <link> would be blocked outright. The mapping is noted per token.
+
+   Scoped to `.si-app`, never `:root`: `theme.css` owns the product palette and
+   several probe suites assert on its exact values, so re-declaring `:root` here
+   would fork the design system in two.
+   ========================================================================== */
+
+.si-app {
+  /* ---- MERIDIAN: the light editorial ground ---------------------------- */
+  --si-bg: #F4F1EB;            /* --canvas */
+  --si-bg-2: #EDE9E1;          /* --canvas-deep */
+  --si-surface: #FFFFFF;       /* --surface */
+  --si-surface-2: #FBF9F5;     /* --surface-2 */
+  --si-surface-3: #F1EDE5;     /* --surface-3 */
+  --si-line: #E4DED3;          /* --border */
+  --si-line-2: #D4CCBE;        /* --border-strong */
+  --si-text: #1A1D19;          /* --ink */
+  --si-text-2: #3D423B;        /* --ink-2 */
+  --si-text-3: #767B70;        /* --muted */
+
+  /* ---- MERIDIAN: the dark green rail ----------------------------------- */
+  --si-rail: #14231D;          /* --nav-bg */
+  --si-rail-2: #1B2F27;        /* --nav-bg-2 */
+  --si-rail-ink: #DCE6E0;      /* --nav-ink */
+  --si-rail-muted: #8CA396;    /* --nav-muted */
+
+  /* ---- MERIDIAN: the brand green --------------------------------------- */
+  --si-brand: #1F4A3C;
+  --si-brand-2: #2C6B55;
+  --si-brand-3: #3D8A6E;
+  --si-brand-deep: #163A2C;
+  --si-brand-soft: #E6EEE9;
+  --si-brand-line: #BFD3C8;
+
+  /* ---- VELA: the action orange ----------------------------------------- */
+  --si-accent: #FF4A15;
+  --si-accent-2: #E84412;      /* pressed / hover */
+  --si-accent-deep: #8A3A12;
+  --si-accent-soft: #FFF1E8;
+  --si-accent-line: #FFD9C5;
+  --si-accent-ink: #FFFFFF;
+  --si-accent-glow: rgba(255, 74, 21, .28);
+
+  /* ---- VELA: warm cream ground, shared with Meridian's canvas ----------- */
+  --si-cream: #F6F3EE;
+  --si-cream-2: #FDFCFA;
+
+  /* ---- MERIDIAN status set --------------------------------------------- */
+  --si-amber: #B4661A;         /* --amber */
+  --si-amber-soft: #F7EADA;
+  --si-rose: #A63A34;          /* --rose */
+  --si-rose-soft: #F7E5E3;
+  --si-slate: #4A5B7A;         /* --slate */
+  --si-slate-soft: #E6EAF2;
+  --si-violet: #6D5AE6;        /* VELA secondary */
+  --si-violet-soft: #EFEAF6;
+
+  /* ---- MERIDIAN elevation ramp (light-based, exactly their values) ------ */
+  --si-shadow-xs: 0 1px 2px rgba(26, 29, 25, .05);
+  --si-shadow-sm: 0 1px 2px rgba(26, 29, 25, .05), 0 2px 6px rgba(26, 29, 25, .04);
+  --si-shadow-md: 0 2px 4px rgba(26, 29, 25, .05), 0 8px 20px rgba(26, 29, 25, .07);
+  --si-shadow-lg: 0 10px 30px rgba(26, 29, 25, .10), 0 2px 8px rgba(26, 29, 25, .05);
+  --si-shadow-xl: 0 20px 48px rgba(26, 29, 25, .14), 0 4px 14px rgba(26, 29, 25, .06);
+  --si-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, .6), inset 0 0 0 1px rgba(26, 29, 25, .04);
+
+  /* ---- MERIDIAN radius progression -------------------------------------- */
+  --si-r-xs: 6px; --si-r-sm: 9px; --si-r-md: 13px; --si-r-lg: 18px;
+  --si-r-xl: 24px; --si-r-2xl: 32px; --si-r-full: 999px; --si-r-ctl: 13px;
+
+  /* ---- MERIDIAN motion -------------------------------------------------- */
+  --si-t: .18s;
+  --si-ease: cubic-bezier(.22, .61, .36, 1);
+  --si-ease-out: cubic-bezier(.16, 1, .3, 1);
+  --si-ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+
+  /* ---- metrics from the references --------------------------------------- */
+  --si-rail-w: 288px;   /* Meridian chat console --sidebar-w */
+  --si-top-h: 56px;     /* Meridian chat console --topbar-h */
+
+  /* ---- type: the shipped faces standing in for Fraunces / Inter / Mono --
+     Fraunces   -> Gambetta    (editorial serif, the display voice)
+     Inter      -> Switzer     (UI sans)
+     JetBrains  -> Fragment Mono (figures, tabular)                        */
+  --si-font-sans: 'Switzer', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --si-font-serif: 'Gambetta', Georgia, 'Times New Roman', serif;
+  --si-font-mono: 'Fragment Mono', 'SF Mono', Menlo, Consolas, monospace;
+
+  /* si.css aliases --display to the SANS face, so every "serif" title in the
+     app was rendering as Switzer. The references make the serif the display
+     voice, so --display is pointed at Gambetta here. */
+  --display: 'Gambetta', Georgia, 'Times New Roman', serif;
+  --si-font: var(--si-font-sans);
+  --si-mono: var(--si-font-mono);
+
+  background: var(--si-bg);
+  color: var(--si-text);
+  font-family: var(--si-font-sans);
+  font-size: 14.5px;
+  letter-spacing: -.003em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================================================
+   THE RAIL — Meridian's dark green navigation
+   ========================================================================== */
+
+.si-rail {
+  background: var(--si-rail);
+  color: var(--si-rail-ink);
+  border-right: none;
+  position: relative;
+  overflow: hidden;
+}
+
+/* VELA's film grain, kept very low so the large dark rail reads as a surface
+   rather than as flat #000. */
+.si-rail::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: .03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+}
+
+/* The brand lockup sits directly on the rail; the wordmark is a transparent
+   PNG, so no ink panel is needed to hide it. */
+.si-brand {
+  align-self: flex-start;
+  width: fit-content;
+  background: transparent;
+  border: 1px solid rgba(220, 230, 224, .14);
+  border-radius: var(--si-r-sm);
+  box-shadow: none;
+  padding: 6px 10px;
+  min-height: 34px;
+}
+.si-brand img { height: 20px; }
+
+/* Meridian's grouped-navigation label */
+.si-nav-cap,
+.si-nav-label {
+  font-family: var(--si-font-sans);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--si-rail-muted);
+  opacity: .85;
+}
+
+.si-nav-item {
+  position: relative;
+  font-family: var(--si-font-sans);
+  font-size: 13.5px;
+  font-weight: 450;
+  letter-spacing: -.005em;
+  color: var(--si-rail-ink);
+  border-radius: var(--si-r-sm);
+  transition: background var(--si-t) var(--si-ease), color var(--si-t) var(--si-ease);
+}
+
+.si-nav-item:hover { background: var(--si-rail-2); color: #fff; }
+
+/* The current door carries fill + weight + an edge, never colour alone. */
+.si-nav-item[aria-current="page"] {
+  background: var(--si-rail-2);
+  color: #fff;
+  font-weight: 600;
+}
+
+.si-nav-item[aria-current="page"]::before {
+  content: "";
+  position: absolute;
+  left: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 20px;
+  border-radius: 0 3px 3px 0;
+  background: var(--si-brand-3);
+}
+
+.si-nav-item .si-nav-ic { color: var(--si-rail-muted); }
+.si-nav-item[aria-current="page"] .si-nav-ic { color: var(--si-brand-3); }
+.si-nav-item:hover .si-nav-ic { color: var(--si-brand-3); }
+
+/* ============================================================================
+   MODE DIAL — Manual / Semi-Autonomous / FIA
+   ========================================================================== */
+
+.si-mode {
+  background: rgba(255, 255, 255, .05);
+  border: 1px solid rgba(220, 230, 224, .12);
+  border-radius: var(--si-r-ctl);
+  box-shadow: none;
+}
+
+.si-mode-btn {
+  font-family: var(--si-font-sans);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  border-radius: var(--si-r-xs);
+  color: var(--si-rail-muted);
+  transition: all var(--si-t) var(--si-ease);
+}
+
+.si-mode-btn:hover { color: #fff; background: rgba(255, 255, 255, .07); }
+
+/* VELA's orange is the app's one loud action - it earns the active mode. */
+.si-mode-btn[aria-pressed="true"] {
+  background: linear-gradient(180deg, #FF6434, var(--si-accent));
+  border-color: var(--si-accent-2);
+  color: var(--si-accent-ink);
+  font-weight: 700;
+  box-shadow: 0 2px 10px var(--si-accent-glow);
+  transition: all var(--si-t) var(--si-ease-spring);
+}
+
+/* ============================================================================
+   MAIN COLUMN + TOP BAR — cream canvas, white raised bar
+   ========================================================================== */
+
+.si-content {
+  background: var(--si-bg);
+  color: var(--si-text);
+}
+
+.si-top {
+  background: var(--si-surface);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-bottom: 1px solid var(--si-line);
+  box-shadow: var(--si-shadow-xs);
+  position: relative;
+  z-index: 20;
+}
+
+/* Meridian's top bar title is the editorial serif, tight-tracked. */
+.si-top h1 {
+  font-family: var(--si-font-serif);
+  font-weight: 600;
+  font-size: 20px;
+  letter-spacing: -.02em;
+  color: var(--si-text);
+}
+
+.si-chip {
+  font-family: var(--si-font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--si-text-2);
+  background: var(--si-surface-2);
+  border: 1px solid var(--si-line);
+  border-radius: var(--si-r-full);
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
+.si-chip.accent {
+  color: var(--si-accent-deep);
+  background: var(--si-accent-soft);
+  border-color: var(--si-accent-line);
+}
+
+/* ============================================================================
+   CARDS — Meridian's white raised surfaces
+   ========================================================================== */
+
+.si-app .card,
+.si-app .rich-card {
+  background: var(--si-surface);
+  border: 1px solid var(--si-line);
+  border-radius: var(--si-r-lg);
+  box-shadow: var(--si-shadow-sm);
+}
+
+/* ============================================================================
+   THE COMPOSER — Meridian's raised box, verbatim geometry
+   ========================================================================== */
+
+.si-app .composer {
+  background: var(--si-surface);
+  border: 1px solid var(--si-line);
+  border-radius: var(--si-r-xl);
+  box-shadow: var(--si-shadow-lg), var(--si-shadow-inset);
+  overflow: hidden;
+  transition: border-color .25s var(--si-ease), box-shadow .25s var(--si-ease);
+}
+.si-app .composer:focus-within {
+  border-color: var(--si-brand-line);
+  box-shadow: var(--si-shadow-xl), 0 0 0 4px rgba(31, 74, 60, .10);
+}
+
+/* Meridian's input metrics: 14.5px, generous padding, auto-growing to 200px. */
+.si-app .composer textarea,
+.si-app .composer input {
+  font-family: var(--si-font-sans);
+  font-size: 14.5px;
+  line-height: 1.55;
+  letter-spacing: -.003em;
+  color: var(--si-text);
+  background: transparent;
+  border: none;
+  outline: none;
+  min-height: 48px;
+  max-height: 200px;
+  padding: 14px 16px 6px;
+  resize: none;
+}
+.si-app .composer textarea::placeholder,
+.si-app .composer input::placeholder { color: var(--si-text-3); }
+
+/* "Think ahead" - the caption above the field. */
+.si-app .cue .lbl,
+.si-app .composer .lbl {
+  font-family: var(--si-font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .02em;
+  color: var(--si-text-2);
+}
+
+/* VELA's orange send button on Meridian's geometry. */
+.si-app .send {
+  background: var(--si-accent);
+  color: var(--si-accent-ink);
+  border: 1px solid var(--si-accent-2);
+  border-radius: 11px;
+  box-shadow: 0 2px 8px var(--si-accent-glow);
+  transition: all .2s var(--si-ease);
+}
+.si-app .send:hover:not(:disabled) {
+  background: var(--si-accent-2);
+  box-shadow: 0 4px 16px var(--si-accent-glow);
+  transform: translateY(-1px);
+}
+.si-app .send:disabled {
+  background: var(--si-surface-3);
+  border-color: var(--si-line);
+  color: var(--si-text-3);
+  box-shadow: none;
+  transform: none;
+}
+
+/* ============================================================================
+   CHAT — Meridian's message metrics and assistant/user avatar gradients
+   ========================================================================== */
+
+.si-app .msg-content {
+  font-size: 14.5px;
+  line-height: 1.72;
+  letter-spacing: -.003em;
+  color: var(--si-text);
+}
+
+.si-app .msg-avatar.assistant {
+  background: linear-gradient(150deg, var(--si-brand-2), var(--si-brand-deep));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .15), 0 4px 12px rgba(31, 74, 60, .15);
+}
+.si-app .msg-avatar.user {
+  background: linear-gradient(150deg, #3D6B58, #22443A);
+}
+
+.si-app .msg-name {
+  font-family: var(--si-font-sans);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--si-text);
+}
+.si-app .msg-time,
+.si-app .msg-role {
+  font-family: var(--si-font-mono);
+  font-size: 10.5px;
+  color: var(--si-text-3);
+}
+
+/* ============================================================================
+   TYPOGRAPHY — Fraunces for display, Inter for UI, mono for figures
+   ========================================================================== */
+
+.si-app h1,
+.si-app h2,
+.si-app h3 {
+  font-family: var(--si-font-serif);
+  font-weight: 600;
+  letter-spacing: -.018em;
+  color: var(--si-text);
+}
+
+.si-app .mono,
+.si-app .num,
+.si-app .si-usage,
+.si-app .usage {
+  font-family: var(--si-font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Meridian's eyebrow: a brand rule before a small-caps label. */
+.si-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--si-brand);
+}
+.si-eyebrow::before {
+  content: "";
+  width: 16px;
+  height: 1.5px;
+  background: var(--si-brand);
+  opacity: .6;
+}
+
+/* ============================================================================
+   CONTROLS
+   ========================================================================== */
+
+.si-app button,
+.si-app .btn {
+  font-family: var(--si-font-sans);
+  transition: transform var(--si-t) var(--si-ease), box-shadow .22s var(--si-ease),
+              background .2s var(--si-ease), border-color .2s var(--si-ease),
+              color .2s var(--si-ease);
+}
+.si-app button:active:not(:disabled) { transform: translateY(1px) scale(.985); }
+
+.si-app input,
+.si-app textarea,
+.si-app select {
+  font-family: var(--si-font-sans);
+  font-size: 14px;
+  color: var(--si-text);
+  background: var(--si-surface);
+  border: 1px solid var(--si-line);
+  border-radius: var(--si-r-sm);
+}
+.si-app input::placeholder,
+.si-app textarea::placeholder { color: var(--si-text-3); }
+
+.si-app input:focus,
+.si-app textarea:focus,
+.si-app select:focus {
+  outline: none;
+  border-color: var(--si-brand-line);
+  box-shadow: 0 0 0 3px rgba(31, 74, 60, .12);
+}
+
+/* ============================================================================
+   MOTION — every loop respects the OS reduced-motion preference
+   ========================================================================== */
+
+@keyframes si-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .45; }
+}
+@keyframes si-shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+.si-app .si-led.ok { animation: si-pulse 2.4s var(--si-ease) infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .si-app *, .si-app *::before, .si-app *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================================
+   FOCUS + SELECTION
+   ========================================================================== */
+
+.si-app :focus-visible {
+  outline: 2px solid var(--si-brand-2);
+  outline-offset: 2px;
+  border-radius: var(--si-r-xs);
+}
+
+::selection { background: var(--si-brand-2); color: #fff; }
+
+/* ============================================================================
+   THE CHANNELS DOOR - the OCE plane, styled in the merged system
+   ========================================================================== */
+
+.si-app .channels { display: flex; flex-direction: column; gap: var(--si-r-lg); }
+
+.si-app .ch-head { display: flex; flex-direction: column; gap: 10px; }
+.si-app .ch-lede {
+  margin: 0;
+  max-width: 74ch;
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: var(--si-text-3);
+}
+
+/* The fact strip: Meridian's KPI tile treatment, on the shell's type scale. */
+.si-app .ch-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--si-r-sm);
+}
+.si-app .ch-fact {
+  background: var(--si-surface);
+  border: 1px solid var(--si-line);
+  border-radius: var(--si-r-md);
+  box-shadow: var(--si-shadow-xs);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.si-app .ch-fact .k {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--si-text-3);
+}
+.si-app .ch-fact .v { font-size: 14px; font-weight: 600; color: var(--si-text); }
+
+.si-app .ch-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--si-r-md);
+  align-items: flex-end;
+  background: var(--si-surface);
+  border: 1px solid var(--si-line);
+  border-radius: var(--si-r-md);
+  box-shadow: var(--si-shadow-xs);
+  padding: 12px 14px;
+}
+.si-app .ch-bar label { display: flex; flex-direction: column; gap: 5px; min-width: 220px; }
+.si-app .ch-bar label span {
+  font-size: 10px; font-weight: 600; letter-spacing: .13em; text-transform: uppercase; color: var(--si-text-3);
+}
+.si-app .ch-bar input,
+.si-app .ch-bar select {
+  height: 34px; padding: 0 10px;
+  border: 1px solid var(--si-line); border-radius: var(--si-r-sm);
+  background: var(--si-surface-2); color: var(--si-text);
+  font-family: var(--si-font-sans); font-size: 13.5px;
+}
+.si-app .ch-bar input:focus,
+.si-app .ch-bar select:focus {
+  outline: none; border-color: var(--si-brand-line);
+  box-shadow: 0 0 0 3px rgba(31, 74, 60, .12);
+}
+.si-app .ch-secret { flex: 1 1 320px; }
+
+.si-app .ch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: var(--si-r-md);
+}
+.si-app .ch-card {
+  background: var(--si-surface);
+  border: 1px solid var(--si-line);
+  border-radius: var(--si-r-lg);
+  box-shadow: var(--si-shadow-sm);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.si-app .ch-card header { display: flex; align-items: center; gap: 10px; }
+.si-app .ch-card h3 {
+  margin: 0; font-family: var(--si-font-serif); font-size: 17px; font-weight: 600; letter-spacing: -.015em;
+}
+.si-app .ch-tag {
+  margin-left: auto; font-size: 9.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: var(--si-r-full);
+}
+.si-app .ch-tag.gated { background: var(--si-amber-soft); color: var(--si-amber); }
+.si-app .ch-tag.open { background: var(--si-brand-soft); color: var(--si-brand); }
+
+.si-app .ch-blurb { margin: 0; font-size: 12.5px; line-height: 1.6; color: var(--si-text-3); }
+
+.si-app .ch-allow { display: flex; flex-direction: column; gap: 5px; }
+.si-app .ch-allow span {
+  font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--si-text-3);
+}
+.si-app .ch-allow em { font-style: normal; font-weight: 500; text-transform: none; letter-spacing: 0; }
+.si-app .ch-allow input {
+  height: 32px; padding: 0 10px;
+  border: 1px solid var(--si-line); border-radius: var(--si-r-sm);
+  background: var(--si-surface-2); color: var(--si-text);
+  font-family: var(--si-font-mono); font-size: 12px;
+}
+.si-app .ch-allow input:focus { outline: none; border-color: var(--si-brand-line); box-shadow: 0 0 0 3px rgba(31, 74, 60, .12); }
+.si-app .ch-allow small { font-size: 11px; color: var(--si-text-3); }
+
+.si-app .ch-acts { display: flex; gap: 8px; margin-top: auto; }
+.si-app .ch-acts .btn {
+  height: 30px; padding: 0 12px; border-radius: var(--si-r-sm);
+  font-size: 12px; font-weight: 600;
+  background: var(--si-accent); color: var(--si-accent-ink); border: 1px solid var(--si-accent-2);
+  box-shadow: 0 2px 8px var(--si-accent-glow);
+}
+.si-app .ch-acts .btn:hover:not(:disabled) { background: var(--si-accent-2); }
+.si-app .ch-acts .btn:disabled { background: var(--si-surface-3); color: var(--si-text-3); border-color: var(--si-line); box-shadow: none; }
+.si-app .ch-acts .btn.ghost {
+  background: var(--si-surface); color: var(--si-text-2); border-color: var(--si-line); box-shadow: none;
+}
+.si-app .ch-acts .btn.ghost:hover:not(:disabled) { background: var(--si-surface-3); color: var(--si-text); }
+
+.si-app .ch-log {
+  background: var(--si-surface); border: 1px solid var(--si-line); border-radius: var(--si-r-lg);
+  box-shadow: var(--si-shadow-sm); padding: 14px 16px;
+}
+.si-app .ch-log h3 {
+  margin: 0 0 10px; font-family: var(--si-font-serif); font-size: 15px; font-weight: 600;
+}
+.si-app .ch-log ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.si-app .ch-log li {
+  display: grid; grid-template-columns: 76px 110px 84px 1fr; gap: 10px; align-items: baseline;
+  padding: 7px 0; border-top: 1px solid var(--si-line); font-size: 12.5px;
+}
+.si-app .ch-log li:first-child { border-top: 0; }
+.si-app .ch-log .t { color: var(--si-text-3); }
+.si-app .ch-log .k { font-weight: 600; color: var(--si-text); }
+.si-app .ch-log .v { font-weight: 600; letter-spacing: .04em; text-transform: uppercase; font-size: 10.5px; }
+.si-app .ch-log li.ok .v { color: var(--si-brand); }
+.si-app .ch-log li.no .v { color: var(--si-rose); }
+.si-app .ch-log .n { color: var(--si-text-3); line-height: 1.5; }
+.si-app .ch-empty { margin: 0; font-size: 12.5px; color: var(--si-text-3); }
+
+@media (max-width: 720px) {
+  .si-app .ch-log li { grid-template-columns: 1fr; gap: 2px; }
+}
+
+/* ============================================================================
+   CORRECTIONS
+   ---------------------------------------------------------------------------
+   Specific structural rules in si.css that read correctly against the old dark
+   shell but fight the Meridian light canvas. Each is overridden here at a
+   specificity that wins, rather than by editing si.css, so the structural sheet
+   stays the single owner of layout and this layer stays the single owner of
+   appearance.
+   ========================================================================== */
+
+/* si.css renders the rail items in caps; Meridian sets navigation in sentence
+   case at 13.5px and reserves the small-caps treatment for the group labels
+   (MISSION / RECORDS) only. The descendant selector is what actually matters -
+   the casing is applied to the label inside the row, not the row itself. */
+.si-app .si-nav-item,
+.si-app .si-nav-item span,
+.si-app .si-nav-item .t {
+  text-transform: none;
+  font-size: 13.5px;
+  letter-spacing: -.005em;
+}
+
+/* The group labels keep their caps treatment. */
+.si-app .si-nav-cap,
+.si-app .si-nav-label {
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: .14em;
+}
+
+/* The mode dial is `flex: 1 1 auto`, which stretched it across the whole rail.
+   Meridian's rail keeps the control compact and left-aligned. */
+.si-app .si-mode {
+  flex: 0 0 auto;
+  width: fit-content;
+  align-self: flex-start;
+  max-width: 100%;
+}
+
+/* The status chips live on the white top bar, so they need the light surface
+   treatment rather than the dark-shell one they inherited. */
+.si-app .si-chip,
+.si-app .si-chips .si-chip {
+  background: var(--si-surface-2);
+  border: 1px solid var(--si-line);
+  color: var(--si-text-2);
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+  padding: 4px 10px;
+}
+
+/* The rail footer sits on the dark green and needs the rail's muted ink, not
+   the content column's muted grey, which is near-invisible against #14231D. */
+.si-app .si-foot,
+.si-app .si-foot-row,
+.si-app .si-foot-btn {
+  color: var(--si-rail-muted);
+}
+.si-app .si-foot-btn:hover { color: var(--si-rail-ink); }
+.si-app .si-owner {
+  background: linear-gradient(150deg, var(--si-brand-2), var(--si-brand-deep));
+  color: #fff;
+  border: none;
+}
+
+/* The top bar sits on white; the shell's own window buttons must stay legible
+   against it rather than inheriting the dark-shell colour. */
+.si-app .si-top .si-chip.accent {
+  color: var(--si-accent-deep);
+  background: var(--si-accent-soft);
+  border-color: var(--si-accent-line);
+}
+
+/* si.css paints the top-bar toggle buttons (No provider / Sandbox / History)
+   with `var(--si-surface-1)`, a token this layer never defines - so they fell
+   through to the dark-shell value and rendered as dark pills on a white bar.
+   They are pill buttons in Meridian's language: tinted fill, hairline, quiet
+   ink, with the open/selected one lifted to solid white. */
+.si-app .si-chipbtn {
+  background: var(--si-surface-2);
+  color: var(--si-text-2);
+  box-shadow: inset 0 0 0 1px var(--si-line);
+  border: 0;
+  transition: box-shadow var(--si-t) var(--si-ease), background-color var(--si-t) var(--si-ease),
+              color var(--si-t) var(--si-ease);
+}
+.si-app .si-chipbtn:hover {
+  background: var(--si-surface-3);
+  color: var(--si-text);
+  box-shadow: inset 0 0 0 1px var(--si-border-strong, var(--si-line-2));
+}
+.si-app .si-chipbtn[aria-expanded="true"],
+.si-app .si-chipbtn[aria-pressed="true"] {
+  background: var(--si-surface);
+  color: var(--si-text);
+  box-shadow: inset 0 0 0 1px var(--si-line), var(--si-shadow-xs);
+}
+
+/* si.css gives each mode button `flex: 1 1 0; min-width: 0`, so once the dial
+   is sized to its content the labels are crushed to nothing and the active one
+   clips its own text. Sizing the buttons to their labels is the fix; the dial
+   itself stays compact. */
+.si-app .si-mode-btn {
+  flex: 0 0 auto;
+  min-width: 0;
+  padding: 5px 10px;
+  white-space: nowrap;
+}
+
+/* ============================================================================
+   LEGACY TOKEN BRIDGE
+   ---------------------------------------------------------------------------
+   `ink.css` and `vh.css` carry their OWN token system (`--surface-2`, `--ink-3`,
+   `--line`, `--ok-soft`, `--s1` ...) which is still the dark-shell palette, and
+   every screen composes its header strip and pills from those names. Patching
+   each component individually would mean chasing them one at a time forever.
+
+   Mapping the legacy names onto Meridian's values once, here, retires the whole
+   class of problem: anything still written against those tokens inherits the
+   light editorial palette automatically.
+   ========================================================================== */
+.si-app {
+  --surface: #FFFFFF;
+  --surface-2: #FBF9F5;
+  --surface-3: #F1EDE5;
+  --ink: #1A1D19;
+  --ink-2: #3D423B;
+  --ink-3: #767B70;
+  --line: #E4DED3;
+  --line-strong: #D4CCBE;
+  --fg: #1A1D19;
+  --fg-2: #3D423B;
+  --fg-3: #767B70;
+  --s1: #FFFFFF;
+  --s2: #FBF9F5;
+
+  /* status, on Meridian's scale */
+  --ok: #0E9F6E;          --ok-soft: #E8F5F0;
+  --warn: #B4661A;        --warn-soft: #F7EADA;
+  --danger: #A63A34;      --danger-soft: #F7E5E3;
+  --info: #4A5B7A;        --info-soft: #E6EAF2;
+  --accent: #FF4A15;      --accent-soft: #FFF1E8;   /* VELA's orange */
+  --accent-2: #E84412;
+}
+
+/* The header status strips themselves: pill geometry on the light ground, with
+   the connected state carrying VELA's green rather than the dark shell's. */
+.si-app .strip-state,
+.si-app .strip-ws {
+  background: var(--si-surface-2);
+  color: var(--si-text-3);
+  border: 1px solid var(--si-line);
+  border-radius: var(--si-r-full);
+  font-size: 11px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.si-app .strip-state.live {
+  background: #E8F5F0;
+  color: #0B7A54;
+  border-color: #CBEADF;
+}

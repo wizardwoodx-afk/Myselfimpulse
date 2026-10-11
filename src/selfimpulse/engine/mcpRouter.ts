@@ -154,7 +154,7 @@ export const MCP_TOOLS: McpToolDef[] = [
   toolDef("system_info", "This machine: runtime, OS/arch, product version, brain. Safe; mints a receipt.", {}),
   toolDef(
     "meta_propose",
-    "M6 meta-loop: propose a change to the product's OWN control plane — kind 'risk.tier' (tighten a tool's gate: safe -> risky; the meta-loop may never loosen) or 'preference.set' (add a standing preference). This is the most sensitive class of change: SIMULATE + human gate + selfimpulseed receipt. Returns pending with the change id; poll meta_status.",
+    "M6 meta-loop: propose a change to the product's OWN control plane — kind 'risk.tier' (tighten a tool's gate: safe -> risky; the meta-loop may never loosen) or 'preference.set' (add a standing preference). This is the most sensitive class of change: SIMULATE + human gate + attested receipt. Returns pending with the change id; poll meta_status.",
     { kind: str, target: str, reason: str },
     ["kind", "target", "reason"],
   ),
@@ -167,7 +167,7 @@ export const MCP_TOOLS: McpToolDef[] = [
   ),
   toolDef(
     "run_drill",
-    "16.4 drill: dispatch a standard REAL mission — a fresh real git repo, the repo's OWN test command, the real mission loop with the real governance arena. Scenarios: guard (fix the disabled-admin bug), maths (implement clamp so the failing test passes), impossible (honest-failure scenario — must report FAILED, never a fake pass). Optional harness (16.7): run the seats on a REAL model — the named harness's CLI must be on PATH, otherwise the drill refuses in words (it never fakes a real-model run); without it, the labeled deterministic seat runs. RISKY — it is a mission; it pauses at the human gate, then runs in the background (poll call_status). The result is a selfimpulseed drill report + attestation digest.",
+    "16.4 drill: dispatch a standard REAL mission — a fresh real git repo, the repo's OWN test command, the real mission loop with the real governance arena. Scenarios: guard (fix the disabled-admin bug), maths (implement clamp so the failing test passes), impossible (honest-failure scenario — must report FAILED, never a fake pass). Optional harness (16.7): run the seats on a REAL model — the named harness's CLI must be on PATH, otherwise the drill refuses in words (it never fakes a real-model run); without it, the labeled deterministic seat runs. RISKY — it is a mission; it pauses at the human gate, then runs in the background (poll call_status). The result is a attested drill report + attestation digest.",
     { scenario: str, harness: { type: "string", description: "optional — run the seats on this harness's real CLI (external-model validation); refused honestly when the CLI is not on PATH" } },
     ["scenario"],
   ),
@@ -242,7 +242,7 @@ function approvalInputRequest(r: { approvalId: string | null; callId: string }, 
       method: "elicitation/create",
       params: {
         mode: "form",
-        message: `SelfImpulse human gate: tool "${name}" is RISKY — approve to execute (the run is selfimpulseed with a signed receipt) or decline. Approval id ${r.approvalId}; call id ${r.callId} (poll it with the call_status tool).`,
+        message: `SelfImpulse human gate: tool "${name}" is RISKY — approve to execute (the run is attested with a signed receipt) or decline. Approval id ${r.approvalId}; call id ${r.callId} (poll it with the call_status tool).`,
         requestedSchema: {
           type: "object",
           properties: { decision: { type: "string", enum: ["accept", "decline"] } },

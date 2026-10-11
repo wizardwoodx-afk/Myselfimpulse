@@ -1371,7 +1371,7 @@ var require_react_development = __commonJS({
           }
           return dispatcher.useContext(Context);
         }
-        function useState18(initialState2) {
+        function useState19(initialState2) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useState(initialState2);
         }
@@ -1399,7 +1399,7 @@ var require_react_development = __commonJS({
           var dispatcher = resolveDispatcher();
           return dispatcher.useCallback(callback, deps);
         }
-        function useMemo6(create3, deps) {
+        function useMemo7(create3, deps) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useMemo(create3, deps);
         }
@@ -2171,10 +2171,10 @@ var require_react_development = __commonJS({
         exports2.useImperativeHandle = useImperativeHandle;
         exports2.useInsertionEffect = useInsertionEffect;
         exports2.useLayoutEffect = useLayoutEffect;
-        exports2.useMemo = useMemo6;
+        exports2.useMemo = useMemo7;
         exports2.useReducer = useReducer;
         exports2.useRef = useRef8;
-        exports2.useState = useState18;
+        exports2.useState = useState19;
         exports2.useSyncExternalStore = useSyncExternalStore;
         exports2.useTransition = useTransition;
         exports2.version = ReactVersion;
@@ -9364,7 +9364,7 @@ var require_react_dom_server_legacy_node_development = __commonJS({
         function basicStateReducer(state2, action) {
           return typeof action === "function" ? action(state2) : action;
         }
-        function useState18(initialState2) {
+        function useState19(initialState2) {
           {
             currentHookNameInDev = "useState";
           }
@@ -9429,7 +9429,7 @@ var require_react_dom_server_legacy_node_development = __commonJS({
             return [workInProgressHook.memoizedState, _dispatch];
           }
         }
-        function useMemo6(nextCreate, deps) {
+        function useMemo7(nextCreate, deps) {
           currentlyRenderingComponent = resolveCurrentlyRenderingComponent();
           workInProgressHook = createWorkInProgressHook();
           var nextDeps = deps === void 0 ? null : deps;
@@ -9503,7 +9503,7 @@ var require_react_dom_server_legacy_node_development = __commonJS({
           }
         }
         function useCallback6(callback, deps) {
-          return useMemo6(function() {
+          return useMemo7(function() {
             return callback;
           }, deps);
         }
@@ -9543,10 +9543,10 @@ var require_react_dom_server_legacy_node_development = __commonJS({
         var Dispatcher = {
           readContext: readContext$1,
           useContext,
-          useMemo: useMemo6,
+          useMemo: useMemo7,
           useReducer,
           useRef: useRef8,
-          useState: useState18,
+          useState: useState19,
           useInsertionEffect: noop2,
           useLayoutEffect,
           useCallback: useCallback6,
@@ -14843,7 +14843,7 @@ var require_react_dom_server_node_development = __commonJS({
         function basicStateReducer(state2, action) {
           return typeof action === "function" ? action(state2) : action;
         }
-        function useState18(initialState2) {
+        function useState19(initialState2) {
           {
             currentHookNameInDev = "useState";
           }
@@ -14908,7 +14908,7 @@ var require_react_dom_server_node_development = __commonJS({
             return [workInProgressHook.memoizedState, _dispatch];
           }
         }
-        function useMemo6(nextCreate, deps) {
+        function useMemo7(nextCreate, deps) {
           currentlyRenderingComponent = resolveCurrentlyRenderingComponent();
           workInProgressHook = createWorkInProgressHook();
           var nextDeps = deps === void 0 ? null : deps;
@@ -14982,7 +14982,7 @@ var require_react_dom_server_node_development = __commonJS({
           }
         }
         function useCallback6(callback, deps) {
-          return useMemo6(function() {
+          return useMemo7(function() {
             return callback;
           }, deps);
         }
@@ -15022,10 +15022,10 @@ var require_react_dom_server_node_development = __commonJS({
         var Dispatcher = {
           readContext: readContext$1,
           useContext,
-          useMemo: useMemo6,
+          useMemo: useMemo7,
           useReducer,
           useRef: useRef8,
-          useState: useState18,
+          useState: useState19,
           useInsertionEffect: noop2,
           useLayoutEffect,
           useCallback: useCallback6,
@@ -16333,13 +16333,12 @@ var require_server_node = __commonJS({
 });
 
 // src/brand.ts
-var PRODUCT_NAME, ENGINE_NAME, ENGINE_CREDIT;
+var PRODUCT_NAME, ENGINE_CREDIT;
 var init_brand = __esm({
   "src/brand.ts"() {
     "use strict";
     PRODUCT_NAME = "SelfImpulse";
-    ENGINE_NAME = "MJ";
-    ENGINE_CREDIT = `Built on the ${ENGINE_NAME} engine`;
+    ENGINE_CREDIT = "On this machine, under your own key";
   }
 });
 
@@ -32897,8 +32896,15 @@ var init_window = __esm({
 });
 
 // src/app/desktop.ts
+function electronBridge() {
+  if (typeof window === "undefined") return null;
+  const b3 = window.selfImpulseDesktop;
+  if (!b3 || b3.host !== "electron" || typeof b3.minimize !== "function") return null;
+  return b3;
+}
 function detectHost() {
   if (typeof window === "undefined") return "web";
+  if (electronBridge()) return "electron";
   const w2 = window;
   if (w2.__TAURI_INTERNALS__) return "tauri";
   if (w2.__TAURI__) return "tauri";
@@ -32906,6 +32912,21 @@ function detectHost() {
   return "web";
 }
 async function getWindowApi() {
+  const el = electronBridge();
+  if (el) {
+    return {
+      minimize: () => el.minimize(),
+      toggleMaximize: () => el.toggleMaximize(),
+      close: () => el.close(),
+      // The frameless Electron window is dragged by a `-webkit-app-region:
+      // drag` header the main process injects, so there is no drag IPC here.
+      startDragging: async () => {
+      },
+      isFullscreen: async () => Boolean(document.fullscreenElement),
+      setFullscreen: (v2) => el.setFullscreen(v2),
+      setAlwaysOnTop: (v2) => el.setAlwaysOnTop(v2)
+    };
+  }
   if (detectHost() === "tauri") {
     try {
       const { getCurrentWindow: getCurrentWindow2 } = await Promise.resolve().then(() => (init_window(), window_exports));
@@ -55568,8 +55589,17 @@ async function execNetFetch(input2, ctx) {
   if (!doFetch) return { outcome: "error", output: "no fetch available in this runtime" };
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  const HEADERS = { accept: "text/html,application/json;q=0.9,*/*;q=0.8", "user-agent": "SelfImpulse/19.7 (+evidence-fetch)" };
   try {
-    const res = await doFetch(url2, { signal: controller.signal, headers: { accept: "text/html,application/json;q=0.9,*/*;q=0.8", "user-agent": "SelfImpulse/19.7 (+evidence-fetch)" } });
+    let res = await doFetch(url2, { signal: controller.signal, redirect: "manual", headers: HEADERS });
+    if (res && (res.status === 301 || res.status === 302 || res.status === 303 || res.status === 307 || res.status === 308)) {
+      const loc = res.headers?.get?.("location") ?? "";
+      const next2 = loc ? new URL(loc, url2).href : "";
+      if (!next2) return { outcome: "refused", output: "egress refused (redirect): no target" };
+      const chk = checkEgressUrl(next2);
+      if (!chk.ok) return { outcome: "refused", output: `egress refused (redirect): ${chk.reason}` };
+      res = await doFetch(next2, { signal: controller.signal, redirect: "manual", headers: HEADERS });
+    }
     if (!res.ok) return { outcome: "error", output: `HTTP ${res.status} from ${url2}` };
     const text = (await res.text()).slice(0, MAX_FETCH_CHARS);
     return { outcome: "ok", output: text };
@@ -67176,7 +67206,7 @@ var init_selfimpulseMesh = __esm({
     hmac = pureHmacSha256;
     jointCanonical = (missionId, channelDigest, actions) => JSON.stringify({ v: "vh.mesh.joint.v1", missionId, channelDigest, actions });
     pairKey = (a, b3) => [a, b3].sort().join("\u2194");
-    meshStanding = (t) => !t ? "unknown" : t.trust < 3 ? "probation" : t.trust < 10 ? "selfimpulseed" : "proven";
+    meshStanding = (t) => !t ? "unknown" : t.trust < 3 ? "probation" : t.trust < 10 ? "attested" : "proven";
   }
 });
 
@@ -67291,7 +67321,7 @@ function grantCanonical(g2) {
   return [g2.id, g2.pair, g2.tier, g2.at, String(g2.humanFirst), g2.granted.join(","), refusals].join("");
 }
 function tiersFor(capability) {
-  return ["probation", "selfimpulseed", "proven"].filter((t) => CAPABILITIES_BY_STANDING[t].includes(capability));
+  return ["probation", "attested", "proven"].filter((t) => CAPABILITIES_BY_STANDING[t].includes(capability));
 }
 function narrowGrant(input2) {
   const tier = input2.standing ?? "unknown";
@@ -67401,7 +67431,7 @@ var init_delegationGrant = __esm({
     CAPABILITIES_BY_STANDING = {
       unknown: [],
       probation: ["repo.read", "data.aggregate"],
-      selfimpulseed: ["repo.read", "data.aggregate", "test.run", "net.fetch", "egress.share"],
+      attested: ["repo.read", "data.aggregate", "test.run", "net.fetch", "egress.share"],
       proven: [
         "repo.read",
         "data.aggregate",
@@ -68178,7 +68208,7 @@ async function crossFederation(parties, wiring = {}) {
   return finish(
     "crossed",
     "crossed",
-    `${envelope.capability} crossed between ${envelope.pair}: the owner key of each selfimpulse approved it, naming who authorised it, both selfimpulses lend the capability at their own standing, and both approvals are now spent`,
+    `${envelope.capability} crossed between ${envelope.pair}: the owner key of each selfimpulse approved it, naming who authorised it, both agents lend the capability at their own standing, and both approvals are now spent`,
     filed,
     { receipts: { initiator: filed[0]?.digest ?? "", responder: filed[1]?.digest ?? "" } }
   );
@@ -77026,7 +77056,7 @@ var init_selfimpulse = __esm({
     listeners = /* @__PURE__ */ new Set();
     MISSIONS_KEY = "selfimpulse.missions.v1";
     KB = [
-      { title: "Grok Bot (xAI, Aug 11 2026)", snippet: "Always-on AI selfimpulses on a vendor cloud computer that sign into your apps; multi-bot group chats; watch-and-learn routines; gated behind SuperGrok/Cursor top tiers. The critique: your credentials live on their VM.", source: "local knowledge base" },
+      { title: "Grok Bot (xAI, Aug 11 2026)", snippet: "Always-on AI agents on a vendor cloud computer that sign into your apps; multi-bot group chats; watch-and-learn routines; gated behind SuperGrok/Cursor top tiers. The critique: your credentials live on their VM.", source: "local knowledge base" },
       { title: "Grok 4.6 (xAI, Aug 2026)", snippet: "Flagship model for long-running agents; 500k context; reasoning effort tiers; $2/$0.50/$6 per 1M tokens under 200k prompt.", source: "local knowledge base" },
       { title: "EU AI Act enforcement (Aug 2 2026)", snippet: "High-risk obligations enforced: tamper-evident logging (Art. 12), human oversight (Art. 14); penalties to 7% of global revenue. Agents need receipts, not logs.", source: "local knowledge base" },
       { title: "The execution core (mission loop)", snippet: "One loop \u2014 COMPOSE \u2192 DISPATCH \u2192 COMMUNICATE \u2192 EXECUTE \u2192 GATE \u2192 ADAPT \u2014 with an allowlisted set of agent CLIs, adversarial arena, budget ledger, Ed25519-signed hash-chained receipts, Assurance Score, FinOps chargeback. The SelfImpulse door dispatches real missions to it.", source: "local knowledge base" },
@@ -77034,7 +77064,7 @@ var init_selfimpulse = __esm({
       { title: "Tauri 2 (desktop shell)", snippet: "Rust core + system webview; small binaries, real OS keychain and stdio child processes; the same frontend runs as a browser edition.", source: "local knowledge base" },
       { title: "Agent funding, H1 2026", snippet: "The 'agent governance' theme is the clearest funded theme of H1 2026: JetStream $34M seed, Guild.ai $30M A, Geordie $30M A, WitnessAI $85M+. The verifiable, local-first quadrant is the empty one.", source: "local knowledge base" },
       { title: "Chennai, Tamil Nadu", snippet: "India's fourth-largest city; the IT and aerospace hub of the south (Omi Vedu, Navi Kempegowda's southern twin in reputation). IST = UTC+5:30.", source: "local knowledge base" },
-      { title: "SelfImpulse (this product)", snippet: "One product: the SelfImpulse door (the accountable colleague) + the execution core (the mission loop) + one proof standard. Every job selfimpulseed \u2014 signed receipts on every run, on your machine.", source: "local knowledge base" },
+      { title: "SelfImpulse (this product)", snippet: "One product: the SelfImpulse door (the accountable colleague) + the execution core (the mission loop) + one proof standard. Every job attested \u2014 signed receipts on every run, on your machine.", source: "local knowledge base" },
       { title: "DeepSearch (Grok feature)", snippet: "Iterative retrieval loop: split query into sub-queries, parallel web + X search, summarize batches in a scratchpad, repeat to a step limit, cross-check before drafting.", source: "local knowledge base" }
     ];
     looksLikeMath = (t) => {
@@ -77244,14 +77274,14 @@ Start one and I'll hold it: \u201Ccontinue <thread name>\u201D picks it back up.
           if (!args) continue;
           const isDispatch = sk.tool === "dispatch_mission";
           return {
-            thoughts: [`Slow\u2192fast: executing my selfimpulseed skill "${sk.name}" v${sk.version} \u2014 test-gated, ${sk.wins} proven win(s), distilled from a selfimpulseed run. The procedure is proven, so no re-planning.`],
-            plan: [`${sk.name} v${sk.version} \u2014 single selfimpulseed step`],
+            thoughts: [`Slow\u2192fast: executing my attested skill "${sk.name}" v${sk.version} \u2014 test-gated, ${sk.wins} proven win(s), distilled from a attested run. The procedure is proven, so no re-planning.`],
+            plan: [`${sk.name} v${sk.version} \u2014 single attested step`],
             actions: isDispatch ? [{ kind: "dispatch", objective: String(args.objective ?? "") }] : [{ kind: "tool", tool: sk.tool, args }],
             confidence: "high",
             skillId: sk.id,
             skillVersion: sk.version,
             final: (r3) => tone(
-              r3[0]?.ok ? `Done \u2014 via my selfimpulseed skill **${sk.name}** v${sk.version} (slow\u2192fast; test-gated, ${sk.wins} proven win${sk.wins === 1 ? "" : "s"}). The receipt binds the skill and verifies offline like every other job.` : `My selfimpulseed skill **${sk.name}** FAILED on live replay \u2014 I've flagged it, filed the failure to memory, and here is the honest record: ${r3[0]?.output ?? ""}`,
+              r3[0]?.ok ? `Done \u2014 via my attested skill **${sk.name}** v${sk.version} (slow\u2192fast; test-gated, ${sk.wins} proven win${sk.wins === 1 ? "" : "s"}). The receipt binds the skill and verifies offline like every other job.` : `My attested skill **${sk.name}** FAILED on live replay \u2014 I've flagged it, filed the failure to memory, and here is the honest record: ${r3[0]?.output ?? ""}`,
               ctx.persona
             )
           };
@@ -77286,7 +77316,7 @@ Brain: **${brain.label}**. The real-model planning seam ships in this runtime \u
               `I'm **${BOT_NAME}** \u2014 a standalone, persistent, named colleague on this machine, running the **SelfImpulse Cycle**: recall \u2192 plan \u2192 think \u2192 simulate \u2192 act \u2192 selfimpulse \u2192 learn.
 
 - **Tools:** calculator (real parser), clock, local knowledge base, live web evidence (keyless providers), memory + preferences (yours to inspect/delete), a local workspace (writes are simulated + approval-gated), system info
-- **Dispatch:** \u201Cdispatch a mission: \u2026\u201D \u2014 hands the objective to the real execution core (the mission loop) under one mission ID; the whole trail lands in one selfimpulseed chain
+- **Dispatch:** \u201Cdispatch a mission: \u2026\u201D \u2014 hands the objective to the real execution core (the mission loop) under one mission ID; the whole trail lands in one attested chain
 - **Learning:** successful runs become test-gated skills you can inspect; your feedback binds to receipts
 - **Proof:** every completed run mints a ${`mj-proof-receipt/2`} \u2014 SHA-256 chain, HMAC seal, Ed25519 issuer signature when this runtime can sign \u2014 verifiable offline, zero runtime state
 
@@ -78163,6 +78193,12 @@ var init_goals = __esm({
 });
 
 // src/engine/initiative.ts
+function modeForLevel(level) {
+  return level === 0 ? "manual" : level >= 3 ? "fia" : "semi";
+}
+function levelForMode(mode) {
+  return AUTONOMY_MODES.find((m) => m.mode === mode)?.level ?? 0;
+}
 function storage16() {
   try {
     return globalThis.localStorage ?? null;
@@ -78361,17 +78397,22 @@ async function executeWakeActs(acts, executor) {
   persist();
   return runs;
 }
-var AUTONOMY_LEVEL_NAMES, INITIATIVE_KEY, HEARTBEAT_DEFAULT_MS, LIMITS, state;
+var AUTONOMY_LEVEL_NAMES, AUTONOMY_MODES, INITIATIVE_KEY, HEARTBEAT_DEFAULT_MS, LIMITS, state;
 var init_initiative = __esm({
   "src/engine/initiative.ts"() {
     "use strict";
     init_goals();
     AUTONOMY_LEVEL_NAMES = {
-      0: "manual \u2014 acts only on your command",
-      1: "scheduled \u2014 heartbeat wakes the crew on an interval",
-      2: "self-set \u2014 the crew may schedule its own follow-ups (capped)",
-      3: "adaptive \u2014 follow-ups adapt to observed state (still capped)"
+      0: "Manual \u2014 nothing runs until you send it; risky steps still ask you",
+      1: "Semi-Autonomous \u2014 a schedule wakes the crew for safe, capped work; risky steps still ask you",
+      2: "Semi-Autonomous \u2014 the crew sets its own safe follow-ups (capped)",
+      3: "FIA \u2014 Fully Integrated Automation: the crew adapts and self-schedules inside hard caps"
     };
+    AUTONOMY_MODES = [
+      { mode: "manual", label: "Manual", short: "MANUAL", level: 0, blurb: "Nothing runs until you send it. Risky steps still ask." },
+      { mode: "semi", label: "Semi-Autonomous", short: "SEMI", level: 1, blurb: "A schedule wakes the crew for safe, capped work; risky steps still ask." },
+      { mode: "fia", label: "Fully Integrated Automation", short: "FIA", level: 3, blurb: "The crew self-schedules and adapts inside hard caps; risky steps still ask." }
+    ];
     INITIATIVE_KEY = "engine.initiative.v1";
     HEARTBEAT_DEFAULT_MS = 15 * 60 * 1e3;
     LIMITS = {
@@ -79294,11 +79335,11 @@ var require_react_jsx_runtime_development = __commonJS({
             return jsxWithValidation(type, props, key, false);
           }
         }
-        var jsx19 = jsxWithValidationDynamic;
-        var jsxs18 = jsxWithValidationStatic;
+        var jsx20 = jsxWithValidationDynamic;
+        var jsxs19 = jsxWithValidationStatic;
         exports2.Fragment = REACT_FRAGMENT_TYPE;
-        exports2.jsx = jsx19;
-        exports2.jsxs = jsxs18;
+        exports2.jsx = jsx20;
+        exports2.jsxs = jsxs19;
       })();
     }
   }
@@ -80203,16 +80244,16 @@ var require_isarray = __commonJS({
   }
 });
 
-// node_modules/jszip/node_modules/readable-stream/lib/internal/streams/stream.js
+// node_modules/readable-stream/lib/internal/streams/stream.js
 var require_stream = __commonJS({
-  "node_modules/jszip/node_modules/readable-stream/lib/internal/streams/stream.js"(exports2, module2) {
+  "node_modules/readable-stream/lib/internal/streams/stream.js"(exports2, module2) {
     module2.exports = __require("stream");
   }
 });
 
-// node_modules/jszip/node_modules/safe-buffer/index.js
+// node_modules/safe-buffer/index.js
 var require_safe_buffer = __commonJS({
-  "node_modules/jszip/node_modules/safe-buffer/index.js"(exports2, module2) {
+  "node_modules/safe-buffer/index.js"(exports2, module2) {
     var buffer = __require("buffer");
     var Buffer2 = buffer.Buffer;
     function copyProps(src, dst) {
@@ -80383,9 +80424,9 @@ var require_inherits = __commonJS({
   }
 });
 
-// node_modules/jszip/node_modules/readable-stream/lib/internal/streams/BufferList.js
+// node_modules/readable-stream/lib/internal/streams/BufferList.js
 var require_BufferList = __commonJS({
-  "node_modules/jszip/node_modules/readable-stream/lib/internal/streams/BufferList.js"(exports2, module2) {
+  "node_modules/readable-stream/lib/internal/streams/BufferList.js"(exports2, module2) {
     "use strict";
     function _classCallCheck(instance, Constructor) {
       if (!(instance instanceof Constructor)) {
@@ -80461,9 +80502,9 @@ var require_BufferList = __commonJS({
   }
 });
 
-// node_modules/jszip/node_modules/readable-stream/lib/internal/streams/destroy.js
+// node_modules/readable-stream/lib/internal/streams/destroy.js
 var require_destroy = __commonJS({
-  "node_modules/jszip/node_modules/readable-stream/lib/internal/streams/destroy.js"(exports2, module2) {
+  "node_modules/readable-stream/lib/internal/streams/destroy.js"(exports2, module2) {
     "use strict";
     var pna = require_process_nextick_args();
     function destroy(err, cb2) {
@@ -80537,9 +80578,9 @@ var require_node = __commonJS({
   }
 });
 
-// node_modules/jszip/node_modules/readable-stream/lib/_stream_writable.js
+// node_modules/readable-stream/lib/_stream_writable.js
 var require_stream_writable = __commonJS({
-  "node_modules/jszip/node_modules/readable-stream/lib/_stream_writable.js"(exports2, module2) {
+  "node_modules/readable-stream/lib/_stream_writable.js"(exports2, module2) {
     "use strict";
     var pna = require_process_nextick_args();
     module2.exports = Writable;
@@ -80977,9 +81018,9 @@ var require_stream_writable = __commonJS({
   }
 });
 
-// node_modules/jszip/node_modules/readable-stream/lib/_stream_duplex.js
+// node_modules/readable-stream/lib/_stream_duplex.js
 var require_stream_duplex = __commonJS({
-  "node_modules/jszip/node_modules/readable-stream/lib/_stream_duplex.js"(exports2, module2) {
+  "node_modules/readable-stream/lib/_stream_duplex.js"(exports2, module2) {
     "use strict";
     var pna = require_process_nextick_args();
     var objectKeys = Object.keys || function(obj2) {
@@ -81054,9 +81095,9 @@ var require_stream_duplex = __commonJS({
   }
 });
 
-// node_modules/jszip/node_modules/string_decoder/lib/string_decoder.js
+// node_modules/string_decoder/lib/string_decoder.js
 var require_string_decoder = __commonJS({
-  "node_modules/jszip/node_modules/string_decoder/lib/string_decoder.js"(exports2) {
+  "node_modules/string_decoder/lib/string_decoder.js"(exports2) {
     "use strict";
     var Buffer2 = require_safe_buffer().Buffer;
     var isEncoding = Buffer2.isEncoding || function(encoding) {
@@ -81292,9 +81333,9 @@ var require_string_decoder = __commonJS({
   }
 });
 
-// node_modules/jszip/node_modules/readable-stream/lib/_stream_readable.js
+// node_modules/readable-stream/lib/_stream_readable.js
 var require_stream_readable = __commonJS({
-  "node_modules/jszip/node_modules/readable-stream/lib/_stream_readable.js"(exports2, module2) {
+  "node_modules/readable-stream/lib/_stream_readable.js"(exports2, module2) {
     "use strict";
     var pna = require_process_nextick_args();
     module2.exports = Readable;
@@ -81978,9 +82019,9 @@ var require_stream_readable = __commonJS({
   }
 });
 
-// node_modules/jszip/node_modules/readable-stream/lib/_stream_transform.js
+// node_modules/readable-stream/lib/_stream_transform.js
 var require_stream_transform = __commonJS({
-  "node_modules/jszip/node_modules/readable-stream/lib/_stream_transform.js"(exports2, module2) {
+  "node_modules/readable-stream/lib/_stream_transform.js"(exports2, module2) {
     "use strict";
     module2.exports = Transform;
     var Duplex = require_stream_duplex();
@@ -82078,9 +82119,9 @@ var require_stream_transform = __commonJS({
   }
 });
 
-// node_modules/jszip/node_modules/readable-stream/lib/_stream_passthrough.js
+// node_modules/readable-stream/lib/_stream_passthrough.js
 var require_stream_passthrough = __commonJS({
-  "node_modules/jszip/node_modules/readable-stream/lib/_stream_passthrough.js"(exports2, module2) {
+  "node_modules/readable-stream/lib/_stream_passthrough.js"(exports2, module2) {
     "use strict";
     module2.exports = PassThrough;
     var Transform = require_stream_transform();
@@ -82097,9 +82138,9 @@ var require_stream_passthrough = __commonJS({
   }
 });
 
-// node_modules/jszip/node_modules/readable-stream/readable.js
+// node_modules/readable-stream/readable.js
 var require_readable = __commonJS({
-  "node_modules/jszip/node_modules/readable-stream/readable.js"(exports2, module2) {
+  "node_modules/readable-stream/readable.js"(exports2, module2) {
     var Stream = __require("stream");
     if (process.env.READABLE_STREAM === "disable" && Stream) {
       module2.exports = Stream;
@@ -137811,10 +137852,10 @@ fn fs_main(in : VertexOutput) -> @location(0) vec4<f32> {
       clipBbox(graphics, x0, y0, x1, y1) {
         const bboxWidth = x1 - x0;
         const bboxHeight = y1 - y0;
-        const clip3 = new Path2D();
-        clip3.rect(x0, y0, bboxWidth, bboxHeight);
+        const clip4 = new Path2D();
+        clip4.rect(x0, y0, bboxWidth, bboxHeight);
         Util.axialAlignedBoundingBox([x0, y0, x1, y1], getCurrentTransform(graphics.ctx), graphics.current.minMax);
-        graphics.ctx.clip(clip3);
+        graphics.ctx.clip(clip4);
         graphics.current.updateClipFromPath();
       }
       setFillAndStrokeStyleToContext(graphics, paintType, color) {
@@ -138766,9 +138807,9 @@ fn fs_main(in : VertexOutput) -> @location(0) vec4<f32> {
             layerCtx.save();
             layerCtx.globalAlpha = 1;
             layerCtx.setTransform(1, 0, 0, 1, 0, 0);
-            const clip3 = new Path2D();
-            clip3.rect(clipX, clipY, clipW, clipH);
-            layerCtx.clip(clip3);
+            const clip4 = new Path2D();
+            clip4.rect(clipX, clipY, clipW, clipH);
+            layerCtx.clip(clip4);
             layerCtx.globalCompositeOperation = "destination-in";
             layerCtx.drawImage(preparedEntry.canvas, srcX, srcY, clipW, clipH, clipX, clipY, clipW, clipH);
             layerCtx.restore();
@@ -138817,9 +138858,9 @@ fn fs_main(in : VertexOutput) -> @location(0) vec4<f32> {
         layerCtx.save();
         layerCtx.globalAlpha = 1;
         layerCtx.setTransform(1, 0, 0, 1, 0, 0);
-        const clip3 = new Path2D();
-        clip3.rect(layerOffsetX, layerOffsetY, width, height);
-        layerCtx.clip(clip3);
+        const clip4 = new Path2D();
+        clip4.rect(layerOffsetX, layerOffsetY, width, height);
+        layerCtx.clip(clip4);
         layerCtx.globalCompositeOperation = "destination-in";
         layerCtx.drawImage(maskCtx.canvas, layerOffsetX - maskOffsetX, layerOffsetY - maskOffsetY, width, height, layerOffsetX, layerOffsetY, width, height);
         layerCtx.restore();
@@ -139455,9 +139496,9 @@ fn fs_main(in : VertexOutput) -> @location(0) vec4<f32> {
       setCharWidth(opIdx, xWidth, yWidth) {
       }
       setCharWidthAndBounds(opIdx, xWidth, yWidth, llx, lly, urx, ury) {
-        const clip3 = new Path2D();
-        clip3.rect(llx, lly, urx - llx, ury - lly);
-        this.ctx.clip(clip3);
+        const clip4 = new Path2D();
+        clip4.rect(llx, lly, urx - llx, ury - lly);
+        this.ctx.clip(clip4);
         this.dependencyTracker?.recordBBox(opIdx, this.ctx, llx, urx, lly, ury).recordClipBox(opIdx, this.ctx, llx, urx, lly, ury);
         this.endPath(opIdx);
       }
@@ -139563,9 +139604,9 @@ fn fs_main(in : VertexOutput) -> @location(0) vec4<f32> {
         if (bbox) {
           Util.axialAlignedBoundingBox(bbox, this.baseTransform, this.current.minMax);
           const [x0, y0, x1, y1] = bbox;
-          const clip3 = new Path2D();
-          clip3.rect(x0, y0, x1 - x0, y1 - y0);
-          this.ctx.clip(clip3);
+          const clip4 = new Path2D();
+          clip4.rect(x0, y0, x1 - x0, y1 - y0);
+          this.ctx.clip(clip4);
           this.dependencyTracker?.recordClipBox(opIdx, this.ctx, x0, x1, y0, y1);
           this.endPath(opIdx);
         }
@@ -139592,15 +139633,15 @@ fn fs_main(in : VertexOutput) -> @location(0) vec4<f32> {
         const currentCtx = this.ctx;
         if ((!group2.needsIsolation || !group2.isolated && !group2.hasSoftMask) && !group2.knockout && !group2.isGray && this.#knockoutGroupLevel === 0 && currentCtx.globalAlpha === 1 && currentCtx.globalCompositeOperation === "source-over" && !inSMaskMode) {
           if (group2.bbox) {
-            let clip3 = new Path2D();
+            let clip4 = new Path2D();
             const [x0, y0, x1, y1] = group2.bbox;
-            clip3.rect(x0, y0, x1 - x0, y1 - y0);
+            clip4.rect(x0, y0, x1 - x0, y1 - y0);
             if (group2.matrix) {
               const path5 = new Path2D();
-              path5.addPath(clip3, new DOMMatrix(group2.matrix));
-              clip3 = path5;
+              path5.addPath(clip4, new DOMMatrix(group2.matrix));
+              clip4 = path5;
             }
-            currentCtx.clip(clip3);
+            currentCtx.clip(clip4);
           }
           this.groupStack.push(null);
           this.#groupStackMeta.push(null);
@@ -139653,15 +139694,15 @@ fn fs_main(in : VertexOutput) -> @location(0) vec4<f32> {
           groupCtx.restore();
         }
         if (group2.bbox) {
-          let clip3 = new Path2D();
+          let clip4 = new Path2D();
           const [x0, y0, x1, y1] = group2.bbox;
-          clip3.rect(x0, y0, x1 - x0, y1 - y0);
+          clip4.rect(x0, y0, x1 - x0, y1 - y0);
           if (group2.matrix) {
             const path5 = new Path2D();
-            path5.addPath(clip3, new DOMMatrix(group2.matrix));
-            clip3 = path5;
+            path5.addPath(clip4, new DOMMatrix(group2.matrix));
+            clip4 = path5;
           }
-          groupCtx.clip(clip3);
+          groupCtx.clip(clip4);
         }
         if (group2.smask) {
           this.smaskStack.push({
@@ -139783,9 +139824,9 @@ fn fs_main(in : VertexOutput) -> @location(0) vec4<f32> {
             }
           } else {
             if (groupMeta.replaceBackdrop) {
-              const clip3 = new Path2D();
-              clip3.rect(0, 0, groupCtx.canvas.width, groupCtx.canvas.height);
-              this.ctx.clip(clip3);
+              const clip4 = new Path2D();
+              clip4.rect(0, 0, groupCtx.canvas.width, groupCtx.canvas.height);
+              this.ctx.clip(clip4);
               this.ctx.globalCompositeOperation = "copy";
             }
             this.ctx.drawImage(groupCtx.canvas, 0, 0);
@@ -139890,9 +139931,9 @@ fn fs_main(in : VertexOutput) -> @location(0) vec4<f32> {
           } else {
             resetCtxToDefault(this.ctx);
             this.endPath(opIdx);
-            const clip3 = new Path2D();
-            clip3.rect(rect[0], rect[1], width, height);
-            this.ctx.clip(clip3);
+            const clip4 = new Path2D();
+            clip4.rect(rect[0], rect[1], width, height);
+            this.ctx.clip(clip4);
           }
         }
         this.current = new CanvasExtraState(this.ctx.canvas.width, this.ctx.canvas.height);
@@ -159031,6 +159072,189 @@ var init_channels = __esm({
   }
 });
 
+// src/engine/channelDoors.ts
+function sessionKeyFor(agentId, m, groupShared = false) {
+  const base = `si:${agentId}:${m.door}`;
+  if (m.threadId) return `${base}:thread:${m.threadId}`;
+  if (m.kind === "dm") return `${base}:main`;
+  return groupShared ? `${base}:main` : `${base}:group:${m.chatId}`;
+}
+function authorizeDoor(agentId, m, doors) {
+  const door2 = doors.find((d2) => d2.id === m.door);
+  if (!door2) return { ok: false, reason: `no channel door "${m.door}" is declared` };
+  if (!door2.enabled) {
+    return { ok: false, reason: `channel door "${m.door}" is not enabled \u2014 enable it before a peer can speak to the crew` };
+  }
+  const allow = door2.access.allow;
+  if (!allow || allow.length === 0) {
+    return { ok: false, reason: `door "${m.door}" admits no one \u2014 name the senders who may speak (fail-closed)` };
+  }
+  if (!allow.includes(m.senderId)) {
+    return { ok: false, reason: `sender "${m.senderId}" is not on door "${m.door}"'s allow list` };
+  }
+  if (m.kind === "group" && door2.access.requireMention && !m.mentioned) {
+    return { ok: false, reason: `group message without a mention \u2014 the door asks to be addressed` };
+  }
+  return { ok: true, session: sessionKeyFor(agentId, m, door2.access.groupPolicy === "shared") };
+}
+var init_channelDoors = __esm({
+  "src/engine/channelDoors.ts"() {
+    "use strict";
+  }
+});
+
+// src/engine/compute.ts
+function resolveCompute(preferred, hostEndpoint) {
+  if (preferred === "in-process") return { ok: true, target: { mode: "in-process" } };
+  if (hostEndpoint && hostEndpoint.length > 0) {
+    return { ok: true, target: { mode: "host-process", endpoint: hostEndpoint } };
+  }
+  return { ok: false, reason: "no host process is available on this machine \u2014 the seat refused rather than pretend to run on a host that is not there" };
+}
+var init_compute = __esm({
+  "src/engine/compute.ts"() {
+    "use strict";
+  }
+});
+
+// src/engine/namespaces.ts
+function nsKey(namespace, kind, name) {
+  return `si:${namespace}:${kind}:${name}`;
+}
+var ROOT_NAMESPACE;
+var init_namespaces = __esm({
+  "src/engine/namespaces.ts"() {
+    "use strict";
+    ROOT_NAMESPACE = "ns.default";
+  }
+});
+
+// src/engine/presets.ts
+function validatePreset(p) {
+  const issues = [];
+  const declared = new Set(p.vars.map((v2) => v2.name));
+  for (const [key, value] of Object.entries(p.template)) {
+    for (const u2 of usedVars(value)) {
+      if (!declared.has(u2)) issues.push(`template "${key}" uses undeclared var "{{${u2}}}"`);
+    }
+  }
+  for (const v2 of p.vars) {
+    const used = Object.values(p.template).some((t) => t.includes(`{{${v2.name}}}`));
+    if (!used) issues.push(`declared var "${v2.name}" is never used in the template`);
+  }
+  return issues;
+}
+function renderPreset(p, values2) {
+  const declared = new Set(p.vars.map((v2) => v2.name));
+  for (const k2 of Object.keys(values2)) {
+    if (!declared.has(k2)) return { ok: false, reason: `"${k2}" is not a declared variable of preset "${p.id}"` };
+  }
+  for (const v2 of p.vars) {
+    if (v2.required && !String(values2[v2.name] ?? "").length) {
+      return { ok: false, reason: `required variable "${v2.name}" is not filled` };
+    }
+  }
+  const config2 = {};
+  for (const [key, tpl] of Object.entries(p.template)) {
+    config2[key] = tpl.replace(/\{\{\s*([a-zA-Z0-9_.-]+)\s*\}\}/g, (_m, name) => String(values2[name] ?? ""));
+  }
+  const hole = Object.keys(config2).find((k2) => /\{\{.*\}\}/.test(config2[k2]));
+  if (hole) return { ok: false, reason: `an unfilled placeholder remains in "${hole}" \u2014 the preset would ship a hole, so it is refused` };
+  return { ok: true, config: config2 };
+}
+function usedVars(s) {
+  return [...s.matchAll(/\{\{\s*([a-zA-Z0-9_.-]+)\s*\}\}/g)].map((m) => m[1]);
+}
+var init_presets = __esm({
+  "src/engine/presets.ts"() {
+    "use strict";
+  }
+});
+
+// src/engine/revisions.ts
+var RevisionLog;
+var init_revisions = __esm({
+  "src/engine/revisions.ts"() {
+    "use strict";
+    RevisionLog = class {
+      revs = [];
+      active = 0;
+      /** Append an immutable snapshot and activate it. Returns its id. */
+      commit(snapshot, at2, note) {
+        const rev = this.revs.length + 1;
+        this.revs.push({ rev, at: at2, snapshot, note });
+        this.active = rev;
+        return rev;
+      }
+      /** The immutable snapshot that is live right now. */
+      current() {
+        return this.revs.find((r3) => r3.rev === this.active) ?? null;
+      }
+      activeRev() {
+        return this.active;
+      }
+      list() {
+        return [...this.revs];
+      }
+      get(rev) {
+        return this.revs.find((r3) => r3.rev === rev) ?? null;
+      }
+      /** Point the running pointer at an existing snapshot. False for an unknown id (never faked). */
+      setActive(rev) {
+        if (!this.revs.some((r3) => r3.rev === rev)) return false;
+        this.active = rev;
+        return true;
+      }
+    };
+  }
+});
+
+// src/engine/channelGateway.ts
+var ChannelGateway;
+var init_channelGateway = __esm({
+  "src/engine/channelGateway.ts"() {
+    "use strict";
+    init_channelDoors();
+    init_compute();
+    init_namespaces();
+    init_presets();
+    init_revisions();
+    ChannelGateway = class {
+      history = new RevisionLog();
+      /** Admit one inbound message and hand it to the engine — or refuse in words. */
+      admit(req) {
+        const door2 = authorizeDoor(req.agentId, req.message, req.doors);
+        if (!door2.ok) return { ok: false, reason: door2.reason };
+        let launch;
+        if (req.preset) {
+          const issues = validatePreset(req.preset);
+          if (issues.length > 0) return { ok: false, reason: `preset "${req.preset.id}" is not sound: ${issues[0]}` };
+          const rendered = renderPreset(req.preset, req.presetValues ?? {});
+          if (!rendered.ok) return { ok: false, reason: rendered.reason };
+          launch = rendered.config;
+        }
+        const compute = resolveCompute(req.computeMode, req.hostEndpoint);
+        if (!compute.ok) return { ok: false, reason: compute.reason };
+        const session5 = nsKey(req.namespaceId, "session", door2.session.replace(/^si:/, ""));
+        const rev = this.history.commit({ door: req.message.door, senderId: req.message.senderId, session: session5 }, req.message.at);
+        req.deliver({
+          session: session5,
+          text: req.message.text,
+          senderId: req.message.senderId,
+          door: req.message.door,
+          compute: compute.target.mode,
+          launch
+        });
+        return { ok: true, session: session5, rev, compute: compute.target.mode, launch };
+      }
+      /** The immutable record of what crossed each admitted door. */
+      crossings() {
+        return this.history.list();
+      }
+    };
+  }
+});
+
 // src/ui/voice.ts
 function readThinking() {
   try {
@@ -159133,26 +159357,26 @@ var init_voice = __esm({
     "use strict";
     import_react7 = __toESM(require_react(), 1);
     VOICE = [
-      "Weighing",
-      "Deliberating",
-      "Charting the route",
-      "Laying the course",
-      "Reading ahead",
-      "Measuring twice",
-      "Counting the cost",
-      "Foreseeing",
-      "Rehearsing",
-      "Sizing the risk",
-      "Turning it over",
-      "Holding the thread",
-      "Framing the ask",
-      "Mulling",
-      "Staking the path"
+      "Reading your request",
+      "Working out the route",
+      "Choosing the crew",
+      "Laying out the work",
+      "Weighing what it takes",
+      "Checking the cost",
+      "Reading two steps ahead",
+      "Thinking it through",
+      "Working out the details",
+      "Getting the crew ready",
+      "Looking at what could go wrong",
+      "Setting out the plan",
+      "Working out what to ask you",
+      "Staying with it",
+      "Finding the way"
     ];
     STEP_MS = 3400;
     THINKING = [
       { id: "plain", word: "Plain", instruction: "", holdMs: STEP_MS },
-      { id: "route", word: "Chart", instruction: "Chart the route and count its cost before you answer.", holdMs: STEP_MS * 1.5 },
+      { id: "route", word: "Plan", instruction: "Work out the route and what it costs before you answer.", holdMs: STEP_MS * 1.5 },
       { id: "ahead", word: "Read ahead", instruction: "Read three steps ahead, name what could go wrong, then answer.", holdMs: STEP_MS * 2 }
     ];
     THINKING_KEY = "vh.thinking.v1";
@@ -159576,6 +159800,17 @@ function armHeartbeat(get2) {
     }
   }, HEARTBEAT_DEFAULT_MS);
 }
+function channelAllowList(doorId) {
+  try {
+    if (typeof localStorage === "undefined") return [];
+    const raw = localStorage.getItem(`si.channel.allow.${doorId}`);
+    if (!raw) return [];
+    const arr = JSON.parse(raw);
+    return Array.isArray(arr) ? arr.filter((x2) => typeof x2 === "string" && x2.length > 0) : [];
+  } catch {
+    return [];
+  }
+}
 var PROVIDER_STORAGE_KEY, THEME_KEY, THEMES, DEFAULT_THEME, INGEST_LOG_KEY, INGEST_LOG_KEEP, seq3, heartbeat, nowIso3, readTheme, readHandle, useVh, memoryGraphData, memoryStats, memorySecurity;
 var init_store = __esm({
   "src/ui/store.ts"() {
@@ -159603,6 +159838,8 @@ var init_store = __esm({
     init_runCheckpoints();
     init_a2aFederation();
     init_channels();
+    init_channelGateway();
+    init_namespaces();
     init_voice();
     init_crashLedger();
     init_nativeProvider();
@@ -159738,6 +159975,33 @@ ${text}`;
             set2({ sessions: listSessions() });
           }
         }
+      },
+      channelInbound: async (input2) => {
+        const authed = input2.authenticate(input2.raw);
+        if (!authed) return { ok: false, note: "ingress failed authentication \u2014 the payload is not trusted, so nothing was delivered" };
+        const message = input2.normalize(input2.raw);
+        if (!message) return { ok: false, note: "the delivery carried no actionable text (bot echo, edit, or non-text event) \u2014 nothing to do" };
+        if (get2().busy) return { ok: false, note: "the crew is mid-mission \u2014 this delivery is held, not queued behind a running turn" };
+        const gw = new ChannelGateway();
+        const door2 = {
+          id: input2.doorId,
+          kind: input2.kind,
+          enabled: true,
+          access: { allow: channelAllowList(input2.doorId), groupPolicy: "isolated", requireMention: input2.kind !== "email" }
+        };
+        const result2 = gw.admit({
+          agentId: "selfimpulse",
+          namespaceId: input2.namespaceId ?? ROOT_NAMESPACE,
+          doors: [door2],
+          message,
+          computeMode: "in-process",
+          hostEndpoint: null,
+          deliver: (h) => {
+            void get2().send(h.text);
+          }
+        });
+        if (!result2.ok) return { ok: false, note: result2.reason };
+        return { ok: true, note: `admitted on the ${input2.doorId} door \u2192 session ${result2.session} (rev ${result2.rev}); the Captain is on it` };
       },
       decideGate: (d2) => {
         const g2 = get2().gate;
@@ -160081,6 +160345,43 @@ ${lines.join("\n")}`, at: nowIso3() }], initiative: loadInitiative(), gate: null
   }
 });
 
+// src/ui/sidekick.ts
+function sidekickReply(input2, ctx) {
+  const q2 = input2.trim();
+  const low = q2.toLowerCase();
+  const who = ctx.captainName && ctx.captainName.length > 0 ? ctx.captainName : "the agent";
+  const onIt = ctx.subject && ctx.subject.length > 0 ? ` on \u201C${clip3(ctx.subject, 60)}\u201D` : "";
+  if (!low) {
+    return `I'm here${ctx.running ? ` \u2014 ${who} is still working${onIt}` : ""}. Ask me anything while you wait.`;
+  }
+  if (/^(hi|hey|hello|yo|sup|good (morning|afternoon|evening))\b/.test(low)) {
+    return `Hey \u2014 I'm your sidekick${ctx.running ? `, and ${who} is busy${onIt}` : ""}. I can give you a quick read on where things stand, or jot a note for when the run lands.`;
+  }
+  if (/(status|progress|where.*at|what.*doing|how.*going|how.*long|almost|done|finished)\b/.test(low)) {
+    return ctx.running ? `Still running${onIt}. I don't have a live step counter to quote you, so I won't guess a percentage \u2014 the Work tab shows the real steps as they land, and the full answer comes through when it finishes.` : `Nothing is running right now. When you send a task, I'll keep you company and ${who} will bring back the answer.`;
+  }
+  if (/^(stop|wait|hold|pause|cancel|abort)\b/.test(low)) {
+    return `Noted \u2014 but stopping a run isn't mine to do; that's the gate's call, and I won't pretend otherwise. If something risky is paused, you'll see the card and can decide there. Otherwise the run finishes on its own.`;
+  }
+  if (/(instead|change|actually|newer idea|revise|scratch that)\b/.test(low)) {
+    return `Got it \u2014 I'll hold that as the next thing you want, and I'll keep it in front of ${who} so it's the first thing handled once this run wraps.`;
+  }
+  if (/(thank|thanks|thx|ty|appreciate)\b/.test(low)) {
+    return `Anytime. ${ctx.running ? `Still working away \u2014 I'll stay right here.` : `I'm here whenever you need me.`}`;
+  }
+  if (low.endsWith("?")) {
+    return `Good question \u2014 \u201C${clip3(q2)}\u201D. I'm only the small companion, so I won't fake an answer; once ${who} finishes, hand it that question and you'll get the real one. It's noted.`;
+  }
+  return `Got it \u2014 \u201C${clip3(q2)}\u201D. ${ctx.running ? `${who} is still working; I've kept your note on the line so it's front-of-mind when the run wraps up.` : `Ready when you are.`}`;
+}
+var clip3;
+var init_sidekick = __esm({
+  "src/ui/sidekick.ts"() {
+    "use strict";
+    clip3 = (s, n = 90) => s.length > n ? `${s.slice(0, n - 1)}\u2026` : s;
+  }
+});
+
 // src/ui/screens/Composer.tsx
 async function readEntry(entry, depth, w2) {
   if (w2.files.length >= MAX_FILES) {
@@ -160213,8 +160514,13 @@ function Composer({ value, onChange, onSend, busy, placeholder, small, onFiles }
   }, []);
   const [dragDepth, bumpDrag] = import_react8.default.useReducer((n, delta) => Math.max(0, n + delta), 0);
   const over = dragDepth > 0;
+  const [side, setSide] = import_react8.default.useState([]);
   const word = useRunWord(value, busy);
-  const { go, newMission, initiative, setAutonomy, knowledge, federation } = useVh();
+  const { go, newMission, initiative, setAutonomy, knowledge, federation, stewardName } = useVh();
+  const askSidekick = (text) => {
+    setSide((s) => [...s, { q: text, a: sidekickReply(text, { running: busy, captainName: stewardName }) }]);
+    onChange("");
+  };
   const [thinking, setThinking] = useThinkingLevel();
   const waitingSkills = knowledge.filter((k2) => k2.status === "proposed").length;
   const chooseThinking = (level) => {
@@ -160278,8 +160584,13 @@ function Composer({ value, onChange, onSend, busy, placeholder, small, onFiles }
           busy && word && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_jsx_runtime3.Fragment, { children: [
             /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "faint mono", "aria-hidden": "true", children: word }),
             /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "sr", role: "status", "aria-live": "polite", children: "Working on this request" })
-          ] })
+          ] }),
+          busy && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "faint", children: "Enter to ask your sidekick" })
         ] }),
+        side.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { role: "log", "aria-live": "polite", "aria-label": "Sidekick", style: { margin: "var(--s-2) var(--s-4) 0", display: "flex", flexDirection: "column", gap: 6, maxHeight: 168, overflowY: "auto" }, children: side.map((m, i2) => /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { style: { display: "flex", flexDirection: "column", gap: 1 }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "faint mono", style: { fontSize: 11 }, children: m.q }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { style: { fontSize: 12.5, lineHeight: 1.4 }, children: m.a })
+        ] }, i2)) }),
         /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
           "textarea",
           {
@@ -160292,7 +160603,9 @@ function Composer({ value, onChange, onSend, busy, placeholder, small, onFiles }
             onKeyDown: (e2) => {
               if (e2.key === "Enter" && !e2.shiftKey) {
                 e2.preventDefault();
-                if (value.trim() && !busy) onSend();
+                if (!value.trim()) return;
+                if (busy) askSidekick(value);
+                else onSend();
               }
             }
           }
@@ -160490,6 +160803,7 @@ var init_Composer = __esm({
     init_voice();
     init_store();
     init_initiative();
+    init_sidekick();
     import_jsx_runtime3 = __toESM(require_jsx_runtime(), 1);
     MAX_DEPTH = 8;
     MAX_FILES = 500;
@@ -163507,13 +163821,13 @@ function Autonomy() {
   return /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(import_jsx_runtime15.Fragment, { children: [
     /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("section", { className: "sgroup", children: [
       /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("h3", { children: "Autonomy" }),
-      /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("div", { className: "radios", children: [0, 1, 2, 3].map((l2) => /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("label", { className: "check", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("input", { type: "radio", name: "auto", checked: initiative.level === l2, onChange: () => setAutonomy(l2) }),
+      /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("div", { className: "radios", children: AUTONOMY_MODES.map((m) => /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("label", { className: "check", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("input", { type: "radio", name: "auto", checked: modeForLevel(initiative.level) === m.mode, onChange: () => setAutonomy(m.level) }),
         /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("span", { children: [
-          AUTONOMY_LEVEL_NAMES[l2].split(" \u2014 ")[0],
-          /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("small", { children: AUTONOMY_LEVEL_NAMES[l2].split(" \u2014 ")[1] })
+          m.label,
+          /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("small", { children: m.blurb })
         ] })
-      ] }, l2)) }),
+      ] }, m.mode)) }),
       /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "row", children: [
         /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("span", { className: "faint", children: "Heartbeat" }),
         /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("b", { children: [
@@ -164128,6 +164442,310 @@ var init_Settings = __esm({
   }
 });
 
+// src/engine/slackTransport.ts
+function slackSignatureBase(timestamp, rawBody) {
+  return `v0:${timestamp}:${rawBody}`;
+}
+function slackExpectedSignature(signingSecret, timestamp, rawBody) {
+  return `v0=${pureHmacSha256(signingSecret, slackSignatureBase(timestamp, rawBody))}`;
+}
+function constantTimeEquals2(a, b3) {
+  if (a.length !== b3.length) return false;
+  let diff = 0;
+  for (let i2 = 0; i2 < a.length; i2++) diff |= a.charCodeAt(i2) ^ b3.charCodeAt(i2);
+  return diff === 0;
+}
+function normalizeSlackEvent(payload, botUserId) {
+  const ev = payload.event ?? payload;
+  if (ev.bot_id) return null;
+  if (ev.subtype) return null;
+  if (typeof ev.text !== "string" || !ev.text.trim()) return null;
+  if (typeof ev.user !== "string" || typeof ev.channel !== "string") return null;
+  const byEvent = payload.type === "app_mention";
+  const byMarker = !!botUserId && ev.text.includes(`<@${botUserId}>`);
+  return {
+    door: "slack",
+    chatId: ev.channel,
+    senderId: ev.user,
+    kind: "group",
+    text: ev.text.trim(),
+    threadId: typeof ev.thread_ts === "string" ? ev.thread_ts : void 0,
+    mentioned: byEvent || byMarker,
+    at: Date.now()
+  };
+}
+var SLACK_MAX_SKEW_MS, SlackAuthenticator;
+var init_slackTransport = __esm({
+  "src/engine/slackTransport.ts"() {
+    "use strict";
+    init_pureHash();
+    SLACK_MAX_SKEW_MS = 5 * 60 * 1e3;
+    SlackAuthenticator = class {
+      constructor(secret, now = Date.now) {
+        this.secret = secret;
+        this.now = now;
+      }
+      seen = /* @__PURE__ */ new Map();
+      /** `raw` is accepted so the authenticator matches the ingress contract; Slack's
+       *  signature is over the RAW BODY, so the header pair alone decides. */
+      authenticate(raw, headers, rawBody) {
+        void raw;
+        const ts = headers["x-slack-request-timestamp"];
+        const sig = headers["x-slack-signature"];
+        if (!ts || !sig) return { ok: false, reason: "ingress is unsigned \u2014 Slack always signs; an unsigned request is refused" };
+        const stamp3 = Number(ts);
+        if (!Number.isFinite(stamp3)) return { ok: false, reason: `timestamp "${ts}" is not a number \u2014 refused` };
+        const skew = Math.abs(this.now() - stamp3 * 1e3);
+        if (skew > SLACK_MAX_SKEW_MS) {
+          return { ok: false, reason: `request timestamp is ${Math.round(skew / 1e3)}s out \u2014 outside the 5-minute window, so it is refused` };
+        }
+        const secret = this.secret();
+        if (!secret) return { ok: false, reason: "no Slack signing secret is configured \u2014 the door stays closed rather than admit unverified traffic" };
+        if (!constantTimeEquals2(sig, slackExpectedSignature(secret, ts, rawBody))) {
+          return { ok: false, reason: "Slack signature does not verify \u2014 refused" };
+        }
+        if (this.seen.has(ts)) return { ok: false, reason: "this Slack timestamp was already spent \u2014 a replayed request is refused" };
+        this.seen.set(ts, this.now());
+        if (this.seen.size > 512) {
+          const oldest = this.seen.keys().next().value;
+          if (oldest !== void 0) this.seen.delete(oldest);
+        }
+        return { ok: true };
+      }
+    };
+  }
+});
+
+// src/ui/screens/Channels.tsx
+var Channels_exports = {};
+__export(Channels_exports, {
+  default: () => Channels2
+});
+function Channels2() {
+  const channelInbound = useVh((s) => s.channelInbound);
+  const busy = useVh((s) => s.busy);
+  const [secret, setSecret] = (0, import_react21.useState)("");
+  const [namespace, setNamespace] = (0, import_react21.useState)("ns.default");
+  const [allow, setAllow] = (0, import_react21.useState)({});
+  const [log, setLog] = (0, import_react21.useState)([]);
+  const doors = (0, import_react21.useMemo)(() => {
+    const read4 = (id) => {
+      try {
+        const raw = localStorage.getItem(`si.channel.allow.${id}`);
+        if (!raw) return [];
+        const arr = JSON.parse(raw);
+        return Array.isArray(arr) ? arr.filter((x2) => typeof x2 === "string" && x2.length > 0) : [];
+      } catch {
+        return [];
+      }
+    };
+    return DOORS.map((d2) => ({
+      id: `si-${d2.kind}`,
+      kind: d2.kind,
+      enabled: true,
+      access: { allow: read4(`si-${d2.kind}`), groupPolicy: "isolated", requireMention: d2.mentionGated }
+    }));
+  }, [allow, log.length]);
+  const saveAllow = (id, ids) => {
+    try {
+      localStorage.setItem(`si.channel.allow.${id}`, JSON.stringify(ids));
+    } catch {
+    }
+    setAllow((m) => ({ ...m, [id]: ids.join(",") }));
+  };
+  const push2 = (kind, ok2, note) => setLog((l2) => [{ at: Date.now(), kind, ok: ok2, note }, ...l2].slice(0, 40));
+  const runSlack = async (d2, negative) => {
+    const doorId = `si-${d2.kind}`;
+    const signingSecret = negative ? "not-the-real-secret" : secret.trim();
+    if (!signingSecret) {
+      push2(d2.kind, false, "no signing secret is loaded for this door - it stays in this door only and is never saved");
+      return;
+    }
+    const allowIds = (allow[doorId] ?? "").split(",").map((s) => s.trim()).filter(Boolean);
+    const senderId = allowIds[0] ?? "U0123SELFIMPULSE";
+    const now = Math.floor(Date.now() / 1e3);
+    const text = `SelfImpulse channel check on the ${d2.kind} door at ${(/* @__PURE__ */ new Date()).toLocaleTimeString()}`;
+    const payload = {
+      token: "unused-slack-verification-token",
+      team_id: "T0123",
+      api_app_id: "A0123",
+      type: "event_callback",
+      event_id: `Ev${now}`,
+      event_time: now,
+      event: {
+        type: "message",
+        user: senderId,
+        channel: "C0123",
+        text,
+        ts: `${now}.000100`
+      }
+    };
+    const rawBody = JSON.stringify(payload);
+    const signature = slackExpectedSignature(signingSecret, String(now), rawBody);
+    const headers = {
+      "x-slack-request-timestamp": String(now),
+      "x-slack-signature": signature,
+      "content-type": "application/json"
+    };
+    const authenticator = new SlackAuthenticator(
+      () => negative ? "the-real-secret" : secret.trim() || null,
+      () => Date.now()
+    );
+    const res = await channelInbound({
+      raw: payload,
+      headers,
+      rawBody,
+      authenticate: (raw) => authenticator.authenticate(raw, headers, rawBody).ok,
+      normalize: (raw) => normalizeSlackEvent(raw, "U0123BOT"),
+      doorId,
+      kind: d2.kind,
+      namespaceId: namespace
+    });
+    push2(negative ? `${d2.kind} (wrong secret)` : d2.kind, res.ok, res.note);
+  };
+  const runPlain = async (d2) => {
+    const doorId = `si-${d2.kind}`;
+    const senderId = (allow[doorId] ?? "").split(",").map((s) => s.trim()).filter(Boolean)[0] ?? "user@selfimpulse";
+    const payload = {
+      type: "message",
+      user: senderId,
+      channel: "C0123",
+      text: `SelfImpulse channel check on the ${d2.kind} door at ${(/* @__PURE__ */ new Date()).toLocaleTimeString()}`,
+      ts: `${Math.floor(Date.now() / 1e3)}.000100`,
+      event_time: Math.floor(Date.now() / 1e3)
+    };
+    const res = await channelInbound({
+      raw: payload,
+      headers: { "content-type": "application/json" },
+      rawBody: JSON.stringify(payload),
+      authenticate: () => true,
+      normalize: (raw) => {
+        const p = raw;
+        if (typeof p.text !== "string" || !p.text.trim()) return null;
+        if (typeof p.user !== "string" || typeof p.channel !== "string") return null;
+        return {
+          door: d2.kind,
+          chatId: p.channel,
+          senderId: p.user,
+          text: p.text,
+          at: typeof p.event_time === "number" ? p.event_time : Math.floor(Date.now() / 1e3),
+          mentioned: !d2.mentionGated
+        };
+      },
+      doorId,
+      kind: d2.kind,
+      namespaceId: namespace
+    });
+    push2(d2.kind, res.ok, res.note);
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "channels", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "ch-head", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { className: "si-eyebrow", children: "Channel plane" }),
+      /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("p", { className: "ch-lede", children: "These are the OpenClaw Enterprise domains, ported and live. Every delivery enters the same fail-closed order: authenticate, normalise, open the door, resolve compute, snapshot a revision, then hand the admitted text to the governed engine - the identical path a typed message takes. A refusal at any step returns words and never touches the engine." })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "ch-facts", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "ch-fact", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { className: "k", children: "Doors" }),
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { className: "v", children: doors.length })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "ch-fact", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { className: "k", children: "Namespace" }),
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { className: "v mono", children: namespace })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "ch-fact", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { className: "k", children: "Compute" }),
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { className: "v", children: "in-process" })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "ch-fact", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { className: "k", children: "Crew" }),
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { className: "v", children: busy ? "mid-mission" : "ready" })
+      ] })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "ch-bar", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("label", { className: "ch-ns", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { children: "Namespace" }),
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("select", { value: namespace, onChange: (e2) => setNamespace(e2.target.value), children: NAMESPACES.map((n) => /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("option", { value: n, children: n }, n)) })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("label", { className: "ch-secret", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { children: "Slack signing secret" }),
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+          "input",
+          {
+            type: "password",
+            value: secret,
+            placeholder: "kept in this door only - never saved, never sent",
+            onChange: (e2) => setSecret(e2.target.value)
+          }
+        )
+      ] })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("div", { className: "ch-grid", children: DOORS.map((d2) => {
+      const doorId = `si-${d2.kind}`;
+      const ids = (allow[doorId] ?? "").split(",").map((s) => s.trim()).filter(Boolean);
+      const signed = d2.kind === "slack";
+      return /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("section", { className: "ch-card", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("header", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("h3", { children: d2.label }),
+          /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { className: `ch-tag ${d2.mentionGated ? "gated" : "open"}`, children: d2.mentionGated ? "mention-gated" : "open" })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("p", { className: "ch-blurb", children: d2.blurb }),
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("label", { className: "ch-allow", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("span", { children: [
+            "Allowed senders ",
+            /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("em", { children: "(identity, never credentials)" })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+            "input",
+            {
+              value: allow[doorId] ?? "",
+              placeholder: "U0123ABCD, U4567",
+              onChange: (e2) => setAllow((m) => ({ ...m, [doorId]: e2.target.value })),
+              onBlur: () => saveAllow(doorId, (allow[doorId] ?? "").split(",").map((s) => s.trim()).filter(Boolean))
+            }
+          ),
+          ids.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("small", { children: [
+            ids.length,
+            " id(s) admitted on this door"
+          ] })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "ch-acts", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("button", { className: "btn sm", disabled: busy, onClick: () => signed ? runSlack(d2, false) : runPlain(d2), children: "Run a real delivery" }),
+          signed && /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("button", { className: "btn sm ghost", disabled: busy, onClick: () => runSlack(d2, true), children: "Wrong secret" })
+        ] })
+      ] }, d2.kind);
+    }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("section", { className: "ch-log", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("h3", { children: "Delivery log" }),
+      log.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("p", { className: "ch-empty", children: "No deliveries yet. Run one - the verdict is the same words a live payload would earn." }) : /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("ul", { children: log.map((e2, i2) => /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("li", { className: e2.ok ? "ok" : "no", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { className: "t mono", children: new Date(e2.at).toLocaleTimeString() }),
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { className: "k", children: e2.kind }),
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { className: "v", children: e2.ok ? "admitted" : "refused" }),
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { className: "n", children: e2.note })
+      ] }, i2)) })
+    ] })
+  ] });
+}
+var import_react21, import_jsx_runtime16, DOORS, NAMESPACES;
+var init_Channels = __esm({
+  "src/ui/screens/Channels.tsx"() {
+    "use strict";
+    import_react21 = __toESM(require_react(), 1);
+    init_store();
+    init_slackTransport();
+    import_jsx_runtime16 = __toESM(require_jsx_runtime(), 1);
+    DOORS = [
+      { kind: "slack", label: "Slack", blurb: "HMAC-SHA256 signed events, 5-minute replay window, bot echo and edit filters.", mentionGated: true },
+      { kind: "telegram", label: "Telegram", blurb: "Bot token bearer; group policy decides shared or isolated sessions.", mentionGated: true },
+      { kind: "discord", label: "Discord", blurb: "Interaction signature verification; isolated sessions by default.", mentionGated: true },
+      { kind: "whatsapp", label: "WhatsApp", blurb: "Business webhook; per-contact namespace, never a shared thread.", mentionGated: false },
+      { kind: "email", label: "Email", blurb: "Addressed to the agent, so no mention rule is required.", mentionGated: false },
+      { kind: "webchat", label: "Web chat", blurb: "Same governed path as the composer, without a transport signature.", mentionGated: false },
+      { kind: "a2a", label: "Agent-to-agent", blurb: "Peer agents speaking the A2A wire; doors still decide who may speak.", mentionGated: true }
+    ];
+    NAMESPACES = ["ns.default"];
+  }
+});
+
 // src/ui/screens/Profile.tsx
 function safeOrigin(raw) {
   if (!raw) return void 0;
@@ -164139,8 +164757,8 @@ function safeOrigin(raw) {
 }
 function Profile() {
   const { ownerHandle, stewardName, vault, provider, go } = useVh();
-  const [editing, setEditing] = (0, import_react21.useState)(false);
-  const [draft, setDraft] = (0, import_react21.useState)(stewardName || DEFAULT_GENERALIST_NAME);
+  const [editing, setEditing] = (0, import_react22.useState)(false);
+  const [draft, setDraft] = (0, import_react22.useState)(stewardName || DEFAULT_GENERALIST_NAME);
   const vaultLine = vault.status === "unlocked" ? { k: "Vault", v: "Unlocked", note: "The owner key is in memory for this session only." } : vault.status === "sealed-locked" ? { k: "Vault", v: "Locked", note: "Sealed on disk. Unlocking needs the passphrase." } : { k: "Vault", v: "Not set", note: "No passphrase has been chosen on this machine yet." };
   const providerLine = provider ? {
     k: "Provider",
@@ -164162,21 +164780,21 @@ function Profile() {
       setDraft(stewardName || DEFAULT_GENERALIST_NAME);
     }
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "stack", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("header", { className: "top", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("h2", { children: "Profile" }),
-      /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("p", { className: "sub", children: "Who this machine is working for." })
+  return /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("div", { className: "stack", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("header", { className: "top", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("h2", { children: "Profile" }),
+      /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("p", { className: "sub", children: "Who this machine is working for." })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("section", { className: "card profile-facts", "aria-labelledby": "profile-who", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "card-h", id: "profile-who", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(GeneralistFace, {}),
-        /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "cb-desk-head", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("b", { children: stewardName || DEFAULT_GENERALIST_NAME }),
-          /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { className: "sub", children: ownerHandle })
+    /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("section", { className: "card profile-facts", "aria-labelledby": "profile-who", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("div", { className: "card-h", id: "profile-who", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(GeneralistFace, {}),
+        /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("div", { className: "cb-desk-head", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("b", { children: stewardName || DEFAULT_GENERALIST_NAME }),
+          /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("span", { className: "sub", children: ownerHandle })
         ] }),
-        editing ? /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "acts", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("label", { className: "sr", htmlFor: "profile-name", children: "Captain name" }),
-          /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+        editing ? /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("div", { className: "acts", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("label", { className: "sr", htmlFor: "profile-name", children: "Captain name" }),
+          /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(
             "input",
             {
               id: "profile-name",
@@ -164193,8 +164811,8 @@ function Profile() {
               }
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("button", { className: "btn primary", onClick: commit2, children: "Save" }),
-          /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("button", { className: "btn primary", onClick: commit2, children: "Save" }),
+          /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(
             "button",
             {
               className: "btn ghost",
@@ -164205,28 +164823,28 @@ function Profile() {
               children: "Cancel"
             }
           )
-        ] }) : /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("button", { className: "btn", onClick: () => setEditing(true), children: "Rename" })
+        ] }) : /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("button", { className: "btn", onClick: () => setEditing(true), children: "Rename" })
       ] }),
-      rows.map((r3) => /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("dl", { className: "kv", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("dt", { children: r3.k }),
-        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("dd", { children: r3.v }),
-        r3.note ? /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("dd", { className: "hint", children: r3.note }) : null
+      rows.map((r3) => /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("dl", { className: "kv", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("dt", { children: r3.k }),
+        /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("dd", { children: r3.v }),
+        r3.note ? /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("dd", { className: "hint", children: r3.note }) : null
       ] }, r3.k)),
-      /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "acts", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { className: "hint", style: { marginRight: "auto" }, children: "Keys are never shown here." }),
-        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("button", { className: "btn sm ghost", onClick: () => go("settings"), children: "Open Settings" })
+      /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("div", { className: "acts", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("span", { className: "hint", style: { marginRight: "auto" }, children: "Keys are never shown here." }),
+        /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("button", { className: "btn sm ghost", onClick: () => go("settings"), children: "Open Settings" })
       ] })
     ] })
   ] });
 }
-var import_react21, import_jsx_runtime16, PROVIDER_LABEL;
+var import_react22, import_jsx_runtime17, PROVIDER_LABEL;
 var init_Profile = __esm({
   "src/ui/screens/Profile.tsx"() {
     "use strict";
-    import_react21 = __toESM(require_react(), 1);
+    import_react22 = __toESM(require_react(), 1);
     init_store();
     init_face();
-    import_jsx_runtime16 = __toESM(require_jsx_runtime(), 1);
+    import_jsx_runtime17 = __toESM(require_jsx_runtime(), 1);
     PROVIDER_LABEL = {
       "openai-compatible": "OpenAI-compatible endpoint",
       anthropic: "Anthropic",
@@ -164242,15 +164860,15 @@ __export(Chat_exports, {
 });
 function Chat({ title }) {
   const { msgs, busy, send, go, openSession, gate: gate2, addFiles } = useVh();
-  const [draft, setDraft] = (0, import_react22.useState)("");
-  const end = (0, import_react22.useRef)(null);
-  (0, import_react22.useEffect)(() => {
+  const [draft, setDraft] = (0, import_react23.useState)("");
+  const end = (0, import_react23.useRef)(null);
+  (0, import_react23.useEffect)(() => {
     end.current?.scrollIntoView({ block: "end" });
   }, [msgs.length, gate2]);
-  const [announced, setAnnounced] = (0, import_react22.useState)("");
-  const spokenMsg = (0, import_react22.useRef)(msgs.length > 0 ? msgs[msgs.length - 1].id : 0);
-  const wasBusy = (0, import_react22.useRef)(busy);
-  (0, import_react22.useEffect)(() => {
+  const [announced, setAnnounced] = (0, import_react23.useState)("");
+  const spokenMsg = (0, import_react23.useRef)(msgs.length > 0 ? msgs[msgs.length - 1].id : 0);
+  const wasBusy = (0, import_react23.useRef)(busy);
+  (0, import_react23.useEffect)(() => {
     const enteredBusy = busy && !wasBusy.current;
     wasBusy.current = busy;
     if (gate2) {
@@ -164273,90 +164891,90 @@ function Chat({ title }) {
     }
   };
   const fromMemory = !!openSession;
-  return /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)(import_jsx_runtime17.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("header", { className: "top", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("h2", { children: openSession?.title ?? "Conversation" }),
-      /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("div", { className: "right", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("button", { className: "btn sm ghost", onClick: () => go(fromMemory ? "memory" : "work"), children: fromMemory ? "Back to memory" : "Back to work" }),
-        fromMemory && /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("button", { className: "btn sm ghost", onClick: () => go("work"), children: "Watch the work" })
+  return /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)(import_jsx_runtime18.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)("header", { className: "top", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("h2", { children: openSession?.title ?? "Conversation" }),
+      /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)("div", { className: "right", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("button", { className: "btn sm ghost", onClick: () => go(fromMemory ? "memory" : "work"), children: fromMemory ? "Back to memory" : "Back to work" }),
+        fromMemory && /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("button", { className: "btn sm ghost", onClick: () => go("work"), children: "Watch the work" })
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("div", { className: "scroll", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("p", { className: "sr", role: "status", "aria-live": "polite", "aria-atomic": "true", children: announced }),
-      /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("div", { className: "thread", children: [
-        msgs.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("div", { className: "empty", children: /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("h3", { children: "Nothing here yet" }) }),
-        msgs.map((m) => /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("div", { className: `msg ${m.role === "user" ? "user" : ""}`, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("span", { className: "av", "aria-hidden": true, children: m.role === "user" ? "Y" : title[0] }),
-          /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("div", { className: "who", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("b", { children: m.role === "user" ? "You" : title }),
+    /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)("div", { className: "scroll", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("p", { className: "sr", role: "status", "aria-live": "polite", "aria-atomic": "true", children: announced }),
+      /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)("div", { className: "thread", children: [
+        msgs.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("div", { className: "empty", children: /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("h3", { children: "Nothing here yet" }) }),
+        msgs.map((m) => /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)("div", { className: `msg ${m.role === "user" ? "user" : ""}`, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("span", { className: "av", "aria-hidden": true, children: m.role === "user" ? "Y" : title[0] }),
+          /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)("div", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)("div", { className: "who", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("b", { children: m.role === "user" ? "You" : title }),
               " \xB7 ",
               fmt(m.at),
-              m.rehydratedFrom ? /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)(import_jsx_runtime17.Fragment, { children: [
+              m.rehydratedFrom ? /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)(import_jsx_runtime18.Fragment, { children: [
                 " \xB7 ",
-                /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("span", { className: "faint", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)("span", { className: "faint", children: [
                   "continuing \u201C",
                   m.rehydratedFrom,
                   "\u201D"
                 ] })
               ] }) : null
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("p", { children: m.text }),
-            m.resp && /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("div", { className: "meta", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("span", { className: `pill ${m.resp.outcome === "refused" ? "bad" : m.resp.executed ? "ok" : "warn"}`, children: m.resp.outcome }),
-              m.resp.specialistIds.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("span", { className: "pill", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("p", { children: m.text }),
+            m.resp && /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)("div", { className: "meta", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("span", { className: `pill ${m.resp.outcome === "refused" ? "bad" : m.resp.executed ? "ok" : "warn"}`, children: m.resp.outcome }),
+              m.resp.specialistIds.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)("span", { className: "pill", children: [
                 m.resp.specialistIds.length,
                 " agent",
                 m.resp.specialistIds.length === 1 ? "" : "s"
               ] }),
-              m.tok && m.tok.savedTokens > 0 && /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("span", { className: "pill", children: [
+              m.tok && m.tok.savedTokens > 0 && /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)("span", { className: "pill", children: [
                 "\u2212",
                 m.tok.savedTokens,
                 " tokens"
               ] }),
-              m.resp.provenanceDigest && /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("span", { className: "pill mono", children: [
+              m.resp.provenanceDigest && /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)("span", { className: "pill mono", children: [
                 m.resp.provenanceDigest.slice(0, 8),
                 "\u2026"
               ] })
             ] })
           ] })
         ] }, m.id)),
-        gate2 && /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("div", { className: "msg", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("span", { className: "av", "aria-hidden": true, children: title[0] }),
-          /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(GateCard, {}) })
+        gate2 && /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)("div", { className: "msg", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("span", { className: "av", "aria-hidden": true, children: title[0] }),
+          /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime18.jsx)(GateCard, {}) })
         ] }),
-        busy && !gate2 && /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("div", { className: "msg", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("span", { className: "av", "aria-hidden": true, children: title[0] }),
-          /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("div", { className: "who", children: /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("b", { children: title }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("p", { className: "faint", children: "Working" })
+        busy && !gate2 && /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)("div", { className: "msg", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("span", { className: "av", "aria-hidden": true, children: title[0] }),
+          /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)("div", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("div", { className: "who", children: /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("b", { children: title }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("p", { className: "faint", children: "Working" })
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("div", { ref: end })
+        /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("div", { ref: end })
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("div", { className: "dock", children: /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(Composer, { small: true, value: draft, onChange: setDraft, onSend: () => {
+    /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("div", { className: "dock", children: /* @__PURE__ */ (0, import_jsx_runtime18.jsx)(Composer, { small: true, value: draft, onChange: setDraft, onSend: () => {
       void send(draft);
       setDraft("");
     }, busy, placeholder: "Continue this conversation\u2026", onFiles: (files) => addFiles(files) }) })
   ] });
 }
-var import_react22, import_jsx_runtime17;
+var import_react23, import_jsx_runtime18;
 var init_Chat = __esm({
   "src/ui/screens/Chat.tsx"() {
     "use strict";
-    import_react22 = __toESM(require_react(), 1);
+    import_react23 = __toESM(require_react(), 1);
     init_store();
     init_Composer();
     init_GateCard();
-    import_jsx_runtime17 = __toESM(require_jsx_runtime(), 1);
+    import_jsx_runtime18 = __toESM(require_jsx_runtime(), 1);
   }
 });
 
 // src/ui/WindowControls.tsx
 function WindowControls() {
-  const [api, setApi] = (0, import_react23.useState)(null);
-  (0, import_react23.useEffect)(() => {
+  const [api, setApi] = (0, import_react24.useState)(null);
+  (0, import_react24.useEffect)(() => {
     let live2 = true;
     if (detectHost() !== "tauri") return;
     void getWindowApi().then((a) => {
@@ -164366,16 +164984,16 @@ function WindowControls() {
       live2 = false;
     };
   }, []);
-  const onDragStart = (0, import_react23.useCallback)((e2) => {
+  const onDragStart = (0, import_react24.useCallback)((e2) => {
     if (e2.target.closest("button")) return;
     void api?.startDragging();
   }, [api]);
-  const onDoubleClick = (0, import_react23.useCallback)(() => {
+  const onDoubleClick = (0, import_react24.useCallback)(() => {
     void api?.toggleMaximize();
   }, [api]);
   if (!api) return null;
-  return /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)("div", { className: "winctl", "aria-hidden": false, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime18.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)("div", { className: "winctl", "aria-hidden": false, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
       "div",
       {
         className: "winctl-drag",
@@ -164384,32 +165002,32 @@ function WindowControls() {
         title: "Drag to move \xB7 double-click to maximize"
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)("div", { className: "winctl-btns", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("button", { type: "button", onClick: () => void api.minimize(), "aria-label": "Minimize", title: "Minimize", children: /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("svg", { width: "10", height: "10", viewBox: "0 0 10 10", "aria-hidden": "true", children: /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("path", { d: "M0 5h10", stroke: "currentColor", strokeWidth: "1" }) }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("button", { type: "button", onClick: () => void api.toggleMaximize(), "aria-label": "Maximize", title: "Maximize / restore", children: /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("svg", { width: "10", height: "10", viewBox: "0 0 10 10", "aria-hidden": "true", children: /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("rect", { x: "0.5", y: "0.5", width: "9", height: "9", fill: "none", stroke: "currentColor", strokeWidth: "1" }) }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("button", { type: "button", className: "is-close", onClick: () => void api.close(), "aria-label": "Close", title: "Close", children: /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("svg", { width: "10", height: "10", viewBox: "0 0 10 10", "aria-hidden": "true", children: /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("path", { d: "M0 0l10 10M10 0L0 10", stroke: "currentColor", strokeWidth: "1" }) }) })
+    /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)("div", { className: "winctl-btns", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime19.jsx)("button", { type: "button", onClick: () => void api.minimize(), "aria-label": "Minimize", title: "Minimize", children: /* @__PURE__ */ (0, import_jsx_runtime19.jsx)("svg", { width: "10", height: "10", viewBox: "0 0 10 10", "aria-hidden": "true", children: /* @__PURE__ */ (0, import_jsx_runtime19.jsx)("path", { d: "M0 5h10", stroke: "currentColor", strokeWidth: "1" }) }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime19.jsx)("button", { type: "button", onClick: () => void api.toggleMaximize(), "aria-label": "Maximize", title: "Maximize / restore", children: /* @__PURE__ */ (0, import_jsx_runtime19.jsx)("svg", { width: "10", height: "10", viewBox: "0 0 10 10", "aria-hidden": "true", children: /* @__PURE__ */ (0, import_jsx_runtime19.jsx)("rect", { x: "0.5", y: "0.5", width: "9", height: "9", fill: "none", stroke: "currentColor", strokeWidth: "1" }) }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime19.jsx)("button", { type: "button", className: "is-close", onClick: () => void api.close(), "aria-label": "Close", title: "Close", children: /* @__PURE__ */ (0, import_jsx_runtime19.jsx)("svg", { width: "10", height: "10", viewBox: "0 0 10 10", "aria-hidden": "true", children: /* @__PURE__ */ (0, import_jsx_runtime19.jsx)("path", { d: "M0 0l10 10M10 0L0 10", stroke: "currentColor", strokeWidth: "1" }) }) })
     ] })
   ] });
 }
-var import_react23, import_jsx_runtime18;
+var import_react24, import_jsx_runtime19;
 var init_WindowControls = __esm({
   "src/ui/WindowControls.tsx"() {
     "use strict";
-    import_react23 = __toESM(require_react(), 1);
+    import_react24 = __toESM(require_react(), 1);
     init_desktop();
-    import_jsx_runtime18 = __toESM(require_jsx_runtime(), 1);
+    import_jsx_runtime19 = __toESM(require_jsx_runtime(), 1);
   }
 });
 
 // src/panels/ErrorBoundary.tsx
-var import_react24, import_jsx_runtime19, ErrorBoundary;
+var import_react25, import_jsx_runtime20, ErrorBoundary;
 var init_ErrorBoundary = __esm({
   "src/panels/ErrorBoundary.tsx"() {
     "use strict";
-    import_react24 = __toESM(require_react(), 1);
+    import_react25 = __toESM(require_react(), 1);
     init_crashLedger();
-    import_jsx_runtime19 = __toESM(require_jsx_runtime(), 1);
-    ErrorBoundary = class extends import_react24.default.Component {
+    import_jsx_runtime20 = __toESM(require_jsx_runtime(), 1);
+    ErrorBoundary = class extends import_react25.default.Component {
       state = {};
       /** guards against a second record for the same throw (StrictMode double-invoke) */
       recording = false;
@@ -164437,20 +165055,20 @@ var init_ErrorBoundary = __esm({
       render() {
         const { err, recorded } = this.state;
         if (err) {
-          return /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)("div", { className: "panel-page", role: "alert", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)("h2", { children: [
+          return /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)("div", { className: "panel-page", role: "alert", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)("h2", { children: [
               this.props.label,
               " stopped"
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime19.jsx)("p", { className: "sub", children: "The rest of the app is still running \u2014 this door did not. Nothing was lost and no action was taken." }),
-            /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)("p", { className: "sub", style: { fontFamily: "var(--font-mono, monospace)", whiteSpace: "pre-wrap" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("p", { className: "sub", children: "The rest of the app is still running \u2014 this door did not. Nothing was lost and no action was taken." }),
+            /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)("p", { className: "sub", style: { fontFamily: "var(--font-mono, monospace)", whiteSpace: "pre-wrap" }, children: [
               err.name,
               ": ",
               err.message
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime19.jsx)("p", { className: "sub", children: recorded ? recorded.ok ? `Recorded in the local crash ledger (${recorded.note}). It never leaves this machine.` : `Not recorded \u2014 ${recorded.note}` : "Recording the crash\u2026" }),
-            /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)("div", { style: { display: "flex", gap: 8, marginTop: 12 }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("p", { className: "sub", children: recorded ? recorded.ok ? `Recorded in the local crash ledger (${recorded.note}). It never leaves this machine.` : `Not recorded \u2014 ${recorded.note}` : "Recording the crash\u2026" }),
+            /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)("div", { style: { display: "flex", gap: 8, marginTop: 12 }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
                 "button",
                 {
                   onClick: () => {
@@ -164460,7 +165078,7 @@ var init_ErrorBoundary = __esm({
                   children: "Try again"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime19.jsx)("button", { onClick: () => {
+              /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("button", { onClick: () => {
                 this.recording = false;
                 this.setState({ err: void 0, recorded: void 0 });
                 this.props.onLeave?.();
@@ -164477,68 +165095,51 @@ var init_ErrorBoundary = __esm({
 // src/ui/si/SiShell.tsx
 function Shell() {
   const { screen, go, provider, busy, ownerHandle, boot, newMission, gate: gate2, stewardName, initiative, setAutonomy, savedTokens } = useVh();
-  (0, import_react25.useEffect)(() => {
+  (0, import_react26.useEffect)(() => {
     void boot();
   }, [boot]);
   const current = NAV.find((n) => n.key === screen);
   const title = screen === "chat" ? CHAT_LABEL : current?.label ?? (screen === "profile" ? "Profile" : PRODUCT_NAME);
-  const solo = initiative.level === 0;
-  const pickMode = (wantSolo) => {
-    if (wantSolo === solo) return;
-    setAutonomy(wantSolo ? 0 : initiative.level || 1);
+  const mode = modeForLevel(initiative.level);
+  const pickMode = (want) => {
+    const level = levelForMode(want);
+    if (level !== initiative.level) setAutonomy(level);
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)("div", { className: "si-app", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(WindowControls, {}),
-    /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("a", { className: "si-skip", href: "#main-content", children: "Skip to content" }),
-    /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)("aside", { className: "si-rail", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)("div", { className: "si-head", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)("div", { className: "si-mode", role: "group", "aria-label": "Who works this mission", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(
-            "button",
-            {
-              type: "button",
-              className: "si-mode-btn",
-              "aria-pressed": solo,
-              title: "ME \u2014 nothing runs that you did not send",
-              onClick: () => pickMode(true),
-              children: [
-                /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("i", { className: "si-mode-ic si-g-solo", "aria-hidden": true }),
-                /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("span", { children: "ME" })
-              ]
-            }
-          ),
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(
-            "button",
-            {
-              type: "button",
-              className: "si-mode-btn",
-              "aria-pressed": !solo,
-              title: "TEAMS \u2014 the crew wakes on the heartbeat without being asked",
-              onClick: () => pickMode(false),
-              children: [
-                /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("i", { className: "si-mode-ic si-g-team", "aria-hidden": true }),
-                /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("span", { children: "TEAMS" })
-              ]
-            }
-          )
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("button", { className: "si-new", onClick: newMission, "aria-label": "New mission", title: "New mission", children: /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("i", { className: "si-new-ic ic ic-plus", "aria-hidden": true }) })
+  return /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)("div", { className: "si-app", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(WindowControls, {}),
+    /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("a", { className: "si-skip", href: "#main-content", children: "Skip to content" }),
+    /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)("aside", { className: "si-rail", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("div", { className: "si-brand", children: /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("img", { src: "/brand/si-wordmark.png", alt: "SelfImpulse" }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)("div", { className: "si-head", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("div", { className: "si-mode", role: "group", "aria-label": "How much runs on its own", children: AUTONOMY_MODES.map((m) => /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
+          "button",
+          {
+            type: "button",
+            className: "si-mode-btn",
+            "aria-pressed": mode === m.mode,
+            title: `${m.label} \u2014 ${m.blurb}`,
+            onClick: () => pickMode(m.mode),
+            children: /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("span", { children: m.short })
+          },
+          m.mode
+        )) }),
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("button", { className: "si-new", onClick: newMission, "aria-label": "New mission", title: "New mission", children: /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("i", { className: "si-new-ic ic ic-plus", "aria-hidden": true }) })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("nav", { className: "si-nav", "aria-label": "Primary", children: NAV_GROUPS.map((g2, gi) => {
+      /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("nav", { className: "si-nav", "aria-label": "Primary", children: NAV_GROUPS.map((g2, gi) => {
         const capId = `si-nav-cap-${gi}`;
-        return /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)("div", { className: "si-nav-grp", role: "group", "aria-labelledby": capId, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("b", { id: capId, className: "si-nav-cap", children: g2.caption }),
+        return /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)("div", { className: "si-nav-grp", role: "group", "aria-labelledby": capId, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("b", { id: capId, className: "si-nav-cap", children: g2.caption }),
           NAV.filter((n) => g2.keys.includes(n.key)).map((n) => {
             const on = screen === n.key;
-            return /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(
+            return /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(
               "button",
               {
                 className: "si-nav-item",
                 onClick: () => go(n.key),
                 "aria-current": on ? "page" : void 0,
                 children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("i", { className: `si-nav-ic ic ic-${n.icon}`, "aria-hidden": true }),
-                  /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("span", { className: "si-nav-label", children: n.label })
+                  /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("i", { className: `si-nav-ic ic ic-${n.icon}`, "aria-hidden": true }),
+                  /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("span", { className: "si-nav-label", children: n.label })
                 ]
               },
               n.key
@@ -164546,8 +165147,8 @@ function Shell() {
           })
         ] }, g2.caption);
       }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)("div", { className: "si-foot", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(
+      /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)("div", { className: "si-foot", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(
           "button",
           {
             className: "si-provider",
@@ -164555,43 +165156,44 @@ function Shell() {
             "aria-label": provider ? `Provider ${provider.model || provider.kind} \u2014 open settings` : "No model connected \u2014 every run is a plan that executes nothing. Open settings.",
             title: provider ? `${provider.kind} \xB7 ${provider.model || "no model named"}` : "no model connected \u2014 runs are plan only",
             children: [
-              /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("span", { className: `si-led ${provider ? "ok" : "warn"}`, "aria-hidden": true }),
-              /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("i", { className: "si-foot-ic si-g-plug", "aria-hidden": true }),
-              /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("span", { className: "si-provider-label", children: provider ? provider.model || provider.kind : "No model" })
+              /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("span", { className: `si-led ${provider ? "ok" : "warn"}`, "aria-hidden": true }),
+              /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("i", { className: "si-foot-ic si-g-plug", "aria-hidden": true }),
+              /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("span", { className: "si-provider-label", children: provider ? provider.model || provider.kind : "No model" })
             ]
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)("div", { className: "si-foot-row", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("button", { className: "si-owner", onClick: () => go("profile"), "aria-label": `Your profile \u2014 ${ownerHandle}`, title: ownerHandle, children: /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("span", { className: "si-av", "aria-hidden": true, children: initials(ownerHandle) }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)("span", { className: "si-usage", title: `${savedTokens.toLocaleString()} tokens kept off the wire this session`, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("i", { className: "si-foot-ic si-g-gauge", "aria-hidden": true }),
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)("div", { className: "si-foot-row", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("button", { className: "si-owner", onClick: () => go("profile"), "aria-label": `Your profile \u2014 ${ownerHandle}`, title: ownerHandle, children: /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("span", { className: "si-av", "aria-hidden": true, children: initials(ownerHandle) }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)("span", { className: "si-usage", title: `${savedTokens.toLocaleString()} tokens kept off the wire this session`, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("i", { className: "si-foot-ic si-g-gauge", "aria-hidden": true }),
             compact2(savedTokens)
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("button", { className: "si-foot-btn", onClick: () => go("docs"), "aria-label": "Docs \u2014 the knowledge and skill door", title: "Docs", children: /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("i", { className: "si-foot-ic ic ic-docs", "aria-hidden": true }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("button", { className: "si-foot-btn", onClick: () => go("settings"), "aria-label": "Settings", title: "Settings", children: /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("i", { className: "si-foot-ic ic ic-settings", "aria-hidden": true }) })
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("button", { className: "si-foot-btn", onClick: () => go("docs"), "aria-label": "Docs \u2014 the knowledge and skill door", title: "Docs", children: /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("i", { className: "si-foot-ic ic ic-docs", "aria-hidden": true }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("button", { className: "si-foot-btn", onClick: () => go("settings"), "aria-label": "Settings", title: "Settings", children: /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("i", { className: "si-foot-ic ic ic-settings", "aria-hidden": true }) })
         ] })
       ] })
     ] }),
-    gate2 && screen !== "chat" && screen !== "work" && /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("div", { className: "si-gate-overlay", children: /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(GateCard, {}) }),
-    /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)("div", { className: "si-main-wrap", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)("header", { className: "si-top", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("h1", { children: title }),
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("div", { className: "si-chips", children: busy ? /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("span", { className: "si-chip", children: "Working" }) : null })
+    gate2 && screen !== "chat" && screen !== "work" && /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("div", { className: "si-gate-overlay", children: /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(GateCard, {}) }),
+    /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)("div", { className: "si-main-wrap", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)("header", { className: "si-top", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("h1", { children: title }),
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("div", { className: "si-chips", children: busy ? /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("span", { className: "si-chip", children: "Working" }) : null })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("main", { className: "si-main", id: "main-content", tabIndex: -1, children: /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("div", { className: "si-scroll", children: /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)("div", { className: "si-content", children: [
-        screen === "steward" && door("steward", /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Steward, {})),
-        screen === "work" && door("work", /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Work, {})),
-        screen === "specialists" && door("specialists", /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Specialists, {})),
-        screen === "federation" && door("federation", /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Federation, {})),
-        screen === "receipts" && door("receipts", /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Receipts, {})),
-        screen === "docs" && door("docs", /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Docs, {})),
-        screen === "memory" && door("memory", /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Memory, {})),
-        screen === "settings" && door("settings", /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Settings, {})),
-        screen === "profile" && door("profile", /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Profile, {})),
-        screen === "chat" && /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(ErrorBoundary, { label: "Conversation", resetKey: screen, onLeave: () => go("steward"), children: /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Chat, { title: stewardName }) })
+      /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("main", { className: "si-main", id: "main-content", tabIndex: -1, children: /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("div", { className: "si-scroll", children: /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)("div", { className: "si-content", children: [
+        screen === "steward" && door("steward", /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(Steward, {})),
+        screen === "work" && door("work", /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(Work, {})),
+        screen === "specialists" && door("specialists", /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(Specialists, {})),
+        screen === "federation" && door("federation", /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(Federation, {})),
+        screen === "receipts" && door("receipts", /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(Receipts, {})),
+        screen === "docs" && door("docs", /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(Docs, {})),
+        screen === "memory" && door("memory", /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(Memory, {})),
+        screen === "settings" && door("settings", /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(Settings, {})),
+        screen === "channels" && door("channels", /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(Channels2, {})),
+        screen === "profile" && door("profile", /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(Profile, {})),
+        screen === "chat" && /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(ErrorBoundary, { label: "Conversation", resetKey: screen, onLeave: () => go("steward"), children: /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(Chat, { title: stewardName }) })
       ] }) }) })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("div", { className: "si-toasts", role: "status", "aria-live": "polite", "aria-atomic": "false", children: /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Toasts, {}) })
+    /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("div", { className: "si-toasts", role: "status", "aria-live": "polite", "aria-atomic": "false", children: /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(Toasts, {}) })
   ] });
 }
 function initials(s) {
@@ -164603,13 +165205,13 @@ function compact2(n) {
   return String(n);
 }
 function door(key, el) {
-  return /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(ErrorBoundary, { label: NAV.find((n) => n.key === key)?.label ?? key, resetKey: key, children: el });
+  return /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(ErrorBoundary, { label: NAV.find((n) => n.key === key)?.label ?? key, resetKey: key, children: el });
 }
-var import_react25, import_jsx_runtime20, NAV, NAV_GROUPS, CHAT_LABEL;
+var import_react26, import_jsx_runtime21, NAV, NAV_GROUPS, CHAT_LABEL;
 var init_SiShell = __esm({
   "src/ui/si/SiShell.tsx"() {
     "use strict";
-    import_react25 = __toESM(require_react(), 1);
+    import_react26 = __toESM(require_react(), 1);
     init_brand();
     init_store();
     init_Steward();
@@ -164620,17 +165222,20 @@ var init_SiShell = __esm({
     init_Memory();
     init_Docs();
     init_Settings();
+    init_Channels();
     init_Profile();
     init_Chat();
     init_GateCard();
     init_WindowControls();
     init_ErrorBoundary();
     init_Toast();
-    import_jsx_runtime20 = __toESM(require_jsx_runtime(), 1);
+    init_initiative();
+    import_jsx_runtime21 = __toESM(require_jsx_runtime(), 1);
     NAV = [
       { key: "steward", label: "Captain", icon: "steward" },
       { key: "work", label: "Work", icon: "crew" },
       { key: "specialists", label: "Specialists", icon: "specialists" },
+      { key: "channels", label: "Channels", icon: "channels" },
       { key: "federation", label: "Federation", icon: "federation" },
       { key: "receipts", label: "Receipts", icon: "receipts" },
       { key: "docs", label: "Docs", icon: "docs" },
@@ -164639,7 +165244,7 @@ var init_SiShell = __esm({
     ];
     NAV_GROUPS = [
       { caption: "Mission", keys: ["steward", "work", "docs", "memory"] },
-      { caption: "Oversight", keys: ["specialists", "federation", "receipts", "settings"] }
+      { caption: "Records", keys: ["specialists", "channels", "federation", "receipts", "settings"] }
     ];
     CHAT_LABEL = "Conversation";
   }
@@ -164661,7 +165266,7 @@ var init_Shell = __esm({
 
 // probe/shellRender.test.tsx
 var import_server = __toESM(require_server_node(), 1);
-var import_react26 = __toESM(require_react(), 1);
+var import_react27 = __toESM(require_react(), 1);
 import fs3 from "node:fs";
 import path4 from "node:path";
 var ROOT = ".";
@@ -164704,19 +165309,20 @@ async function main() {
   const { Docs: Docs2 } = await Promise.resolve().then(() => (init_Docs(), Docs_exports));
   const { Specialists: Specialists2 } = await Promise.resolve().then(() => (init_Specialists(), Specialists_exports));
   const { default: Federation3 } = await Promise.resolve().then(() => (init_Federation(), Federation_exports));
+  const { default: Channels3 } = await Promise.resolve().then(() => (init_Channels(), Channels_exports));
   const { Settings: Settings2 } = await Promise.resolve().then(() => (init_Settings(), Settings_exports));
   const { Chat: Chat2 } = await Promise.resolve().then(() => (init_Chat(), Chat_exports));
   section("0. the shell renders cold (no storage, no provider, no WebGL)");
   let html = "";
   try {
-    html = (0, import_server.renderToStaticMarkup)((0, import_react26.createElement)(Shell2));
+    html = (0, import_server.renderToStaticMarkup)((0, import_react27.createElement)(Shell2));
   } catch (err) {
     ok("Shell renders without throwing", false, err instanceof Error ? err.message : String(err));
   }
   ok("Shell renders without throwing", html.length > 1e3, `${html.length} bytes`);
   const text = strip(html);
   const doors = shellDoors();
-  ok("the shell declares eight doors", doors.length === 8, `declared ${doors.length}: ${doors.map((d2) => d2.label).join(" \xB7 ")}`);
+  ok("the shell declares nine doors", doors.length === 9, `declared ${doors.length}: ${doors.map((d2) => d2.label).join(" \xB7 ")}`);
   ok("every declared door is on screen", doors.every((d2) => text.includes(d2.label)), `missing: ${doors.filter((d2) => !text.includes(d2.label)).map((d2) => d2.label).join(", ") || "none"}`);
   ok("the Docs door is among them", doors.some((d2) => d2.key === "docs" && d2.label === "Docs"));
   ok("the Specialists door is among them", doors.some((d2) => d2.key === "specialists" && d2.label === "Specialists"));
@@ -164732,6 +165338,7 @@ async function main() {
     receipts: Receipts2,
     docs: Docs2,
     specialists: Specialists2,
+    channels: Channels3,
     federation: Federation3,
     memory: Memory2,
     settings: Settings2
@@ -164745,13 +165352,13 @@ async function main() {
     let h = "";
     let err = "";
     try {
-      h = (0, import_server.renderToStaticMarkup)((0, import_react26.createElement)(C2));
+      h = (0, import_server.renderToStaticMarkup)((0, import_react27.createElement)(C2));
     } catch (e2) {
       err = e2 instanceof Error ? e2.message : String(e2);
     }
     ok(`${d2.label} renders without throwing`, h.length > 200 && !err, err || `${h.length} bytes`);
   }
-  const fed = strip((0, import_server.renderToStaticMarkup)((0, import_react26.createElement)(Federation3)));
+  const fed = strip((0, import_server.renderToStaticMarkup)((0, import_react27.createElement)(Federation3)));
   ok(
     "the Federation door states that no listener starts on launch",
     /does not start a federation listener on launch/i.test(fed),
@@ -164762,7 +165369,7 @@ async function main() {
     /signed agent card/.test(fed) && /Mount the A2A host/.test(fed),
     "the explanation or the control is missing"
   );
-  const docs = strip((0, import_server.renderToStaticMarkup)((0, import_react26.createElement)(Docs2)));
+  const docs = strip((0, import_server.renderToStaticMarkup)((0, import_react27.createElement)(Docs2)));
   ok(
     "Docs: offers the document path, installs nothing on its own, and states it",
     /Propose knowledge/.test(docs) && /Load a file/.test(docs) && /No documents yet/.test(docs) && /asks you before anything is installed/.test(docs) && /structure/.test(docs),
@@ -164770,22 +165377,22 @@ async function main() {
   );
   let chatHtml = "";
   try {
-    chatHtml = (0, import_server.renderToStaticMarkup)((0, import_react26.createElement)(Chat2, { title: "Steward" }));
+    chatHtml = (0, import_server.renderToStaticMarkup)((0, import_react27.createElement)(Chat2, { title: "Steward" }));
   } catch (e2) {
     chatHtml = "";
   }
   ok("Chat renders empty without throwing", chatHtml.length > 200 && /Nothing here yet/.test(strip(chatHtml)));
   section("2. the empty states say the truth, not a loading spinner");
-  const work = strip((0, import_server.renderToStaticMarkup)((0, import_react26.createElement)(Work2)));
+  const work = strip((0, import_server.renderToStaticMarkup)((0, import_react27.createElement)(Work2)));
   ok("Work: 'No work yet' \u2014 not a spinner, not fake nodes", /No work yet/.test(work) && !/spinner|loading/i.test(work));
-  const receipts = strip((0, import_server.renderToStaticMarkup)((0, import_react26.createElement)(Receipts2)));
+  const receipts = strip((0, import_server.renderToStaticMarkup)((0, import_react27.createElement)(Receipts2)));
   ok("Receipts: KPI strip renders zeros, not blanks", /0 Recorded/.test(receipts) && /No receipts yet/.test(receipts));
   ok(
     "Receipts: the strip never claims verification it does not perform",
     !/Verified/.test(receipts),
     'a "Verified" label returned \u2014 counting state==="ok" rows is not verification'
   );
-  const memory2 = strip((0, import_server.renderToStaticMarkup)((0, import_react26.createElement)(Memory2)));
+  const memory2 = strip((0, import_server.renderToStaticMarkup)((0, import_react27.createElement)(Memory2)));
   ok("Memory: names where memory lives (on device)", /Nothing remembered yet|Memory is off/.test(memory2) && /this device/.test(memory2));
   section("3. state moves the surface \u2014 a gate renders as a decision, never a silent skip");
   let resolved = null;

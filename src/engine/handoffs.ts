@@ -25,7 +25,7 @@ export interface HandoffRecord {
   /** SelfImpulseMesh joint-receipt digest — present only when the handoff delegated. */
   meshJointDigest?: string | null;
   /** Pair standing after this handoff moved mesh trust. */
-  meshStanding?: "unknown" | "probation" | "selfimpulseed" | "proven";
+  meshStanding?: "unknown" | "probation" | "attested" | "proven";
   /** The mesh decision in words. */
   meshDetail?: string;
   at: string;

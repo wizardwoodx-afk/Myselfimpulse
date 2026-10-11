@@ -3,7 +3,7 @@
  *
  * THE DIFFERENTIATOR. Every agent can *claim* a job happened. SelfImpulse issues
  * receipts instead: tamper-evident, signed, independently verifiable.
- * "Every job selfimpulseed" — the claim is checkable by anyone, with zero SelfImpulse
+ * "Every job attested" — the claim is checkable by anyone, with zero SelfImpulse
  * state: re-canonicalize, re-hash the chain, re-check the seal.
  *
  * PROTOCOL — `si-proof-receipt/2`, the SelfImpulse proof standard (16.1.0):

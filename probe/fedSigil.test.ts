@@ -18,7 +18,7 @@ import {
 import { pureSha256 } from "../src/engine/pureHash";
 import { AVATAR_INKS, AVATAR_FIELDS } from "../src/engine/avatarEngine";
 
-/** A fixed spread: owners, selfimpulses, peers, specialists, seats — the real population. */
+/** A fixed spread: owners, agents, peers, specialists, seats — the real population. */
 const SEEDS = Array.from({ length: 120 }, (_, i) => `identity:probe-${i}`);
 
 test("federation sigil — a face that is derived, measured and never selectable", async (t) => {

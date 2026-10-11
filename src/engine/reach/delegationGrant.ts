@@ -50,12 +50,12 @@ export const DELEGATION_CAPABILITIES = [
 
 export type DelegationCapability = (typeof DELEGATION_CAPABILITIES)[number];
 
-export type PairStanding = "unknown" | "probation" | "selfimpulseed" | "proven";
+export type PairStanding = "unknown" | "probation" | "attested" | "proven";
 
 /**
  * The lending table. Read it as a policy document, because that is what it is:
  * a stranger may read nothing, a probationary pair may read and aggregate,
- * a selfimpulseed pair may also run tests and fetch, and only a proven pair may
+ * a attested pair may also run tests and fetch, and only a proven pair may
  * write, execute or commit. The two capabilities that can destroy a selfimpulse
  * outright — shipping a release and reading secrets — are additionally
  * human-first at EVERY tier.
@@ -63,7 +63,7 @@ export type PairStanding = "unknown" | "probation" | "selfimpulseed" | "proven";
 export const CAPABILITIES_BY_STANDING: Record<PairStanding, DelegationCapability[]> = {
   unknown: [],
   probation: ["repo.read", "data.aggregate"],
-  selfimpulseed: ["repo.read", "data.aggregate", "test.run", "net.fetch", "egress.share"],
+  attested: ["repo.read", "data.aggregate", "test.run", "net.fetch", "egress.share"],
   proven: [
     "repo.read", "data.aggregate", "test.run", "net.fetch", "egress.share",
     "repo.write", "shell.exec", "spend.commit", "deploy.release", "secrets.read",
@@ -145,7 +145,7 @@ export function grantCanonical(g: Omit<DelegationGrant, "digest">): string {
 
 /** The tiers a capability is lent at — used to explain a refusal in words. */
 export function tiersFor(capability: DelegationCapability): PairStanding[] {
-  return (["probation", "selfimpulseed", "proven"] as PairStanding[]).filter((t) => CAPABILITIES_BY_STANDING[t].includes(capability));
+  return (["probation", "attested", "proven"] as PairStanding[]).filter((t) => CAPABILITIES_BY_STANDING[t].includes(capability));
 }
 
 /**

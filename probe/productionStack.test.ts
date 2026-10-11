@@ -181,7 +181,7 @@ describe("productionStack — the six production features", () => {
     const stripped = { ...cat, signature: null };
     const unsigned = await importFromCatalog(stripped, "s1");
     assert.equal(unsigned.ok, false);
-    assert.ok(!unsigned.ok && unsigned.refused.includes("UNSIGNED"), "an import nobody selfimpulsees for is refused");
+    assert.ok(!unsigned.ok && unsigned.refused.includes("UNSIGNED"), "an import nobody attests for is refused");
     const tampered = { ...cat, skills: [{ ...cat.skills[0], title: "EVIL" }] };
     const t = await importFromCatalog(tampered as typeof cat, "s1");
     assert.equal(t.ok, false);

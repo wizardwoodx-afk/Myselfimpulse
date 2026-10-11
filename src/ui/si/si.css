@@ -265,6 +265,24 @@ summary:focus-visible,
   gap: var(--si-3);
 }
 
+/* Brand chip at the rail's top. A dark surface so the white wordmark reads on
+   every theme; the artwork's own black background drops into the chip, so the
+   seam is invisible on a dark rail and deliberate on a light one. */
+.si-brand {
+  display: flex;
+  align-items: center;
+  background: #0a0a0b;
+  border: 1px solid var(--si-line);
+  border-radius: var(--si-r-ctl);
+  padding: 6px 10px;
+  min-height: 34px;
+}
+.si-brand img {
+  height: 18px;
+  width: auto;
+  display: block;
+}
+
 /* Rail head: the one dial, and the mission reset beside it. */
 .si-head {
   display: flex;

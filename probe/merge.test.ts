@@ -137,7 +137,7 @@ describe("merge — one mission ID, one chain, one state (16.0)", () => {
       const badRc = receiptFromJsonl(tampered);
       assert.ok(badRc, "the tampered jsonl is still parseable (one byte, inside the hash)");
       const bad = await verifyProofReceipt(badRc!);
-      assert.equal(bad.ok, false, "the tampered chain FAILS verification — every job selfimpulseed");
+      assert.equal(bad.ok, false, "the tampered chain FAILS verification — every job attested");
     } finally {
       setBridgeDeps(null);
     }

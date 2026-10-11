@@ -320,8 +320,21 @@ async function execNetFetch(input: Record<string, unknown>, ctx: ToolContext): P
   if (!doFetch) return { outcome: "error", output: "no fetch available in this runtime" };
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  const HEADERS = { accept: "text/html,application/json;q=0.9,*/*;q=0.8", "user-agent": "SelfImpulse/19.7 (+evidence-fetch)" };
   try {
-    const res = await doFetch(url, { signal: controller.signal, headers: { accept: "text/html,application/json;q=0.9,*/*;q=0.8", "user-agent": "SelfImpulse/19.7 (+evidence-fetch)" } });
+    /* redirect:"manual" — a 3xx is never followed automatically. A site that
+       bounces the crew to an internal address (SSRF / DNS-rebinding) must
+       clear the SAME egress policy the original URL did; we check each hop
+       ourselves, so the checked address is the one actually fetched. */
+    let res = await doFetch(url, { signal: controller.signal, redirect: "manual", headers: HEADERS });
+    if (res && (res.status === 301 || res.status === 302 || res.status === 303 || res.status === 307 || res.status === 308)) {
+      const loc = res.headers?.get?.("location") ?? "";
+      const next = loc ? new URL(loc, url).href : "";
+      if (!next) return { outcome: "refused", output: "egress refused (redirect): no target" };
+      const chk = checkEgressUrl(next);
+      if (!chk.ok) return { outcome: "refused", output: `egress refused (redirect): ${chk.reason}` };
+      res = await doFetch(next, { signal: controller.signal, redirect: "manual", headers: HEADERS });
+    }
     if (!res.ok) return { outcome: "error", output: `HTTP ${res.status} from ${url}` };
     const text = (await res.text()).slice(0, MAX_FETCH_CHARS);
     return { outcome: "ok", output: text };

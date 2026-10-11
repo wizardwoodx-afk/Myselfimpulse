@@ -2413,8 +2413,15 @@ __export(desktop_exports, {
   notifyNative: () => notifyNative,
   pickJsonFile: () => pickJsonFile
 });
+function electronBridge() {
+  if (typeof window === "undefined") return null;
+  const b = window.selfImpulseDesktop;
+  if (!b || b.host !== "electron" || typeof b.minimize !== "function") return null;
+  return b;
+}
 function detectHost() {
   if (typeof window === "undefined") return "web";
+  if (electronBridge()) return "electron";
   const w = window;
   if (w.__TAURI_INTERNALS__) return "tauri";
   if (w.__TAURI__) return "tauri";
@@ -2428,6 +2435,21 @@ function detectPlatform() {
   return "linux";
 }
 async function getWindowApi() {
+  const el = electronBridge();
+  if (el) {
+    return {
+      minimize: () => el.minimize(),
+      toggleMaximize: () => el.toggleMaximize(),
+      close: () => el.close(),
+      // The frameless Electron window is dragged by a `-webkit-app-region:
+      // drag` header the main process injects, so there is no drag IPC here.
+      startDragging: async () => {
+      },
+      isFullscreen: async () => Boolean(document.fullscreenElement),
+      setFullscreen: (v) => el.setFullscreen(v),
+      setAlwaysOnTop: (v) => el.setAlwaysOnTop(v)
+    };
+  }
   if (detectHost() === "tauri") {
     try {
       const { getCurrentWindow: getCurrentWindow2 } = await Promise.resolve().then(() => (init_window(), window_exports));

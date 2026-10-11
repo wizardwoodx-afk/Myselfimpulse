@@ -132,7 +132,7 @@ describe("the production handoff seam is meshed", () => {
     recordHandoff({ peer: "peer-borealis", task: "t3", outcome: "delegated", detail: "ok" });
     const t = pairTrustFor("vh.selfimpulse", "peer-borealis");
     assert.ok(t && t.trust === 3 && t.jointReceipts === 3, JSON.stringify(t));
-    assert.equal(standingFor("vh.selfimpulse", "peer-borealis"), "selfimpulseed");
+    assert.equal(standingFor("vh.selfimpulse", "peer-borealis"), "attested");
     // persisted, not just in memory: a fresh read sees the same ledger
     const again = JSON.parse(globalThis.localStorage.getItem("engine.mesh.trust.v1") ?? "[]") as { trust: number }[];
     assert.ok(again.some((r) => r.trust === 3));

@@ -6,7 +6,7 @@
  * suite pins it at three levels:
  *   1. ENGINE — runSelfImpulseToolCall is the single governed path: safe calls
  *      act + selfimpulse; risky calls PAUSE at the human gate (pending +
- *      approval handle), denials execute nothing, refusals are selfimpulseed,
+ *      approval handle), denials execute nothing, refusals are attested,
  *      and every completed call's receipt verifies offline with the
  *      calling face's origin riding in the events.
  *   2. PROTOCOL — the real server (tools/mcp.mjs) over real stdio
@@ -53,7 +53,7 @@ async function waitFor<T>(fn: () => T | null | undefined, what: string, timeoutM
 
 /* ── 1. ENGINE — the governed single-call path ───────────────────────────── */
 describe("M3 engine — runSelfImpulseToolCall is the only route, governed end to end", () => {
-  it("a safe call acts, selfimpulsees, and the receipt verifies offline with the face's origin", async () => {
+  it("a safe call acts, attests, and the receipt verifies offline with the face's origin", async () => {
     const r = await runSelfImpulseToolCall("calculator", { expression: "1+1" }, { origin: "mcp" });
     assert.equal(r.ok, true, "calculator ran");
     assert.equal(r.output, "2", "real parser result");
@@ -70,7 +70,7 @@ describe("M3 engine — runSelfImpulseToolCall is the only route, governed end t
     assert.equal(v.ok, true, "the MCP call's receipt verifies offline — " + JSON.stringify(v));
   });
 
-  it("a risky call PAUSES at the human gate: pending, nothing executed, denial is selfimpulseed", async () => {
+  it("a risky call PAUSES at the human gate: pending, nothing executed, denial is attested", async () => {
     const r = await runSelfImpulseToolCall("workspace_write", { name: "gate-probe.txt", content: "x" }, { origin: "mcp" });
     assert.equal(r.pending, true, "risky calls do not block the caller");
     assert.ok(r.approvalId && r.callId, "the caller gets the approval handle + call id");
@@ -89,12 +89,12 @@ describe("M3 engine — runSelfImpulseToolCall is the only route, governed end t
     const verdict = ref.receipt.events.find((e) => e.kind === "selfimpulse.verdict")!.data as { status?: string };
     assert.equal(verdict.status, "denied");
     const simEv = ref.receipt.events.find((e) => e.kind === "selfimpulse.simulation");
-    assert.ok(simEv, "the SIMULATION (dry-run prediction) is selfimpulseed before the gate");
+    assert.ok(simEv, "the SIMULATION (dry-run prediction) is attested before the gate");
     const v = await verifySelfImpulseReceipt(track.result!.receiptId!);
     assert.equal(v.ok, true, "the denial receipt verifies offline — " + JSON.stringify(v));
   });
 
-  it("a risky call that is APPROVED executes and selfimpulsees", async () => {
+  it("a risky call that is APPROVED executes and attests", async () => {
     const r = await runSelfImpulseToolCall("workspace_write", { name: "mcp-approved.txt", content: "hello from the mcp face" }, { origin: "mcp" });
     assert.equal(r.pending, true);
     resolveSelfImpulseApproval(r.approvalId!, true);
@@ -108,7 +108,7 @@ describe("M3 engine — runSelfImpulseToolCall is the only route, governed end t
     if (fs.existsSync(written)) fs.rmSync(written);
   });
 
-  it("an unknown tool is refused in words — and the refusal is selfimpulseed", async () => {
+  it("an unknown tool is refused in words — and the refusal is attested", async () => {
     const r = await runSelfImpulseToolCall("self_upgrade", {}, { origin: "mcp" });
     assert.equal(r.ok, false);
     assert.ok(r.output.includes('unknown tool "self_upgrade"'), "refusal names the tool");
@@ -224,7 +224,7 @@ describe("M3 protocol — tools/mcp.mjs speaks MCP over stdio, governed", () => 
     assert.ok(r.result.content[0].text.includes('unknown MCP tool "rm_rf_everything"'), r.result.content[0].text);
   });
 
-  it("the FULL gate flow over the wire: pending → deny → selfimpulseed denial", async () => {
+  it("the FULL gate flow over the wire: pending → deny → attested denial", async () => {
     const r = await request("tools/call", { name: "workspace_write", arguments: { name: "wire-denied.txt", content: "nope" } });
     const text: string = r.result.content[0].text;
     assert.ok(text.includes("Paused at the human gate"), text);
@@ -242,7 +242,7 @@ describe("M3 protocol — tools/mcp.mjs speaks MCP over stdio, governed", () => 
     assert.ok(v.result.content[0].text.startsWith("VALID"));
   });
 
-  it("the FULL gate flow over the wire: pending → approve → executed + selfimpulseed", async () => {
+  it("the FULL gate flow over the wire: pending → approve → executed + attested", async () => {
     const r = await request("tools/call", { name: "workspace_write", arguments: { name: "wire-approved.txt", content: "hello wire" } });
     const text: string = r.result.content[0].text;
     const approval = text.match(/approval (a[0-9a-z]+)/)! [1];
@@ -255,7 +255,7 @@ describe("M3 protocol — tools/mcp.mjs speaks MCP over stdio, governed", () => 
     assert.ok(list.result.content[0].text.includes("wire-approved.txt"), "the approved write is in the workspace");
   });
 
-  it("dispatch_mission over the wire: gated, then a REAL mission loop runs and selfimpulsees", async () => {
+  it("dispatch_mission over the wire: gated, then a REAL mission loop runs and attests", async () => {
     const r = await request("tools/call", { name: "dispatch_mission", arguments: { objective: "probe: check that the mcp face dispatches a real mission" } });
     const text: string = r.result.content[0].text;
     assert.ok(text.includes("Paused at the human gate"), "dispatch is risky → gated first");
@@ -384,7 +384,7 @@ describe("MCP 2026-07-28 — dual-era server: stateless modern + legacy, one thr
     assert.equal(r.result.isError, undefined, "input_required is not an error");
   });
 
-  it("the MRTR retry carries the human decision back: approve → executed → selfimpulseed", async () => {
+  it("the MRTR retry carries the human decision back: approve → executed → attested", async () => {
     const first = await request("tools/call", { name: "workspace_write", arguments: { name: "wire-mrtr.txt", content: "mrtr" }, _meta: META() });
     assert.equal(first.result.resultType, "input_required");
     const retry = await request("tools/call", {

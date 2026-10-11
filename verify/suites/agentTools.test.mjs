@@ -20877,8 +20877,15 @@ var init_mcpRuntime = __esm({
 });
 
 // src/app/desktop.ts
+function electronBridge() {
+  if (typeof window === "undefined") return null;
+  const b2 = window.selfImpulseDesktop;
+  if (!b2 || b2.host !== "electron" || typeof b2.minimize !== "function") return null;
+  return b2;
+}
 function detectHost() {
   if (typeof window === "undefined") return "web";
+  if (electronBridge()) return "electron";
   const w = window;
   if (w.__TAURI_INTERNALS__) return "tauri";
   if (w.__TAURI__) return "tauri";
@@ -22707,8 +22714,17 @@ async function execNetFetch(input2, ctx) {
   if (!doFetch) return { outcome: "error", output: "no fetch available in this runtime" };
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  const HEADERS = { accept: "text/html,application/json;q=0.9,*/*;q=0.8", "user-agent": "SelfImpulse/19.7 (+evidence-fetch)" };
   try {
-    const res = await doFetch(url2, { signal: controller.signal, headers: { accept: "text/html,application/json;q=0.9,*/*;q=0.8", "user-agent": "SelfImpulse/19.7 (+evidence-fetch)" } });
+    let res = await doFetch(url2, { signal: controller.signal, redirect: "manual", headers: HEADERS });
+    if (res && (res.status === 301 || res.status === 302 || res.status === 303 || res.status === 307 || res.status === 308)) {
+      const loc = res.headers?.get?.("location") ?? "";
+      const next = loc ? new URL(loc, url2).href : "";
+      if (!next) return { outcome: "refused", output: "egress refused (redirect): no target" };
+      const chk = checkEgressUrl(next);
+      if (!chk.ok) return { outcome: "refused", output: `egress refused (redirect): ${chk.reason}` };
+      res = await doFetch(next, { signal: controller.signal, redirect: "manual", headers: HEADERS });
+    }
     if (!res.ok) return { outcome: "error", output: `HTTP ${res.status} from ${url2}` };
     const text = (await res.text()).slice(0, MAX_FETCH_CHARS);
     return { outcome: "ok", output: text };

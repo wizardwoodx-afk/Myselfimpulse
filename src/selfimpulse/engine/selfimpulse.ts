@@ -6,10 +6,10 @@
  *
  *   ROUTE  → fast path (recall→act→selfimpulse) or slow path, triaged by risk +
  *            complexity + CONFIDENCE + mode — the loop thinks at the RIGHT depth
- *   RECALL → pulls facts, matched preferences, available skills (selfimpulseed)
+ *   RECALL → pulls facts, matched preferences, available skills (attested)
  *   PLAN   → the plan is a visible, structured artifact
  *   THINK  → chain-of-thought trace + COUNCIL on hard steps (3 seats, 4-section
- *            synthesis, the deliberation itself selfimpulseed — rule-based, labeled)
+ *            synthesis, the deliberation itself attested — rule-based, labeled)
  *   SIMULATE → risky actions are DRY-RUN first: SelfImpulse signs a prediction
  *            ("what will exist when this is done") and the human gate shows
  *            it — imagine before you act
@@ -482,7 +482,7 @@ function workspaceWrite(name: string, content: string): { name: string; chars: n
 export interface KnowledgeEntry { title: string; snippet: string; source: string; }
 
 const KB: KnowledgeEntry[] = [
-  { title: "Grok Bot (xAI, Aug 11 2026)", snippet: "Always-on AI selfimpulses on a vendor cloud computer that sign into your apps; multi-bot group chats; watch-and-learn routines; gated behind SuperGrok/Cursor top tiers. The critique: your credentials live on their VM.", source: "local knowledge base" },
+  { title: "Grok Bot (xAI, Aug 11 2026)", snippet: "Always-on AI agents on a vendor cloud computer that sign into your apps; multi-bot group chats; watch-and-learn routines; gated behind SuperGrok/Cursor top tiers. The critique: your credentials live on their VM.", source: "local knowledge base" },
   { title: "Grok 4.6 (xAI, Aug 2026)", snippet: "Flagship model for long-running agents; 500k context; reasoning effort tiers; $2/$0.50/$6 per 1M tokens under 200k prompt.", source: "local knowledge base" },
   { title: "EU AI Act enforcement (Aug 2 2026)", snippet: "High-risk obligations enforced: tamper-evident logging (Art. 12), human oversight (Art. 14); penalties to 7% of global revenue. Agents need receipts, not logs.", source: "local knowledge base" },
   { title: "The execution core (mission loop)", snippet: "One loop — COMPOSE → DISPATCH → COMMUNICATE → EXECUTE → GATE → ADAPT — with an allowlisted set of agent CLIs, adversarial arena, budget ledger, Ed25519-signed hash-chained receipts, Assurance Score, FinOps chargeback. The SelfImpulse door dispatches real missions to it.", source: "local knowledge base" },
@@ -490,7 +490,7 @@ const KB: KnowledgeEntry[] = [
   { title: "Tauri 2 (desktop shell)", snippet: "Rust core + system webview; small binaries, real OS keychain and stdio child processes; the same frontend runs as a browser edition.", source: "local knowledge base" },
   { title: "Agent funding, H1 2026", snippet: "The 'agent governance' theme is the clearest funded theme of H1 2026: JetStream $34M seed, Guild.ai $30M A, Geordie $30M A, WitnessAI $85M+. The verifiable, local-first quadrant is the empty one.", source: "local knowledge base" },
   { title: "Chennai, Tamil Nadu", snippet: "India's fourth-largest city; the IT and aerospace hub of the south (Omi Vedu, Navi Kempegowda's southern twin in reputation). IST = UTC+5:30.", source: "local knowledge base" },
-  { title: "SelfImpulse (this product)", snippet: "One product: the SelfImpulse door (the accountable colleague) + the execution core (the mission loop) + one proof standard. Every job selfimpulseed — signed receipts on every run, on your machine.", source: "local knowledge base" },
+  { title: "SelfImpulse (this product)", snippet: "One product: the SelfImpulse door (the accountable colleague) + the execution core (the mission loop) + one proof standard. Every job attested — signed receipts on every run, on your machine.", source: "local knowledge base" },
   { title: "DeepSearch (Grok feature)", snippet: "Iterative retrieval loop: split query into sub-queries, parallel web + X search, summarize batches in a scratchpad, repeat to a step limit, cross-check before drafting.", source: "local knowledge base" },
 ];
 
@@ -726,7 +726,7 @@ async function validateWithRetry(tool: string, raw: Record<string, unknown>) {
  * reference shared so nothing silently diverges. */
 export const RISKY_TOOLS: Set<string> = policyRiskyTools;
 
-/* ── SIMULATE: dry-run before act; the prediction is selfimpulseed ──────────────── */
+/* ── SIMULATE: dry-run before act; the prediction is attested ──────────────── */
 function actionToolName(a: SelfImpulseAction): string {
   return a.kind === "tool" ? a.tool : "dispatch_mission";
 }
@@ -900,7 +900,7 @@ export interface SelfImpulsePlan {
   final: (results: SelfImpulseActionResult[]) => string;
   /** how confident the brain is in this plan — "low" plans route SLOW (deliberate, don't guess) */
   confidence?: "high" | "medium" | "low";
-  /** set when the plan is the EXECUTION of a recalled selfimpulseed skill (slow→fast distillation) */
+  /** set when the plan is the EXECUTION of a recalled attested skill (slow→fast distillation) */
   skillId?: string;
   /** the executed skill's version, bound into the receipt */
   skillVersion?: number;
@@ -1007,7 +1007,7 @@ function deepPlanSteps(intent: string): string[] {
  * deliberate the plan before any risky act: Proposer (the plan), Critic (risk
  * audit), Verifier (what proof will exist). The synthesis is the four-section
  * record (proposal / critique / verdict / resolution). The deliberation
- * itself is selfimpulseed — a selfimpulse.deliberation receipt event — so a hard step
+ * itself is attested — a selfimpulse.deliberation receipt event — so a hard step
  * leaves a verifiable deliberation artifact, not just a result. Rule-based
  * in the simulated brain (honestly labeled); a model brain brings real models.
  */
@@ -1029,7 +1029,7 @@ export function councilDeliberate(plan: SelfImpulsePlan, input: string): Council
         section:
           risky.length > 0
             ? `Risk audit: ${risky.map((a) => actionToolName(a)).join(", ")} — each requires a signed simulation and a human gate. Worst case is contained: nothing executes before approval.`
-            : "No risky actions. Worst case: a wasted run — still selfimpulseed.",
+            : "No risky actions. Worst case: a wasted run — still attested.",
       },
       {
         seat: "Verifier",
@@ -1039,16 +1039,16 @@ export function councilDeliberate(plan: SelfImpulsePlan, input: string): Council
     ],
     synthesis: {
       proposal: plan.plan.length > 0 ? plan.plan.join("; ") : input.slice(0, 100),
-      critique: risky.length > 0 ? `${risky.length} gated action(s) — simulate first, human decides` : "no gate required — the fast path stays selfimpulseed",
+      critique: risky.length > 0 ? `${risky.length} gated action(s) — simulate first, human decides` : "no gate required — the fast path stays attested",
       verdict: conf === "low" ? "low confidence — deliberate fully before any act" : "plan stands as proposed",
-      resolution: `route SLOW · ${risky.length} gated · 3-seat rule-based council (deliberation selfimpulseed)`,
+      resolution: `route SLOW · ${risky.length} gated · 3-seat rule-based council (deliberation attested)`,
     },
     ruleBased: true,
   };
 }
 
 /**
- * SLOW→FAST — how a selfimpulseed skill re-derives its args from the LIVE input.
+ * SLOW→FAST — how a attested skill re-derives its args from the LIVE input.
  * The trigger is the tool's OWN branch test (the same predicate that
  * originally produced the skill), so a skill can never hijack an input it
  * was not distilled from. Tools without a clean live trigger (knowledge
@@ -1081,7 +1081,7 @@ function skillTriggerArgs(tool: string, t: string, lower: string, skill?: SelfIm
       return { query };
     }
     case "dispatch_mission": {
-      /* M4: a selfimpulseed mission skill triggers on a dispatch intent whose
+      /* M4: a attested mission skill triggers on a dispatch intent whose
        * objective stem-overlaps the objective pattern it was distilled from —
        * the SAME overlap rule the replay gate uses (proposeSelfImpulseSkill). */
       if (!/\bdispatch\b/i.test(lower) || !/\bmission\b/i.test(lower)) return null;
@@ -1133,7 +1133,7 @@ export const simulatedBrain: SelfImpulseBrain = {
       };
     }
 
-    /* 0b. slow→fast: a recalled selfimpulseed skill whose trigger fires EXECUTES —
+    /* 0b. slow→fast: a recalled attested skill whose trigger fires EXECUTES —
      * single step, no re-planning; the receipt binds skillId + version.
      * Flagged skills and skills without a proven win never auto-execute. */
     for (const sk of ctx.recall?.skills ?? []) {
@@ -1142,8 +1142,8 @@ export const simulatedBrain: SelfImpulseBrain = {
       if (!args) continue;
       const isDispatch = sk.tool === "dispatch_mission";
       return {
-        thoughts: [`Slow→fast: executing my selfimpulseed skill "${sk.name}" v${sk.version} — test-gated, ${sk.wins} proven win(s), distilled from a selfimpulseed run. The procedure is proven, so no re-planning.`],
-        plan: [`${sk.name} v${sk.version} — single selfimpulseed step`],
+        thoughts: [`Slow→fast: executing my attested skill "${sk.name}" v${sk.version} — test-gated, ${sk.wins} proven win(s), distilled from a attested run. The procedure is proven, so no re-planning.`],
+        plan: [`${sk.name} v${sk.version} — single attested step`],
         actions: isDispatch
           ? [{ kind: "dispatch", objective: String(args.objective ?? "") }]
           : [{ kind: "tool", tool: sk.tool, args }],
@@ -1153,8 +1153,8 @@ export const simulatedBrain: SelfImpulseBrain = {
         final: (r) =>
           tone(
             r[0]?.ok
-              ? `Done — via my selfimpulseed skill **${sk.name}** v${sk.version} (slow→fast; test-gated, ${sk.wins} proven win${sk.wins === 1 ? "" : "s"}). The receipt binds the skill and verifies offline like every other job.`
-              : `My selfimpulseed skill **${sk.name}** FAILED on live replay — I've flagged it, filed the failure to memory, and here is the honest record: ${r[0]?.output ?? ""}`,
+              ? `Done — via my attested skill **${sk.name}** v${sk.version} (slow→fast; test-gated, ${sk.wins} proven win${sk.wins === 1 ? "" : "s"}). The receipt binds the skill and verifies offline like every other job.`
+              : `My attested skill **${sk.name}** FAILED on live replay — I've flagged it, filed the failure to memory, and here is the honest record: ${r[0]?.output ?? ""}`,
             ctx.persona,
           ),
       };
@@ -1183,7 +1183,7 @@ export const simulatedBrain: SelfImpulseBrain = {
         actions: [],
         final: () =>
           tone(
-            `I'm **${BOT_NAME}** — a standalone, persistent, named colleague on this machine, running the **SelfImpulse Cycle**: recall → plan → think → simulate → act → selfimpulse → learn.\n\n- **Tools:** calculator (real parser), clock, local knowledge base, live web evidence (keyless providers), memory + preferences (yours to inspect/delete), a local workspace (writes are simulated + approval-gated), system info\n- **Dispatch:** “dispatch a mission: …” — hands the objective to the real execution core (the mission loop) under one mission ID; the whole trail lands in one selfimpulseed chain\n- **Learning:** successful runs become test-gated skills you can inspect; your feedback binds to receipts\n- **Proof:** every completed run mints a ${`mj-proof-receipt/2`} — SHA-256 chain, HMAC seal, Ed25519 issuer signature when this runtime can sign — verifiable offline, zero runtime state\n\nEverything runs on **this machine**. Brain: **${brain.label}**.`,
+            `I'm **${BOT_NAME}** — a standalone, persistent, named colleague on this machine, running the **SelfImpulse Cycle**: recall → plan → think → simulate → act → selfimpulse → learn.\n\n- **Tools:** calculator (real parser), clock, local knowledge base, live web evidence (keyless providers), memory + preferences (yours to inspect/delete), a local workspace (writes are simulated + approval-gated), system info\n- **Dispatch:** “dispatch a mission: …” — hands the objective to the real execution core (the mission loop) under one mission ID; the whole trail lands in one attested chain\n- **Learning:** successful runs become test-gated skills you can inspect; your feedback binds to receipts\n- **Proof:** every completed run mints a ${`mj-proof-receipt/2`} — SHA-256 chain, HMAC seal, Ed25519 issuer signature when this runtime can sign — verifiable offline, zero runtime state\n\nEverything runs on **this machine**. Brain: **${brain.label}**.`,
             ctx.persona,
           ),
       };
@@ -1415,7 +1415,7 @@ function routeSelfImpulse(plan: SelfImpulsePlan, mode: SelfImpulseMode): SelfImp
   return { path: slow ? "slow" : "fast", reasons: reasons.slice(0, 3) };
 }
 
-/* ── LEARN: skills, failure memory, feedback (all selfimpulseed) ────────────────── */
+/* ── LEARN: skills, failure memory, feedback (all attested) ────────────────── */
 
 function nowIso(): string {
   return new Date().toISOString();
@@ -1763,7 +1763,7 @@ export async function sendSelfImpulseMessage(input: string): Promise<void> {
   ];
 
   /* THINK — council on HARD steps: the slow path deliberates before acting,
-   * and the deliberation itself is selfimpulseed (rule-based, honestly labeled). */
+   * and the deliberation itself is attested (rule-based, honestly labeled). */
   const council = route.path === "slow" ? councilDeliberate(plan, text) : null;
   if (council) {
     receiptEvents.push({
@@ -1775,7 +1775,7 @@ export async function sendSelfImpulseMessage(input: string): Promise<void> {
 
   /* Aborted runs end the message HONESTLY: streaming stops, an interruption
    * note lands in the trace, and NO receipt is minted — nothing completed,
-   * so nothing is selfimpulseed. */
+   * so nothing is attested. */
   const finalizeIfAborted = (): void => {
     if (token === runToken) return;
     updateActive((t) => ({
@@ -1824,7 +1824,7 @@ export async function sendSelfImpulseMessage(input: string): Promise<void> {
   }
 
   /* per action: SIMULATE (risky) → GATE (risky) → ACT → SELFIMPULSE.
-   * The action list is mutable on purpose: when a selfimpulseed skill FAILS on live
+   * The action list is mutable on purpose: when a attested skill FAILS on live
    * replay, the run flags the skill, files the failure, re-plans the full
    * cycle (skills off) and CONTINUES — the receipt records both attempts. */
   let activePlan = plan;
@@ -2051,7 +2051,7 @@ export async function sendSelfImpulseMessage(input: string): Promise<void> {
           failures: [...session.failures.slice(-49), { id: `x${Date.now()}${Math.random().toString(36).slice(2, 6)}`, ts: nowIso(), what: `skill "${failedSkill?.name ?? activePlan.skillId}" replay failed live`, reason: output.slice(0, 200) }],
         };
         commit();
-        patchMsg((m) => ({ ...m, trace: [...m.trace, { kind: "thought", text: `My selfimpulseed skill ${failedSkill ? `"${failedSkill.name}"` : ""} FAILED on live replay — flagged it, filed it to failure memory, and re-planning the full cycle (skills off).` }] }));
+        patchMsg((m) => ({ ...m, trace: [...m.trace, { kind: "thought", text: `My attested skill ${failedSkill ? `"${failedSkill.name}"` : ""} FAILED on live replay — flagged it, filed it to failure memory, and re-planning the full cycle (skills off).` }] }));
         const fb = await brainNow.decide(text, { mode: session.mode, persona: session.persona, facts: session.facts, recall: { ...recall, skills: [] } });
         activePlan = fb;
         actions = fb.actions;
@@ -2349,7 +2349,7 @@ export async function runSelfImpulseToolCall(
    * validation, BEFORE the human gate. Refuses poison keys, oversized or
    * over-deep arguments, malformed tool names and rate floods; injection
    * findings ride the approval card as warnings. A refusal here still
-   * finalizes through the receipt-selfimpulseed path — nothing executes, and the
+   * finalizes through the receipt-attested path — nothing executes, and the
    * denial is audited like every other outcome. */
   const gr = scanToolCall(tool, args);
   if (!gr.ok) {
@@ -2378,7 +2378,7 @@ export async function runSelfImpulseToolCall(
   // below look at the post-repair objective (dispatch_mission case).
   if (isDispatch) action = { kind: "dispatch", objective: String(args.objective ?? "") };
 
-  /* 1. AUTHORIZE — known tools only; refusals are still selfimpulseed. */
+  /* 1. AUTHORIZE — known tools only; refusals are still attested. */
   if (!isDispatch && SELFIMPULSE_TOOLS[tool] === undefined) {
     return finalize({ ok: false, output: `unknown tool "${tool}" — refused. Known tools: ${[...Object.keys(SELFIMPULSE_TOOLS), "dispatch_mission"].join(", ")}`, approved: true, simulated: false, mission: null });
   }
@@ -2500,7 +2500,7 @@ export async function runSelfImpulseToolCall(
    sensitive class of change, so it gets the strictest treatment in the
    product: the same human gate, receipts for every decision (applied,
    denied, refused, reverted), a tightening-only rule for proposals, and
-   reversibility as a first-class, itself-gated, itself-selfimpulseed operation.
+   reversibility as a first-class, itself-gated, itself-attested operation.
    These primitives are the ONLY way the meta-loop touches the session.
    ═══════════════════════════════════════════════════════════════════════ */
 

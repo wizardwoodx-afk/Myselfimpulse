@@ -48,7 +48,7 @@ async function main(): Promise<void> {
   const T0 = 1_700_000_000_000;
 
   /* levels */
-  ok("four autonomy levels named honestly", AUTONOMY_LEVEL_NAMES[0].startsWith("manual") && AUTONOMY_LEVEL_NAMES[2].includes("capped") && AUTONOMY_LEVEL_NAMES[3].includes("capped"));
+  ok("autonomy levels named honestly (three modes)", AUTONOMY_LEVEL_NAMES[0].toLowerCase().startsWith("manual") && AUTONOMY_LEVEL_NAMES[2].includes("capped") && AUTONOMY_LEVEL_NAMES[3].includes("caps"));
   const s0 = freshState(); s0.level = 0;
   const wake0 = evaluateWake({ now: T0, level: 0, providerReady: true, vaultUnlocked: true, memoryOn: false }, s0, { newFacts: 99 });
   ok("level 0 NEVER acts — manual is manual", wake0.kind === "ok" && wake0.acts.length === 0);

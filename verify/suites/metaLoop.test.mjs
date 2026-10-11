@@ -48,8 +48,15 @@ var init_id = __esm({
 });
 
 // src/app/desktop.ts
+function electronBridge() {
+  if (typeof window === "undefined") return null;
+  const b = window.selfImpulseDesktop;
+  if (!b || b.host !== "electron" || typeof b.minimize !== "function") return null;
+  return b;
+}
 function detectHost() {
   if (typeof window === "undefined") return "web";
+  if (electronBridge()) return "electron";
   const w = window;
   if (w.__TAURI_INTERNALS__) return "tauri";
   if (w.__TAURI__) return "tauri";
@@ -28529,7 +28536,7 @@ function workspaceWrite(name, content) {
   return { name: safeName, chars: safeContent.length };
 }
 var KB = [
-  { title: "Grok Bot (xAI, Aug 11 2026)", snippet: "Always-on AI selfimpulses on a vendor cloud computer that sign into your apps; multi-bot group chats; watch-and-learn routines; gated behind SuperGrok/Cursor top tiers. The critique: your credentials live on their VM.", source: "local knowledge base" },
+  { title: "Grok Bot (xAI, Aug 11 2026)", snippet: "Always-on AI agents on a vendor cloud computer that sign into your apps; multi-bot group chats; watch-and-learn routines; gated behind SuperGrok/Cursor top tiers. The critique: your credentials live on their VM.", source: "local knowledge base" },
   { title: "Grok 4.6 (xAI, Aug 2026)", snippet: "Flagship model for long-running agents; 500k context; reasoning effort tiers; $2/$0.50/$6 per 1M tokens under 200k prompt.", source: "local knowledge base" },
   { title: "EU AI Act enforcement (Aug 2 2026)", snippet: "High-risk obligations enforced: tamper-evident logging (Art. 12), human oversight (Art. 14); penalties to 7% of global revenue. Agents need receipts, not logs.", source: "local knowledge base" },
   { title: "The execution core (mission loop)", snippet: "One loop \u2014 COMPOSE \u2192 DISPATCH \u2192 COMMUNICATE \u2192 EXECUTE \u2192 GATE \u2192 ADAPT \u2014 with an allowlisted set of agent CLIs, adversarial arena, budget ledger, Ed25519-signed hash-chained receipts, Assurance Score, FinOps chargeback. The SelfImpulse door dispatches real missions to it.", source: "local knowledge base" },
@@ -28537,7 +28544,7 @@ var KB = [
   { title: "Tauri 2 (desktop shell)", snippet: "Rust core + system webview; small binaries, real OS keychain and stdio child processes; the same frontend runs as a browser edition.", source: "local knowledge base" },
   { title: "Agent funding, H1 2026", snippet: "The 'agent governance' theme is the clearest funded theme of H1 2026: JetStream $34M seed, Guild.ai $30M A, Geordie $30M A, WitnessAI $85M+. The verifiable, local-first quadrant is the empty one.", source: "local knowledge base" },
   { title: "Chennai, Tamil Nadu", snippet: "India's fourth-largest city; the IT and aerospace hub of the south (Omi Vedu, Navi Kempegowda's southern twin in reputation). IST = UTC+5:30.", source: "local knowledge base" },
-  { title: "SelfImpulse (this product)", snippet: "One product: the SelfImpulse door (the accountable colleague) + the execution core (the mission loop) + one proof standard. Every job selfimpulseed \u2014 signed receipts on every run, on your machine.", source: "local knowledge base" },
+  { title: "SelfImpulse (this product)", snippet: "One product: the SelfImpulse door (the accountable colleague) + the execution core (the mission loop) + one proof standard. Every job attested \u2014 signed receipts on every run, on your machine.", source: "local knowledge base" },
   { title: "DeepSearch (Grok feature)", snippet: "Iterative retrieval loop: split query into sub-queries, parallel web + X search, summarize batches in a scratchpad, repeat to a step limit, cross-check before drafting.", source: "local knowledge base" }
 ];
 function searchKnowledge(query) {
@@ -29002,14 +29009,14 @@ Start one and I'll hold it: \u201Ccontinue <thread name>\u201D picks it back up.
       if (!args) continue;
       const isDispatch = sk.tool === "dispatch_mission";
       return {
-        thoughts: [`Slow\u2192fast: executing my selfimpulseed skill "${sk.name}" v${sk.version} \u2014 test-gated, ${sk.wins} proven win(s), distilled from a selfimpulseed run. The procedure is proven, so no re-planning.`],
-        plan: [`${sk.name} v${sk.version} \u2014 single selfimpulseed step`],
+        thoughts: [`Slow\u2192fast: executing my attested skill "${sk.name}" v${sk.version} \u2014 test-gated, ${sk.wins} proven win(s), distilled from a attested run. The procedure is proven, so no re-planning.`],
+        plan: [`${sk.name} v${sk.version} \u2014 single attested step`],
         actions: isDispatch ? [{ kind: "dispatch", objective: String(args.objective ?? "") }] : [{ kind: "tool", tool: sk.tool, args }],
         confidence: "high",
         skillId: sk.id,
         skillVersion: sk.version,
         final: (r) => tone(
-          r[0]?.ok ? `Done \u2014 via my selfimpulseed skill **${sk.name}** v${sk.version} (slow\u2192fast; test-gated, ${sk.wins} proven win${sk.wins === 1 ? "" : "s"}). The receipt binds the skill and verifies offline like every other job.` : `My selfimpulseed skill **${sk.name}** FAILED on live replay \u2014 I've flagged it, filed the failure to memory, and here is the honest record: ${r[0]?.output ?? ""}`,
+          r[0]?.ok ? `Done \u2014 via my attested skill **${sk.name}** v${sk.version} (slow\u2192fast; test-gated, ${sk.wins} proven win${sk.wins === 1 ? "" : "s"}). The receipt binds the skill and verifies offline like every other job.` : `My attested skill **${sk.name}** FAILED on live replay \u2014 I've flagged it, filed the failure to memory, and here is the honest record: ${r[0]?.output ?? ""}`,
           ctx.persona
         )
       };
@@ -29044,7 +29051,7 @@ Brain: **${brain.label}**. The real-model planning seam ships in this runtime \u
           `I'm **${BOT_NAME}** \u2014 a standalone, persistent, named colleague on this machine, running the **SelfImpulse Cycle**: recall \u2192 plan \u2192 think \u2192 simulate \u2192 act \u2192 selfimpulse \u2192 learn.
 
 - **Tools:** calculator (real parser), clock, local knowledge base, live web evidence (keyless providers), memory + preferences (yours to inspect/delete), a local workspace (writes are simulated + approval-gated), system info
-- **Dispatch:** \u201Cdispatch a mission: \u2026\u201D \u2014 hands the objective to the real execution core (the mission loop) under one mission ID; the whole trail lands in one selfimpulseed chain
+- **Dispatch:** \u201Cdispatch a mission: \u2026\u201D \u2014 hands the objective to the real execution core (the mission loop) under one mission ID; the whole trail lands in one attested chain
 - **Learning:** successful runs become test-gated skills you can inspect; your feedback binds to receipts
 - **Proof:** every completed run mints a ${`mj-proof-receipt/2`} \u2014 SHA-256 chain, HMAC seal, Ed25519 issuer signature when this runtime can sign \u2014 verifiable offline, zero runtime state
 
@@ -29580,7 +29587,7 @@ function validateProposal(kindRaw, targetRaw, reasonRaw, isRevert) {
       simulation: {
         prediction: prediction2,
         sideEffects: [isRevert ? `risk.tier(${target}) restored to safe` : `risk.tier(${target}) moved to risky`],
-        warnings: isRevert ? ["this LOOSENS the gate \u2014 it is itself human-gated and selfimpulseed"] : ["future calls to this tool will pause for approval"]
+        warnings: isRevert ? ["this LOOSENS the gate \u2014 it is itself human-gated and attested"] : ["future calls to this tool will pause for approval"]
       }
     };
   }
@@ -29879,7 +29886,7 @@ async function pollMeta(changeId, timeoutMs = 15e3) {
   }
 }
 describe3("M6 engine \u2014 propose \u2192 simulate \u2192 gate \u2192 apply \u2192 selfimpulse \u2192 revert", () => {
-  it("a tightening is gated, applies the REAL control change, and is selfimpulseed", async () => {
+  it("a tightening is gated, applies the REAL control change, and is attested", async () => {
     assert2.equal(RISKY_TOOLS.has("search"), false, "precondition: search starts safe");
     const p = await proposeMetaChange("risk.tier", "search", "probe: tighten search to prove the loop");
     assert2.equal(p.pending, true, "meta changes are non-blocking at the gate");
@@ -29901,7 +29908,7 @@ describe3("M6 engine \u2014 propose \u2192 simulate \u2192 gate \u2192 apply \u2
     resolveSelfImpulseApproval(r.approvalId, true);
     await sleep(400);
   });
-  it("the revert is itself gated, restores the exact state, and selfimpulsees itself", async () => {
+  it("the revert is itself gated, restores the exact state, and attests itself", async () => {
     const origId = metaChanges().find((c) => c.status === "applied").id;
     const rv = await revertMetaChange(origId);
     assert2.equal(rv.pending, true, "a revert is gated \u2014 it changes governance too");
@@ -29920,15 +29927,15 @@ describe3("M6 engine \u2014 propose \u2192 simulate \u2192 gate \u2192 apply \u2
     const v = await verifySelfImpulseReceipt(rc.receiptId);
     assert2.equal(v.ok, true, "the revert receipt verifies offline");
   });
-  it("the tightening-only rule: no demotions, no double reverts, no unknowns \u2014 all refused in words and selfimpulseed", async () => {
+  it("the tightening-only rule: no demotions, no double reverts, no unknowns \u2014 all refused in words and attested", async () => {
     const d1 = await proposeMetaChange("risk.tier", "workspace_write", "try to loosen the gate");
     assert2.equal(d1.ok, false);
     assert2.ok(/already at the maximum gate/i.test(d1.output), d1.output);
-    assert2.ok(d1.receiptId, "the refusal is selfimpulseed");
+    assert2.ok(d1.receiptId, "the refusal is attested");
     const d2 = await revertMetaChange("mc-does-not-exist");
     assert2.equal(d2.ok, false);
     assert2.ok(/unknown meta change/.test(d2.output));
-    assert2.ok(d2.receiptId, "the refusal is selfimpulseed");
+    assert2.ok(d2.receiptId, "the refusal is attested");
     const appliedId = metaChanges().find((c) => c.status === "reverted").id;
     const d3 = await revertMetaChange(appliedId);
     assert2.equal(d3.ok, false);
@@ -29946,7 +29953,7 @@ describe3("M6 engine \u2014 propose \u2192 simulate \u2192 gate \u2192 apply \u2
     assert2.equal(RISKY_TOOLS.has("workspace_write"), true, "the demotion never applied");
     assert2.equal(RISKY_TOOLS.has("search"), false);
   });
-  it("preference.set: applied to the real session, reverted from it, both selfimpulseed", async () => {
+  it("preference.set: applied to the real session, reverted from it, both attested", async () => {
     const p = await proposeMetaChange("preference.set", "always prefer concise answers in probes", "probe: standing preference");
     assert2.equal(p.pending, true);
     resolveSelfImpulseApproval(p.approvalId, true);
@@ -29960,13 +29967,13 @@ describe3("M6 engine \u2014 propose \u2192 simulate \u2192 gate \u2192 apply \u2
     assert2.equal(rc.status, "applied");
     assert2.ok(!selfimpulseSession().preferences.some((x) => x.text === "always prefer concise answers in probes"), "the revert removed it from the session");
   });
-  it("a DENIED meta change changes nothing and is still selfimpulseed", async () => {
+  it("a DENIED meta change changes nothing and is still attested", async () => {
     const p = await proposeMetaChange("preference.set", "a preference the human will refuse", "probe: denial path");
     resolveSelfImpulseApproval(p.approvalId, false);
     const c = await pollMeta(p.changeId);
     assert2.equal(c.status, "denied");
     assert2.equal(c.decision, "denied");
-    assert2.ok(c.receiptId, "the denial is selfimpulseed");
+    assert2.ok(c.receiptId, "the denial is attested");
     assert2.ok(!selfimpulseSession().preferences.some((x) => x.text === "a preference the human will refuse"), "nothing was applied");
     const v = await verifySelfImpulseReceipt(c.receiptId);
     assert2.equal(v.ok, true);
@@ -29982,7 +29989,7 @@ describe3("M6 engine \u2014 propose \u2192 simulate \u2192 gate \u2192 apply \u2
         verified++;
       }
     }
-    assert2.ok(verified >= 8, `at least the decisions selfimpulseed: ${verified}`);
+    assert2.ok(verified >= 8, `at least the decisions attested: ${verified}`);
   });
 });
 describe3("M6 protocol \u2014 meta_propose / meta_status / meta_revert over the wire", () => {

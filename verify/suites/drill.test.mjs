@@ -48,8 +48,15 @@ var init_id = __esm({
 });
 
 // src/app/desktop.ts
+function electronBridge() {
+  if (typeof window === "undefined") return null;
+  const b = window.selfImpulseDesktop;
+  if (!b || b.host !== "electron" || typeof b.minimize !== "function") return null;
+  return b;
+}
 function detectHost() {
   if (typeof window === "undefined") return "web";
+  if (electronBridge()) return "electron";
   const w = window;
   if (w.__TAURI_INTERNALS__) return "tauri";
   if (w.__TAURI__) return "tauri";
@@ -28539,7 +28546,7 @@ function workspaceWrite(name, content) {
   return { name: safeName, chars: safeContent.length };
 }
 var KB = [
-  { title: "Grok Bot (xAI, Aug 11 2026)", snippet: "Always-on AI selfimpulses on a vendor cloud computer that sign into your apps; multi-bot group chats; watch-and-learn routines; gated behind SuperGrok/Cursor top tiers. The critique: your credentials live on their VM.", source: "local knowledge base" },
+  { title: "Grok Bot (xAI, Aug 11 2026)", snippet: "Always-on AI agents on a vendor cloud computer that sign into your apps; multi-bot group chats; watch-and-learn routines; gated behind SuperGrok/Cursor top tiers. The critique: your credentials live on their VM.", source: "local knowledge base" },
   { title: "Grok 4.6 (xAI, Aug 2026)", snippet: "Flagship model for long-running agents; 500k context; reasoning effort tiers; $2/$0.50/$6 per 1M tokens under 200k prompt.", source: "local knowledge base" },
   { title: "EU AI Act enforcement (Aug 2 2026)", snippet: "High-risk obligations enforced: tamper-evident logging (Art. 12), human oversight (Art. 14); penalties to 7% of global revenue. Agents need receipts, not logs.", source: "local knowledge base" },
   { title: "The execution core (mission loop)", snippet: "One loop \u2014 COMPOSE \u2192 DISPATCH \u2192 COMMUNICATE \u2192 EXECUTE \u2192 GATE \u2192 ADAPT \u2014 with an allowlisted set of agent CLIs, adversarial arena, budget ledger, Ed25519-signed hash-chained receipts, Assurance Score, FinOps chargeback. The SelfImpulse door dispatches real missions to it.", source: "local knowledge base" },
@@ -28547,7 +28554,7 @@ var KB = [
   { title: "Tauri 2 (desktop shell)", snippet: "Rust core + system webview; small binaries, real OS keychain and stdio child processes; the same frontend runs as a browser edition.", source: "local knowledge base" },
   { title: "Agent funding, H1 2026", snippet: "The 'agent governance' theme is the clearest funded theme of H1 2026: JetStream $34M seed, Guild.ai $30M A, Geordie $30M A, WitnessAI $85M+. The verifiable, local-first quadrant is the empty one.", source: "local knowledge base" },
   { title: "Chennai, Tamil Nadu", snippet: "India's fourth-largest city; the IT and aerospace hub of the south (Omi Vedu, Navi Kempegowda's southern twin in reputation). IST = UTC+5:30.", source: "local knowledge base" },
-  { title: "SelfImpulse (this product)", snippet: "One product: the SelfImpulse door (the accountable colleague) + the execution core (the mission loop) + one proof standard. Every job selfimpulseed \u2014 signed receipts on every run, on your machine.", source: "local knowledge base" },
+  { title: "SelfImpulse (this product)", snippet: "One product: the SelfImpulse door (the accountable colleague) + the execution core (the mission loop) + one proof standard. Every job attested \u2014 signed receipts on every run, on your machine.", source: "local knowledge base" },
   { title: "DeepSearch (Grok feature)", snippet: "Iterative retrieval loop: split query into sub-queries, parallel web + X search, summarize batches in a scratchpad, repeat to a step limit, cross-check before drafting.", source: "local knowledge base" }
 ];
 function searchKnowledge(query) {
@@ -29012,14 +29019,14 @@ Start one and I'll hold it: \u201Ccontinue <thread name>\u201D picks it back up.
       if (!args) continue;
       const isDispatch = sk.tool === "dispatch_mission";
       return {
-        thoughts: [`Slow\u2192fast: executing my selfimpulseed skill "${sk.name}" v${sk.version} \u2014 test-gated, ${sk.wins} proven win(s), distilled from a selfimpulseed run. The procedure is proven, so no re-planning.`],
-        plan: [`${sk.name} v${sk.version} \u2014 single selfimpulseed step`],
+        thoughts: [`Slow\u2192fast: executing my attested skill "${sk.name}" v${sk.version} \u2014 test-gated, ${sk.wins} proven win(s), distilled from a attested run. The procedure is proven, so no re-planning.`],
+        plan: [`${sk.name} v${sk.version} \u2014 single attested step`],
         actions: isDispatch ? [{ kind: "dispatch", objective: String(args.objective ?? "") }] : [{ kind: "tool", tool: sk.tool, args }],
         confidence: "high",
         skillId: sk.id,
         skillVersion: sk.version,
         final: (r) => tone(
-          r[0]?.ok ? `Done \u2014 via my selfimpulseed skill **${sk.name}** v${sk.version} (slow\u2192fast; test-gated, ${sk.wins} proven win${sk.wins === 1 ? "" : "s"}). The receipt binds the skill and verifies offline like every other job.` : `My selfimpulseed skill **${sk.name}** FAILED on live replay \u2014 I've flagged it, filed the failure to memory, and here is the honest record: ${r[0]?.output ?? ""}`,
+          r[0]?.ok ? `Done \u2014 via my attested skill **${sk.name}** v${sk.version} (slow\u2192fast; test-gated, ${sk.wins} proven win${sk.wins === 1 ? "" : "s"}). The receipt binds the skill and verifies offline like every other job.` : `My attested skill **${sk.name}** FAILED on live replay \u2014 I've flagged it, filed the failure to memory, and here is the honest record: ${r[0]?.output ?? ""}`,
           ctx.persona
         )
       };
@@ -29054,7 +29061,7 @@ Brain: **${brain.label}**. The real-model planning seam ships in this runtime \u
           `I'm **${BOT_NAME}** \u2014 a standalone, persistent, named colleague on this machine, running the **SelfImpulse Cycle**: recall \u2192 plan \u2192 think \u2192 simulate \u2192 act \u2192 selfimpulse \u2192 learn.
 
 - **Tools:** calculator (real parser), clock, local knowledge base, live web evidence (keyless providers), memory + preferences (yours to inspect/delete), a local workspace (writes are simulated + approval-gated), system info
-- **Dispatch:** \u201Cdispatch a mission: \u2026\u201D \u2014 hands the objective to the real execution core (the mission loop) under one mission ID; the whole trail lands in one selfimpulseed chain
+- **Dispatch:** \u201Cdispatch a mission: \u2026\u201D \u2014 hands the objective to the real execution core (the mission loop) under one mission ID; the whole trail lands in one attested chain
 - **Learning:** successful runs become test-gated skills you can inspect; your feedback binds to receipts
 - **Proof:** every completed run mints a ${`mj-proof-receipt/2`} \u2014 SHA-256 chain, HMAC seal, Ed25519 issuer signature when this runtime can sign \u2014 verifiable offline, zero runtime state
 
@@ -30000,7 +30007,7 @@ describe3("drill \u2014 the product proving itself on real missions", () => {
     assert2.ok(SELFIMPULSE_TOOLS["run_drill"], "run_drill is in the governed tool registry");
     assert2.ok(RISKY_TOOLS.has("run_drill"), "run_drill is on the risky side \u2014 it pauses at the gate");
   });
-  it("guard: a real git repo, the real loop, the repo's OWN tests \u2014 PASSED, selfimpulseed, led", async () => {
+  it("guard: a real git repo, the real loop, the repo's OWN tests \u2014 PASSED, attested, led", async () => {
     const r = await runDrill("guard");
     assert2.equal(r.ok, true, r.output);
     assert2.equal(r.report.status, "passed");
@@ -30022,7 +30029,7 @@ describe3("drill \u2014 the product proving itself on real missions", () => {
     assert2.equal(r.report.verifiedSeats, 2);
     assert2.ok(r.report.testTail.includes("all tests pass"), "the repo's own test passed for real");
   });
-  it("impossible: the honest-failure scenario \u2014 FAILED for real, never a fake pass, repo kept, still selfimpulseed", async () => {
+  it("impossible: the honest-failure scenario \u2014 FAILED for real, never a fake pass, repo kept, still attested", async () => {
     const r = await runDrill("impossible");
     assert2.equal(r.ok, false);
     assert2.equal(r.report.status, "failed", "the loop reported failure \u2014 the drill says so");
@@ -30033,7 +30040,7 @@ describe3("drill \u2014 the product proving itself on real missions", () => {
     const gitHead = fs3.existsSync(path3.join(r.report.repoPath, ".git"));
     assert2.ok(gitHead, "the forensics repo is a REAL git repo");
     const v = await verifySelfImpulseReceipt(r.report.receiptId);
-    assert2.equal(v.ok, true, "the failure is selfimpulseed too");
+    assert2.equal(v.ok, true, "the failure is attested too");
     forensics = r.report.repoPath;
   });
   it("unknown scenarios are refused in words \u2014 nothing runs, nothing is claimed", async () => {
@@ -30131,7 +30138,7 @@ describe3("drill \u2014 the product proving itself on real missions", () => {
       assert2.ok(rep.scope.toLowerCase().includes("never fakes"), "the honesty rule travels inside the artifact");
     }
   });
-  it("through the SINGLE THROAT: run_drill pauses at the human gate, then selfimpulsees the result", async () => {
+  it("through the SINGLE THROAT: run_drill pauses at the human gate, then attests the result", async () => {
     const g = await runSelfImpulseToolCall("run_drill", { scenario: "guard" }, { origin: "probe" });
     assert2.equal(g.pending, true, "a drill is a mission \u2014 it gates");
     assert2.ok(g.approvalId && g.callId);

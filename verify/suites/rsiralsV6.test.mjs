@@ -21773,8 +21773,15 @@ function nowIso() {
 }
 
 // src/app/desktop.ts
+function electronBridge() {
+  if (typeof window === "undefined") return null;
+  const b2 = window.selfImpulseDesktop;
+  if (!b2 || b2.host !== "electron" || typeof b2.minimize !== "function") return null;
+  return b2;
+}
 function detectHost() {
   if (typeof window === "undefined") return "web";
+  if (electronBridge()) return "electron";
   const w = window;
   if (w.__TAURI_INTERNALS__) return "tauri";
   if (w.__TAURI__) return "tauri";

@@ -136,7 +136,7 @@ function pureSha256(text) {
 
 // src/engine/selfimpulseMesh.ts
 var pairKey = (a, b) => [a, b].sort().join("\u2194");
-var meshStanding = (t) => !t ? "unknown" : t.trust < 3 ? "probation" : t.trust < 10 ? "selfimpulseed" : "proven";
+var meshStanding = (t) => !t ? "unknown" : t.trust < 3 ? "probation" : t.trust < 10 ? "attested" : "proven";
 
 // src/engine/meshRuntime.ts
 var TRUST_KEY = "engine.mesh.trust.v1";
@@ -173,7 +173,7 @@ var DELEGATION_CAPABILITIES = [
 var CAPABILITIES_BY_STANDING = {
   unknown: [],
   probation: ["repo.read", "data.aggregate"],
-  selfimpulseed: ["repo.read", "data.aggregate", "test.run", "net.fetch", "egress.share"],
+  attested: ["repo.read", "data.aggregate", "test.run", "net.fetch", "egress.share"],
   proven: [
     "repo.read",
     "data.aggregate",
@@ -199,7 +199,7 @@ function grantCanonical(g) {
   return [g.id, g.pair, g.tier, g.at, String(g.humanFirst), g.granted.join(","), refusals].join("");
 }
 function tiersFor(capability) {
-  return ["probation", "selfimpulseed", "proven"].filter((t) => CAPABILITIES_BY_STANDING[t].includes(capability));
+  return ["probation", "attested", "proven"].filter((t) => CAPABILITIES_BY_STANDING[t].includes(capability));
 }
 function narrowGrant(input) {
   const tier = input.standing ?? "unknown";
@@ -1120,7 +1120,7 @@ async function crossFederation(parties, wiring = {}) {
   return finish(
     "crossed",
     "crossed",
-    `${envelope2.capability} crossed between ${envelope2.pair}: the owner key of each selfimpulse approved it, naming who authorised it, both selfimpulses lend the capability at their own standing, and both approvals are now spent`,
+    `${envelope2.capability} crossed between ${envelope2.pair}: the owner key of each selfimpulse approved it, naming who authorised it, both agents lend the capability at their own standing, and both approvals are now spent`,
     filed,
     { receipts: { initiator: filed[0]?.digest ?? "", responder: filed[1]?.digest ?? "" } }
   );
@@ -1436,7 +1436,7 @@ test("federated crossing \u2014 both owner keys approve, or nothing crosses", as
     });
     assert.equal(responderSaysNo.status, "refused");
     assert.equal(responderSaysNo.reason, "responder-below-standing");
-    assert.equal(responderSaysNo.tierInitiator, "proven", "the initiator's own store selfimpulseed for the pair");
+    assert.equal(responderSaysNo.tierInitiator, "proven", "the initiator's own store attested for the pair");
     assert.equal(responderSaysNo.tierResponder, "probation", "\u2026and the responder's own store did not");
     assert.match(responderSaysNo.detail, /the responder's own local trust store \(lisbon\)/);
     assert.match(responderSaysNo.detail, /not the other side's \(reykjavik\)/);

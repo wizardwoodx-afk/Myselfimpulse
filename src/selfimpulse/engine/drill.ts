@@ -7,7 +7,7 @@
  * REAL missions — a real git repository, a real codebase, the repository's
  * OWN test command — dispatched through the REAL mission loop with REAL
  * git and REAL verification. The product runs its own acceptance test and
- * stamps the result with a selfimpulseed drill report + attestation digest.
+ * stamps the result with a attested drill report + attestation digest.
  *
  * Honesty model (stated, probe-pinned):
  *   - REAL: the git repository (init/commit/diff via the git binary), the
@@ -291,7 +291,7 @@ function drillDeps(sc: DrillScenario, verifyLog: string[], canonicalTest: string
   };
 }
 
-/* ── the report (selfimpulseed + digest-stamped) ───────────────────────────────── */
+/* ── the report (attested + digest-stamped) ───────────────────────────────── */
 export interface DrillReport {
   id: string; // dr<ts><rand>
   scenarioId: string;
@@ -477,7 +477,7 @@ function realSeatDeps(sc: DrillScenario, harnessId: HarnessId, verifyLog: string
 /**
  * Run one standard drill: a fresh REAL git repo, the REAL mission loop
  * (real governance arena, real git, the repo's OWN test command), one
- * cycle receipt, a mission ledger entry, and a selfimpulseed drill report.
+ * cycle receipt, a mission ledger entry, and a attested drill report.
  *
  * 16.7.0: `opts.harness` selects a REAL model seat — that harness's CLI
  * must be on PATH (the run then spawns it for real). A missing harness is

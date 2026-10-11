@@ -71,8 +71,8 @@ export function registerPeer(p: Omit<MeshPeer, "identityDigest" | "registeredAt"
 
 // ── mutual attestation ──────────────────────────────────────────────────────
 export interface Attestation {
-  attester: string;          // who selfimpulsees
-  subject: string;           // who is selfimpulseed for
+  attester: string;          // who attests
+  subject: string;           // who is attested for
   capabilities: string[];    // what the attester confirms the subject can do
   trustGrant: number;        // initial trust units extended
   issuedAt: number;
@@ -163,5 +163,5 @@ export function quarantinePeer(peerId: string, reason: string, now = Date.now())
   return { peerId, reason, at: now, digest: sha256(`vh.mesh.quarantine.v1:${peerId}:${reason}:${now}`) };
 }
 
-export const meshStanding = (t: PairTrust | undefined): "unknown" | "probation" | "selfimpulseed" | "proven" =>
-  !t ? "unknown" : t.trust < 3 ? "probation" : t.trust < 10 ? "selfimpulseed" : "proven";
+export const meshStanding = (t: PairTrust | undefined): "unknown" | "probation" | "attested" | "proven" =>
+  !t ? "unknown" : t.trust < 3 ? "probation" : t.trust < 10 ? "attested" : "proven";

@@ -4,7 +4,7 @@
  * THE DRILL is the product proving itself on real missions: a fresh REAL
  * git repository, the repository's OWN test command executed for real,
  * the REAL mission loop (real governance arena, real git worktrees, one
- * signed cycle receipt), a unified mission-ledger entry, and a selfimpulseed
+ * signed cycle receipt), a unified mission-ledger entry, and a attested
  * drill report with an attestation digest.
  *
  * What this suite pins:
@@ -13,7 +13,7 @@
  *      output tail).
  *   2. NO FAKE PASSES — the `impossible` scenario must come back FAILED
  *      with the real failing test output; its repo is kept for forensics;
- *      it is selfimpulseed like everything else.
+ *      it is attested like everything else.
  *   3. ONE THROAT — run_drill is a governed tool (risky): through
  *      runSelfImpulseToolCall it pauses at the human gate like every mission.
  *   4. LEDGER PARITY — drill missions land in the unified mission ledger.
@@ -61,7 +61,7 @@ describe("drill — the product proving itself on real missions", () => {
     assert.ok(RISKY_TOOLS.has("run_drill"), "run_drill is on the risky side — it pauses at the gate");
   });
 
-  it("guard: a real git repo, the real loop, the repo's OWN tests — PASSED, selfimpulseed, led", async () => {
+  it("guard: a real git repo, the real loop, the repo's OWN tests — PASSED, attested, led", async () => {
     const r = await runDrill("guard");
     assert.equal(r.ok, true, r.output);
     assert.equal(r.report!.status, "passed");
@@ -85,7 +85,7 @@ describe("drill — the product proving itself on real missions", () => {
     assert.ok(r.report!.testTail.includes("all tests pass"), "the repo's own test passed for real");
   });
 
-  it("impossible: the honest-failure scenario — FAILED for real, never a fake pass, repo kept, still selfimpulseed", async () => {
+  it("impossible: the honest-failure scenario — FAILED for real, never a fake pass, repo kept, still attested", async () => {
     const r = await runDrill("impossible");
     assert.equal(r.ok, false);
     assert.equal(r.report!.status, "failed", "the loop reported failure — the drill says so");
@@ -96,7 +96,7 @@ describe("drill — the product proving itself on real missions", () => {
     const gitHead = fs.existsSync(path.join(r.report!.repoPath!, ".git"));
     assert.ok(gitHead, "the forensics repo is a REAL git repo");
     const v = await verifySelfImpulseReceipt(r.report!.receiptId!);
-    assert.equal(v.ok, true, "the failure is selfimpulseed too");
+    assert.equal(v.ok, true, "the failure is attested too");
     forensics = r.report!.repoPath;
   });
 
@@ -211,7 +211,7 @@ describe("drill — the product proving itself on real missions", () => {
     }
   });
 
-  it("through the SINGLE THROAT: run_drill pauses at the human gate, then selfimpulsees the result", async () => {
+  it("through the SINGLE THROAT: run_drill pauses at the human gate, then attests the result", async () => {
     const g = await runSelfImpulseToolCall("run_drill", { scenario: "guard" }, { origin: "probe" });
     assert.equal(g.pending, true, "a drill is a mission — it gates");
     assert.ok(g.approvalId && g.callId);

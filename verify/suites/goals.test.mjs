@@ -12717,7 +12717,7 @@ function recordJointOutcome(ledger, a, b2, outcome) {
   ledger.set(key, cur);
   return cur;
 }
-var meshStanding = (t) => !t ? "unknown" : t.trust < 3 ? "probation" : t.trust < 10 ? "selfimpulseed" : "proven";
+var meshStanding = (t) => !t ? "unknown" : t.trust < 3 ? "probation" : t.trust < 10 ? "attested" : "proven";
 
 // src/engine/meshRuntime.ts
 var TRUST_KEY = "engine.mesh.trust.v1";

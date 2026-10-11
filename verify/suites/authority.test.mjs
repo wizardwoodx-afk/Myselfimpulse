@@ -401,7 +401,7 @@ function recordJointOutcome(ledger, a, b, outcome) {
 function quarantinePeer(peerId, reason, now2 = Date.now()) {
   return { peerId, reason, at: now2, digest: sha2562(`vh.mesh.quarantine.v1:${peerId}:${reason}:${now2}`) };
 }
-var meshStanding = (t) => !t ? "unknown" : t.trust < 3 ? "probation" : t.trust < 10 ? "selfimpulseed" : "proven";
+var meshStanding = (t) => !t ? "unknown" : t.trust < 3 ? "probation" : t.trust < 10 ? "attested" : "proven";
 
 // probe/authority.test.ts
 var now = 18e11;

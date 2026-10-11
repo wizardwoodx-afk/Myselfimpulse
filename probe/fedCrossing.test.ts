@@ -265,7 +265,7 @@ test("federated crossing — both owner keys approve, or nothing crosses", async
 
   await t.test("§9 TWO LOCAL STORES — distributed evidence, local trust, in the runtime", async () => {
     /* The reviewer's P1: one `standing` reader for both sides cannot express
-       two selfimpulses whose local trust states disagree. Each side now reads its
+       two agents whose local trust states disagree. Each side now reads its
        OWN store, and the outcome records which store answered. */
     const env = await envelope("repo.write");
     const ia = await decideCrossing(env, "initiator", "priya", ka, { entropy: seq, now: () => AT });
@@ -311,7 +311,7 @@ test("federated crossing — both owner keys approve, or nothing crosses", async
     });
     assert.equal(responderSaysNo.status, "refused");
     assert.equal(responderSaysNo.reason, "responder-below-standing");
-    assert.equal(responderSaysNo.tierInitiator, "proven", "the initiator's own store selfimpulseed for the pair");
+    assert.equal(responderSaysNo.tierInitiator, "proven", "the initiator's own store attested for the pair");
     assert.equal(responderSaysNo.tierResponder, "probation", "…and the responder's own store did not");
     assert.match(responderSaysNo.detail, /the responder's own local trust store \(lisbon\)/);
     assert.match(responderSaysNo.detail, /not the other side's \(reykjavik\)/);

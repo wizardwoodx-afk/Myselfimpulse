@@ -47,8 +47,15 @@ var init_id = __esm({
 });
 
 // src/app/desktop.ts
+function electronBridge() {
+  if (typeof window === "undefined") return null;
+  const b = window.selfImpulseDesktop;
+  if (!b || b.host !== "electron" || typeof b.minimize !== "function") return null;
+  return b;
+}
 function detectHost() {
   if (typeof window === "undefined") return "web";
+  if (electronBridge()) return "electron";
   const w = window;
   if (w.__TAURI_INTERNALS__) return "tauri";
   if (w.__TAURI__) return "tauri";
@@ -28559,7 +28566,7 @@ function workspaceWrite(name, content) {
   return { name: safeName, chars: safeContent.length };
 }
 var KB = [
-  { title: "Grok Bot (xAI, Aug 11 2026)", snippet: "Always-on AI selfimpulses on a vendor cloud computer that sign into your apps; multi-bot group chats; watch-and-learn routines; gated behind SuperGrok/Cursor top tiers. The critique: your credentials live on their VM.", source: "local knowledge base" },
+  { title: "Grok Bot (xAI, Aug 11 2026)", snippet: "Always-on AI agents on a vendor cloud computer that sign into your apps; multi-bot group chats; watch-and-learn routines; gated behind SuperGrok/Cursor top tiers. The critique: your credentials live on their VM.", source: "local knowledge base" },
   { title: "Grok 4.6 (xAI, Aug 2026)", snippet: "Flagship model for long-running agents; 500k context; reasoning effort tiers; $2/$0.50/$6 per 1M tokens under 200k prompt.", source: "local knowledge base" },
   { title: "EU AI Act enforcement (Aug 2 2026)", snippet: "High-risk obligations enforced: tamper-evident logging (Art. 12), human oversight (Art. 14); penalties to 7% of global revenue. Agents need receipts, not logs.", source: "local knowledge base" },
   { title: "The execution core (mission loop)", snippet: "One loop \u2014 COMPOSE \u2192 DISPATCH \u2192 COMMUNICATE \u2192 EXECUTE \u2192 GATE \u2192 ADAPT \u2014 with an allowlisted set of agent CLIs, adversarial arena, budget ledger, Ed25519-signed hash-chained receipts, Assurance Score, FinOps chargeback. The SelfImpulse door dispatches real missions to it.", source: "local knowledge base" },
@@ -28567,7 +28574,7 @@ var KB = [
   { title: "Tauri 2 (desktop shell)", snippet: "Rust core + system webview; small binaries, real OS keychain and stdio child processes; the same frontend runs as a browser edition.", source: "local knowledge base" },
   { title: "Agent funding, H1 2026", snippet: "The 'agent governance' theme is the clearest funded theme of H1 2026: JetStream $34M seed, Guild.ai $30M A, Geordie $30M A, WitnessAI $85M+. The verifiable, local-first quadrant is the empty one.", source: "local knowledge base" },
   { title: "Chennai, Tamil Nadu", snippet: "India's fourth-largest city; the IT and aerospace hub of the south (Omi Vedu, Navi Kempegowda's southern twin in reputation). IST = UTC+5:30.", source: "local knowledge base" },
-  { title: "SelfImpulse (this product)", snippet: "One product: the SelfImpulse door (the accountable colleague) + the execution core (the mission loop) + one proof standard. Every job selfimpulseed \u2014 signed receipts on every run, on your machine.", source: "local knowledge base" },
+  { title: "SelfImpulse (this product)", snippet: "One product: the SelfImpulse door (the accountable colleague) + the execution core (the mission loop) + one proof standard. Every job attested \u2014 signed receipts on every run, on your machine.", source: "local knowledge base" },
   { title: "DeepSearch (Grok feature)", snippet: "Iterative retrieval loop: split query into sub-queries, parallel web + X search, summarize batches in a scratchpad, repeat to a step limit, cross-check before drafting.", source: "local knowledge base" }
 ];
 function searchKnowledge(query) {
@@ -29032,14 +29039,14 @@ Start one and I'll hold it: \u201Ccontinue <thread name>\u201D picks it back up.
       if (!args) continue;
       const isDispatch = sk.tool === "dispatch_mission";
       return {
-        thoughts: [`Slow\u2192fast: executing my selfimpulseed skill "${sk.name}" v${sk.version} \u2014 test-gated, ${sk.wins} proven win(s), distilled from a selfimpulseed run. The procedure is proven, so no re-planning.`],
-        plan: [`${sk.name} v${sk.version} \u2014 single selfimpulseed step`],
+        thoughts: [`Slow\u2192fast: executing my attested skill "${sk.name}" v${sk.version} \u2014 test-gated, ${sk.wins} proven win(s), distilled from a attested run. The procedure is proven, so no re-planning.`],
+        plan: [`${sk.name} v${sk.version} \u2014 single attested step`],
         actions: isDispatch ? [{ kind: "dispatch", objective: String(args.objective ?? "") }] : [{ kind: "tool", tool: sk.tool, args }],
         confidence: "high",
         skillId: sk.id,
         skillVersion: sk.version,
         final: (r) => tone(
-          r[0]?.ok ? `Done \u2014 via my selfimpulseed skill **${sk.name}** v${sk.version} (slow\u2192fast; test-gated, ${sk.wins} proven win${sk.wins === 1 ? "" : "s"}). The receipt binds the skill and verifies offline like every other job.` : `My selfimpulseed skill **${sk.name}** FAILED on live replay \u2014 I've flagged it, filed the failure to memory, and here is the honest record: ${r[0]?.output ?? ""}`,
+          r[0]?.ok ? `Done \u2014 via my attested skill **${sk.name}** v${sk.version} (slow\u2192fast; test-gated, ${sk.wins} proven win${sk.wins === 1 ? "" : "s"}). The receipt binds the skill and verifies offline like every other job.` : `My attested skill **${sk.name}** FAILED on live replay \u2014 I've flagged it, filed the failure to memory, and here is the honest record: ${r[0]?.output ?? ""}`,
           ctx.persona
         )
       };
@@ -29074,7 +29081,7 @@ Brain: **${brain.label}**. The real-model planning seam ships in this runtime \u
           `I'm **${BOT_NAME}** \u2014 a standalone, persistent, named colleague on this machine, running the **SelfImpulse Cycle**: recall \u2192 plan \u2192 think \u2192 simulate \u2192 act \u2192 selfimpulse \u2192 learn.
 
 - **Tools:** calculator (real parser), clock, local knowledge base, live web evidence (keyless providers), memory + preferences (yours to inspect/delete), a local workspace (writes are simulated + approval-gated), system info
-- **Dispatch:** \u201Cdispatch a mission: \u2026\u201D \u2014 hands the objective to the real execution core (the mission loop) under one mission ID; the whole trail lands in one selfimpulseed chain
+- **Dispatch:** \u201Cdispatch a mission: \u2026\u201D \u2014 hands the objective to the real execution core (the mission loop) under one mission ID; the whole trail lands in one attested chain
 - **Learning:** successful runs become test-gated skills you can inspect; your feedback binds to receipts
 - **Proof:** every completed run mints a ${`mj-proof-receipt/2`} \u2014 SHA-256 chain, HMAC seal, Ed25519 issuer signature when this runtime can sign \u2014 verifiable offline, zero runtime state
 
@@ -29691,7 +29698,7 @@ function validateProposal(kindRaw, targetRaw, reasonRaw, isRevert) {
       simulation: {
         prediction: prediction2,
         sideEffects: [isRevert ? `risk.tier(${target}) restored to safe` : `risk.tier(${target}) moved to risky`],
-        warnings: isRevert ? ["this LOOSENS the gate \u2014 it is itself human-gated and selfimpulseed"] : ["future calls to this tool will pause for approval"]
+        warnings: isRevert ? ["this LOOSENS the gate \u2014 it is itself human-gated and attested"] : ["future calls to this tool will pause for approval"]
       }
     };
   }
@@ -31026,7 +31033,7 @@ var MCP_TOOLS = [
   toolDef("system_info", "This machine: runtime, OS/arch, product version, brain. Safe; mints a receipt.", {}),
   toolDef(
     "meta_propose",
-    "M6 meta-loop: propose a change to the product's OWN control plane \u2014 kind 'risk.tier' (tighten a tool's gate: safe -> risky; the meta-loop may never loosen) or 'preference.set' (add a standing preference). This is the most sensitive class of change: SIMULATE + human gate + selfimpulseed receipt. Returns pending with the change id; poll meta_status.",
+    "M6 meta-loop: propose a change to the product's OWN control plane \u2014 kind 'risk.tier' (tighten a tool's gate: safe -> risky; the meta-loop may never loosen) or 'preference.set' (add a standing preference). This is the most sensitive class of change: SIMULATE + human gate + attested receipt. Returns pending with the change id; poll meta_status.",
     { kind: str, target: str, reason: str },
     ["kind", "target", "reason"]
   ),
@@ -31039,7 +31046,7 @@ var MCP_TOOLS = [
   ),
   toolDef(
     "run_drill",
-    "16.4 drill: dispatch a standard REAL mission \u2014 a fresh real git repo, the repo's OWN test command, the real mission loop with the real governance arena. Scenarios: guard (fix the disabled-admin bug), maths (implement clamp so the failing test passes), impossible (honest-failure scenario \u2014 must report FAILED, never a fake pass). Optional harness (16.7): run the seats on a REAL model \u2014 the named harness's CLI must be on PATH, otherwise the drill refuses in words (it never fakes a real-model run); without it, the labeled deterministic seat runs. RISKY \u2014 it is a mission; it pauses at the human gate, then runs in the background (poll call_status). The result is a selfimpulseed drill report + attestation digest.",
+    "16.4 drill: dispatch a standard REAL mission \u2014 a fresh real git repo, the repo's OWN test command, the real mission loop with the real governance arena. Scenarios: guard (fix the disabled-admin bug), maths (implement clamp so the failing test passes), impossible (honest-failure scenario \u2014 must report FAILED, never a fake pass). Optional harness (16.7): run the seats on a REAL model \u2014 the named harness's CLI must be on PATH, otherwise the drill refuses in words (it never fakes a real-model run); without it, the labeled deterministic seat runs. RISKY \u2014 it is a mission; it pauses at the human gate, then runs in the background (poll call_status). The result is a attested drill report + attestation digest.",
     { scenario: str, harness: { type: "string", description: "optional \u2014 run the seats on this harness's real CLI (external-model validation); refused honestly when the CLI is not on PATH" } },
     ["scenario"]
   )
@@ -31088,7 +31095,7 @@ function approvalInputRequest(r, name) {
       method: "elicitation/create",
       params: {
         mode: "form",
-        message: `SelfImpulse human gate: tool "${name}" is RISKY \u2014 approve to execute (the run is selfimpulseed with a signed receipt) or decline. Approval id ${r.approvalId}; call id ${r.callId} (poll it with the call_status tool).`,
+        message: `SelfImpulse human gate: tool "${name}" is RISKY \u2014 approve to execute (the run is attested with a signed receipt) or decline. Approval id ${r.approvalId}; call id ${r.callId} (poll it with the call_status tool).`,
         requestedSchema: {
           type: "object",
           properties: { decision: { type: "string", enum: ["accept", "decline"] } },

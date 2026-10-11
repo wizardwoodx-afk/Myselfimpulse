@@ -3,7 +3,9 @@
   "private": true,
   "version": "1.9.2",
   "description": "SelfImpulse — Intelligence Meets Collaboration.",
+  "author": "K.S. / SelfImpulse",
   "type": "module",
+  "main": "electron/main.cjs",
   "engines": {
     "node": ">=22.12.0"
   },
@@ -15,6 +17,10 @@
     "tauri:dev": "powershell -ExecutionPolicy Bypass -File src-tauri/scripts/with-msvc.ps1 tauri dev",
     "tauri:build": "powershell -ExecutionPolicy Bypass -File src-tauri/scripts/with-msvc.ps1 tauri build",
     "desktop:build": "npm run build && powershell -ExecutionPolicy Bypass -File src-tauri/scripts/with-msvc.ps1 build --release",
+    "electron:dev": "electron .",
+    "electron:start": "npm run build && electron .",
+    "electron:pack": "npm run build && electron-builder --dir",
+    "electron:build": "npm run build && electron-builder --win nsis portable",
     "typecheck": "tsc --noEmit",
     "test": "node tools/run-all-probes.mjs",
     "test:rust": "cd src-tauri && cargo test --no-fail-fast",
@@ -63,16 +69,58 @@
     "@vitejs/plugin-react": "^4.7.0",
     "ajv": "^8.20.0",
     "ajv-formats": "^3.0.1",
+    "electron": "^44.7.0",
+    "electron-builder": "^26.15.3",
     "playwright": "^1.63.0",
     "typescript": "^5.9.3",
     "vite": "^6.3.5"
   },
   "allowScripts": {
-    "esbuild@0.25.12": true
+    "esbuild@0.25.12": true,
+    "electron@44.7.0": true,
+    "electron-winstaller@5.4.0": true
   },
   "engine": {
     "name": "MJ",
     "version": "19.7.16",
     "codename": "Handle"
+  },
+  "build": {
+    "appId": "com.selfimpulse.desktop",
+    "productName": "SelfImpulse",
+    "copyright": "Copyright (c) 2024-2026 K.S. / SelfImpulse",
+    "directories": {
+      "output": "release/electron",
+      "buildResources": "src-tauri/icons"
+    },
+    "files": [
+      "electron/**/*",
+      "dist/**/*",
+      "package.json",
+      "!node_modules"
+    ],
+    "extraMetadata": {
+      "main": "electron/main.cjs"
+    },
+    "asar": true,
+    "win": {
+      "target": [
+        { "target": "nsis", "arch": ["x64"] },
+        { "target": "portable", "arch": ["x64"] }
+      ],
+      "icon": "src-tauri/icons/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "SelfImpulse"
+    },
+    "portable": {
+      "artifactName": "SelfImpulse-${version}-portable.${ext}"
+    },
+    "artifactName": "SelfImpulse-${version}-setup.${ext}"
   }
 }

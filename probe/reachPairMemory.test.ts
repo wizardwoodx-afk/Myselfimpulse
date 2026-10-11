@@ -1,5 +1,5 @@
 /**
- * probe/reachPairMemory.test.ts — what two selfimpulses learned together.
+ * probe/reachPairMemory.test.ts — what two agents learned together.
  *
  * The org already remembers missions, teams, agents, artefacts, decisions and
  * failures (§20/§21 memory) and the blackboard already versions shared state

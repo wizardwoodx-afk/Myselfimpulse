@@ -4,7 +4,7 @@
  * Why this exists: SelfImpulseMesh must run on BOTH sides of the bundler seam. Under
  * Node (probes, the Tauri engine, the stdio MCP server) `node:crypto` is real;
  * in the WebView the `node:crypto` alias throws by design (see
- * src/browser/nodeStubs/crypto.ts). Mesh co-selfimpulseing runs on the live handoff
+ * src/browser/nodeStubs/crypto.ts). Mesh co-attesting runs on the live handoff
  * path, which lives in the WebView — so the mesh primitives need a synchronous
  * hash that works everywhere and produces BYTE-IDENTICAL output to node:crypto.
  *

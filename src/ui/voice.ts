@@ -20,21 +20,21 @@ import { useEffect, useRef, useState } from "react";
  * reaches the gate card.
  */
 export const VOICE: readonly string[] = [
-  "Weighing",
-  "Deliberating",
-  "Charting the route",
-  "Laying the course",
-  "Reading ahead",
-  "Measuring twice",
-  "Counting the cost",
-  "Foreseeing",
-  "Rehearsing",
-  "Sizing the risk",
-  "Turning it over",
-  "Holding the thread",
-  "Framing the ask",
-  "Mulling",
-  "Staking the path",
+  "Reading your request",
+  "Working out the route",
+  "Choosing the crew",
+  "Laying out the work",
+  "Weighing what it takes",
+  "Checking the cost",
+  "Reading two steps ahead",
+  "Thinking it through",
+  "Working out the details",
+  "Getting the crew ready",
+  "Looking at what could go wrong",
+  "Setting out the plan",
+  "Working out what to ask you",
+  "Staying with it",
+  "Finding the way",
 ];
 
 /** How long a word holds before the run moves on. Slow on purpose: a word that
@@ -68,7 +68,7 @@ export interface ThinkingLevel {
 
 export const THINKING: readonly ThinkingLevel[] = [
   { id: "plain", word: "Plain", instruction: "", holdMs: STEP_MS },
-  { id: "route", word: "Chart", instruction: "Chart the route and count its cost before you answer.", holdMs: STEP_MS * 1.5 },
+  { id: "route", word: "Plan", instruction: "Work out the route and what it costs before you answer.", holdMs: STEP_MS * 1.5 },
   { id: "ahead", word: "Read ahead", instruction: "Read three steps ahead, name what could go wrong, then answer.", holdMs: STEP_MS * 2 },
 ] as const;
 

@@ -91,13 +91,13 @@ var shell = read("src/ui/si/SiShell.tsx");
 ok("New mission resets the store", /onClick=\{newMission\}/.test(shell) && /newMission:\s*\(\)\s*=>\s*set\(/.test(storeSrc));
 var shellDoors = [...shell.matchAll(/\{ key: "([a-z]+)", label: "([A-Za-z ]+)", icon: "[a-z]+" \}/g)].map((m) => m[1]);
 ok(
-  "the shell declares eight doors, Docs, Specialists and Federation among them",
-  shellDoors.length === 8 && shellDoors.includes("docs") && shellDoors.includes("specialists") && shellDoors.includes("federation"),
+  "the shell declares nine doors, Docs, Specialists, Channels and Federation among them",
+  shellDoors.length === 9 && shellDoors.includes("docs") && shellDoors.includes("specialists") && shellDoors.includes("channels") && shellDoors.includes("federation"),
   `declared ${shellDoors.length}: ${shellDoors.join(" \xC2\xB7 ")}`
 );
 ok(
   "every door is Steward \xC2\xB7 Work \xC2\xB7 Specialists \xC2\xB7 Federation \xC2\xB7 Receipts \xC2\xB7 Docs \xC2\xB7 Memory \xC2\xB7 Settings",
-  ["steward", "work", "specialists", "federation", "receipts", "docs", "memory", "settings"].every((k) => shellDoors.includes(k)),
+  ["steward", "work", "specialists", "channels", "federation", "receipts", "docs", "memory", "settings"].every((k) => shellDoors.includes(k)),
   shellDoors.join(" \xC2\xB7 ")
 );
 ok("the crew never faces the user by name \xE2\u20AC\u201D Work renders AGENT nn tags", /AGENT \$\{String\(i \+ 1\)\.padStart\(2, "0"\)\}/.test(read("src/ui/screens/Work.tsx")));

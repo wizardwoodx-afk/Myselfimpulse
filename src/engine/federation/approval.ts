@@ -88,7 +88,7 @@ export interface FederationApprovalBody {
   v: typeof APPROVAL_FORMAT;
   /** CSPRNG id — the handle this decision is filed under. */
   approvalId: string;
-  /** The order-free pair key of the two selfimpulses (SelfImpulseMesh's `pairKey`). */
+  /** The order-free pair key of the two agents (SelfImpulseMesh's `pairKey`). */
   pair: string;
   /** Which side of the crossing this human sits on. */
   side: "initiator" | "responder";

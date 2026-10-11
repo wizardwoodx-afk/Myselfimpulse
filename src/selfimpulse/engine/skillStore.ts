@@ -90,7 +90,7 @@ export async function importFromCatalog(catalog: SkillCatalog, skillId: string, 
     const okSig = await verifyIssuerSignature(catalog.digest, catalog.signature.sigHex, publicKeyHex);
     if (!okSig) return { ok: false, refused: "catalog signature does NOT verify — refused." };
   } else {
-    return { ok: false, refused: "catalog is UNSIGNED — an import nobody selfimpulsees for is refused; the issuer must sign or state why." };
+    return { ok: false, refused: "catalog is UNSIGNED — an import nobody attests for is refused; the issuer must sign or state why." };
   }
   const skill = catalog.skills.find((s) => s.id === skillId);
   if (!skill) return { ok: false, refused: `skill "${skillId}" is not in this catalog.` };

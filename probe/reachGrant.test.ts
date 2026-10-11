@@ -54,15 +54,15 @@ test("reach delegation grant — what a peer may do here, decided in words", asy
     const probation = narrowGrant({ ownerA: A, ownerB: B, requested: [...DELEGATION_CAPABILITIES], standing: "probation", at: AT });
     assert.deepEqual(probation.granted, ["data.aggregate", "repo.read"], "probation reads; it does not run or write");
     assert.equal(refusalFor(probation, "test.run")?.rule, "below-standing");
-    assert.match(refusalFor(probation, "test.run")?.why ?? "", /lent from selfimpulseed or proven/);
+    assert.match(refusalFor(probation, "test.run")?.why ?? "", /lent from attested or proven/);
 
-    const selfimpulseed = narrowGrant({ ownerA: A, ownerB: B, requested: [...DELEGATION_CAPABILITIES], standing: "selfimpulseed", at: AT, approvals: [{ capability: "repo.write", approvalId: "appr-1", at: AT }] });
-    assert.deepEqual(selfimpulseed.granted, ["data.aggregate", "egress.share", "net.fetch", "repo.read", "test.run"], "a selfimpulseed pair may test and fetch, not write");
+    const attested = narrowGrant({ ownerA: A, ownerB: B, requested: [...DELEGATION_CAPABILITIES], standing: "attested", at: AT, approvals: [{ capability: "repo.write", approvalId: "appr-1", at: AT }] });
+    assert.deepEqual(attested.granted, ["data.aggregate", "egress.share", "net.fetch", "repo.read", "test.run"], "a attested pair may test and fetch, not write");
 
     const proven = narrowGrant({ ownerA: A, ownerB: B, requested: ["repo.read", "repo.write"], standing: "proven", at: AT });
     assert.deepEqual(proven.granted, ["repo.read"], "even a proven pair does not write without a human in the loop");
 
-    const ladder: PairStanding[] = ["probation", "selfimpulseed", "proven"];
+    const ladder: PairStanding[] = ["probation", "attested", "proven"];
     for (const cap of DELEGATION_CAPABILITIES) {
       const lends = (s: PairStanding) => CAPABILITIES_BY_STANDING[s].includes(cap);
       assert.equal(lends("unknown"), false, `${cap} is lent to a stranger`);
@@ -75,7 +75,7 @@ test("reach delegation grant — what a peer may do here, decided in words", asy
       });
     }
     assert.deepEqual(tiersFor("secrets.read"), ["proven"], "secrets are a proven-only capability");
-    assert.deepEqual(tiersFor("repo.read"), ["probation", "selfimpulseed", "proven"]);
+    assert.deepEqual(tiersFor("repo.read"), ["probation", "attested", "proven"]);
   });
 
   await t.test("§3 human-first holds at runtime, and the irreversible set cannot be relaxed", () => {
@@ -134,7 +134,7 @@ test("reach delegation grant — what a peer may do here, decided in words", asy
 
   await t.test("§5 nothing is silently dropped — unknown asks are refused by name", () => {
     const grant = narrowGrant({
-      ownerA: A, ownerB: B, at: AT, standing: "selfimpulseed",
+      ownerA: A, ownerB: B, at: AT, standing: "attested",
       requested: ["repo.read", "repo.read", "root.everything", "REPO.READ", "  test.run  "],
     });
     assert.deepEqual(grant.granted, ["repo.read", "test.run"], "duplicates collapse; surrounding space is trimmed");
@@ -154,7 +154,7 @@ test("reach delegation grant — what a peer may do here, decided in words", asy
     const { digest, ...body } = g1;
     assert.equal(digest, pureSha256(`vh.reach.delegationGrant.v1:${grantCanonical(body)}`));
 
-    const moved = narrowGrant({ ...input, standing: "selfimpulseed" });
+    const moved = narrowGrant({ ...input, standing: "attested" });
     assert.notEqual(moved.digest, g1.digest, "a different tier is a different decision, and digests differently");
     assert.equal(grantAllows(moved, "repo.write"), false);
 

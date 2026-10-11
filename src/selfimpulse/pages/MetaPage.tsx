@@ -3,7 +3,7 @@
  *
  * The most sensitive door in the product: it shows the ledger of the
  * product's self-change proposals — risk tiers and standing preferences —
- * each one proposed in words, simulated, human-gated, receipt-selfimpulseed, and
+ * each one proposed in words, simulated, human-gated, receipt-attested, and
  * reversible. The gate decision itself is made on the SelfImpulse face (the one
  * gate) or over MCP; this page is the ledger + the proposal/revert intent.
  */
@@ -123,7 +123,7 @@ export function MetaPage() {
         written in words, simulated, and paused at the <b>human gate</b> (decided on the SelfImpulse face or over
         MCP); every decision — applied, denied, refused, reverted — mints a receipt. Two rules keep it a
         feature and not a loop: the meta loop may <b>tighten</b> the gate, never loosen it, and every
-        change is <b>revertible</b> (the revert itself is gated + selfimpulseed; reverts are terminal).
+        change is <b>revertible</b> (the revert itself is gated + attested; reverts are terminal).
       </p>
 
       <div style={{ fontSize: 12, opacity: 0.7, marginBottom: 10 }}>
@@ -182,7 +182,7 @@ export function MetaPage() {
       </div>
       {changes.length === 0 && (
         <div style={{ fontSize: 12, opacity: 0.5, padding: "8px 2px" }}>
-          No self-changes yet — the product proposes, the human decides, everything is selfimpulseed.
+          No self-changes yet — the product proposes, the human decides, everything is attested.
         </div>
       )}
       {changes.slice(-10).reverse().map((c) => (

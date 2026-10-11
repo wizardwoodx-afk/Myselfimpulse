@@ -10,8 +10,15 @@ var __export = (target, all) => {
 };
 
 // src/app/desktop.ts
+function electronBridge() {
+  if (typeof window === "undefined") return null;
+  const b = window.selfImpulseDesktop;
+  if (!b || b.host !== "electron" || typeof b.minimize !== "function") return null;
+  return b;
+}
 function detectHost() {
   if (typeof window === "undefined") return "web";
+  if (electronBridge()) return "electron";
   const w = window;
   if (w.__TAURI_INTERNALS__) return "tauri";
   if (w.__TAURI__) return "tauri";
@@ -2290,7 +2297,7 @@ async function importFromCatalog(catalog, skillId, publicKeyHex, genome) {
     const okSig = await verifyIssuerSignature(catalog.digest, catalog.signature.sigHex, publicKeyHex);
     if (!okSig) return { ok: false, refused: "catalog signature does NOT verify \u2014 refused." };
   } else {
-    return { ok: false, refused: "catalog is UNSIGNED \u2014 an import nobody selfimpulsees for is refused; the issuer must sign or state why." };
+    return { ok: false, refused: "catalog is UNSIGNED \u2014 an import nobody attests for is refused; the issuer must sign or state why." };
   }
   const skill = catalog.skills.find((s) => s.id === skillId);
   if (!skill) return { ok: false, refused: `skill "${skillId}" is not in this catalog.` };
@@ -2872,7 +2879,7 @@ describe("productionStack \u2014 the six production features", () => {
     const stripped = { ...cat, signature: null };
     const unsigned = await importFromCatalog(stripped, "s1");
     assert.equal(unsigned.ok, false);
-    assert.ok(!unsigned.ok && unsigned.refused.includes("UNSIGNED"), "an import nobody selfimpulsees for is refused");
+    assert.ok(!unsigned.ok && unsigned.refused.includes("UNSIGNED"), "an import nobody attests for is refused");
     const tampered = { ...cat, skills: [{ ...cat.skills[0], title: "EVIL" }] };
     const t = await importFromCatalog(tampered, "s1");
     assert.equal(t.ok, false);

@@ -36,6 +36,15 @@ import { THEMES, DEFAULT_THEME } from './ui/store';
 import './ui/ink.css';
 import './ui/si/si.css';
 import './ui/theme.css';
+/* A 17 " premium.css is the merged design system (Meridian's deep-green editorial
+   console + VELA's orange action accent and film grain) and it loads LAST on
+   purpose. theme.css pins the product palette on `:root`, and `:root` and
+   `.si-app` have equal specificity, so whichever file comes later wins those
+   tokens. premium.css therefore has to be the final stylesheet in the chain to
+   own the shell. It scopes its tokens to `.si-app` rather than `:root` so the
+   palette theme.css publishes (and that probe suites assert on) stays the one
+   source of truth instead of being forked in two. */
+import './ui/si/premium.css';
 /* §13 — pdf.js parses inside a Worker in the browser and will not start without
  * one. The URL comes from the bundler, so it cannot drift from the shipped
  * pdf.js build, and the seam that takes it imports nothing else — booting the

@@ -48,8 +48,15 @@ var init_id = __esm({
 });
 
 // src/app/desktop.ts
+function electronBridge() {
+  if (typeof window === "undefined") return null;
+  const b = window.selfImpulseDesktop;
+  if (!b || b.host !== "electron" || typeof b.minimize !== "function") return null;
+  return b;
+}
 function detectHost() {
   if (typeof window === "undefined") return "web";
+  if (electronBridge()) return "electron";
   const w = window;
   if (w.__TAURI_INTERNALS__) return "tauri";
   if (w.__TAURI__) return "tauri";
@@ -28529,7 +28536,7 @@ function workspaceWrite(name, content) {
   return { name: safeName, chars: safeContent.length };
 }
 var KB = [
-  { title: "Grok Bot (xAI, Aug 11 2026)", snippet: "Always-on AI selfimpulses on a vendor cloud computer that sign into your apps; multi-bot group chats; watch-and-learn routines; gated behind SuperGrok/Cursor top tiers. The critique: your credentials live on their VM.", source: "local knowledge base" },
+  { title: "Grok Bot (xAI, Aug 11 2026)", snippet: "Always-on AI agents on a vendor cloud computer that sign into your apps; multi-bot group chats; watch-and-learn routines; gated behind SuperGrok/Cursor top tiers. The critique: your credentials live on their VM.", source: "local knowledge base" },
   { title: "Grok 4.6 (xAI, Aug 2026)", snippet: "Flagship model for long-running agents; 500k context; reasoning effort tiers; $2/$0.50/$6 per 1M tokens under 200k prompt.", source: "local knowledge base" },
   { title: "EU AI Act enforcement (Aug 2 2026)", snippet: "High-risk obligations enforced: tamper-evident logging (Art. 12), human oversight (Art. 14); penalties to 7% of global revenue. Agents need receipts, not logs.", source: "local knowledge base" },
   { title: "The execution core (mission loop)", snippet: "One loop \u2014 COMPOSE \u2192 DISPATCH \u2192 COMMUNICATE \u2192 EXECUTE \u2192 GATE \u2192 ADAPT \u2014 with an allowlisted set of agent CLIs, adversarial arena, budget ledger, Ed25519-signed hash-chained receipts, Assurance Score, FinOps chargeback. The SelfImpulse door dispatches real missions to it.", source: "local knowledge base" },
@@ -28537,7 +28544,7 @@ var KB = [
   { title: "Tauri 2 (desktop shell)", snippet: "Rust core + system webview; small binaries, real OS keychain and stdio child processes; the same frontend runs as a browser edition.", source: "local knowledge base" },
   { title: "Agent funding, H1 2026", snippet: "The 'agent governance' theme is the clearest funded theme of H1 2026: JetStream $34M seed, Guild.ai $30M A, Geordie $30M A, WitnessAI $85M+. The verifiable, local-first quadrant is the empty one.", source: "local knowledge base" },
   { title: "Chennai, Tamil Nadu", snippet: "India's fourth-largest city; the IT and aerospace hub of the south (Omi Vedu, Navi Kempegowda's southern twin in reputation). IST = UTC+5:30.", source: "local knowledge base" },
-  { title: "SelfImpulse (this product)", snippet: "One product: the SelfImpulse door (the accountable colleague) + the execution core (the mission loop) + one proof standard. Every job selfimpulseed \u2014 signed receipts on every run, on your machine.", source: "local knowledge base" },
+  { title: "SelfImpulse (this product)", snippet: "One product: the SelfImpulse door (the accountable colleague) + the execution core (the mission loop) + one proof standard. Every job attested \u2014 signed receipts on every run, on your machine.", source: "local knowledge base" },
   { title: "DeepSearch (Grok feature)", snippet: "Iterative retrieval loop: split query into sub-queries, parallel web + X search, summarize batches in a scratchpad, repeat to a step limit, cross-check before drafting.", source: "local knowledge base" }
 ];
 function searchKnowledge(query) {
@@ -29001,14 +29008,14 @@ Start one and I'll hold it: \u201Ccontinue <thread name>\u201D picks it back up.
       if (!args) continue;
       const isDispatch = sk.tool === "dispatch_mission";
       return {
-        thoughts: [`Slow\u2192fast: executing my selfimpulseed skill "${sk.name}" v${sk.version} \u2014 test-gated, ${sk.wins} proven win(s), distilled from a selfimpulseed run. The procedure is proven, so no re-planning.`],
-        plan: [`${sk.name} v${sk.version} \u2014 single selfimpulseed step`],
+        thoughts: [`Slow\u2192fast: executing my attested skill "${sk.name}" v${sk.version} \u2014 test-gated, ${sk.wins} proven win(s), distilled from a attested run. The procedure is proven, so no re-planning.`],
+        plan: [`${sk.name} v${sk.version} \u2014 single attested step`],
         actions: isDispatch ? [{ kind: "dispatch", objective: String(args.objective ?? "") }] : [{ kind: "tool", tool: sk.tool, args }],
         confidence: "high",
         skillId: sk.id,
         skillVersion: sk.version,
         final: (r) => tone(
-          r[0]?.ok ? `Done \u2014 via my selfimpulseed skill **${sk.name}** v${sk.version} (slow\u2192fast; test-gated, ${sk.wins} proven win${sk.wins === 1 ? "" : "s"}). The receipt binds the skill and verifies offline like every other job.` : `My selfimpulseed skill **${sk.name}** FAILED on live replay \u2014 I've flagged it, filed the failure to memory, and here is the honest record: ${r[0]?.output ?? ""}`,
+          r[0]?.ok ? `Done \u2014 via my attested skill **${sk.name}** v${sk.version} (slow\u2192fast; test-gated, ${sk.wins} proven win${sk.wins === 1 ? "" : "s"}). The receipt binds the skill and verifies offline like every other job.` : `My attested skill **${sk.name}** FAILED on live replay \u2014 I've flagged it, filed the failure to memory, and here is the honest record: ${r[0]?.output ?? ""}`,
           ctx.persona
         )
       };
@@ -29043,7 +29050,7 @@ Brain: **${brain.label}**. The real-model planning seam ships in this runtime \u
           `I'm **${BOT_NAME}** \u2014 a standalone, persistent, named colleague on this machine, running the **SelfImpulse Cycle**: recall \u2192 plan \u2192 think \u2192 simulate \u2192 act \u2192 selfimpulse \u2192 learn.
 
 - **Tools:** calculator (real parser), clock, local knowledge base, live web evidence (keyless providers), memory + preferences (yours to inspect/delete), a local workspace (writes are simulated + approval-gated), system info
-- **Dispatch:** \u201Cdispatch a mission: \u2026\u201D \u2014 hands the objective to the real execution core (the mission loop) under one mission ID; the whole trail lands in one selfimpulseed chain
+- **Dispatch:** \u201Cdispatch a mission: \u2026\u201D \u2014 hands the objective to the real execution core (the mission loop) under one mission ID; the whole trail lands in one attested chain
 - **Learning:** successful runs become test-gated skills you can inspect; your feedback binds to receipts
 - **Proof:** every completed run mints a ${`mj-proof-receipt/2`} \u2014 SHA-256 chain, HMAC seal, Ed25519 issuer signature when this runtime can sign \u2014 verifiable offline, zero runtime state
 
@@ -29543,7 +29550,7 @@ async function waitFor(fn, what, timeoutMs = 15e3) {
   }
 }
 describe3("M3 engine \u2014 runSelfImpulseToolCall is the only route, governed end to end", () => {
-  it("a safe call acts, selfimpulsees, and the receipt verifies offline with the face's origin", async () => {
+  it("a safe call acts, attests, and the receipt verifies offline with the face's origin", async () => {
     const r = await runSelfImpulseToolCall("calculator", { expression: "1+1" }, { origin: "mcp" });
     assert2.equal(r.ok, true, "calculator ran");
     assert2.equal(r.output, "2", "real parser result");
@@ -29559,7 +29566,7 @@ describe3("M3 engine \u2014 runSelfImpulseToolCall is the only route, governed e
     const v = await verifySelfImpulseReceipt(r.receiptId);
     assert2.equal(v.ok, true, "the MCP call's receipt verifies offline \u2014 " + JSON.stringify(v));
   });
-  it("a risky call PAUSES at the human gate: pending, nothing executed, denial is selfimpulseed", async () => {
+  it("a risky call PAUSES at the human gate: pending, nothing executed, denial is attested", async () => {
     const r = await runSelfImpulseToolCall("workspace_write", { name: "gate-probe.txt", content: "x" }, { origin: "mcp" });
     assert2.equal(r.pending, true, "risky calls do not block the caller");
     assert2.ok(r.approvalId && r.callId, "the caller gets the approval handle + call id");
@@ -29577,11 +29584,11 @@ describe3("M3 engine \u2014 runSelfImpulseToolCall is the only route, governed e
     const verdict = ref.receipt.events.find((e) => e.kind === "selfimpulse.verdict").data;
     assert2.equal(verdict.status, "denied");
     const simEv = ref.receipt.events.find((e) => e.kind === "selfimpulse.simulation");
-    assert2.ok(simEv, "the SIMULATION (dry-run prediction) is selfimpulseed before the gate");
+    assert2.ok(simEv, "the SIMULATION (dry-run prediction) is attested before the gate");
     const v = await verifySelfImpulseReceipt(track.result.receiptId);
     assert2.equal(v.ok, true, "the denial receipt verifies offline \u2014 " + JSON.stringify(v));
   });
-  it("a risky call that is APPROVED executes and selfimpulsees", async () => {
+  it("a risky call that is APPROVED executes and attests", async () => {
     const r = await runSelfImpulseToolCall("workspace_write", { name: "mcp-approved.txt", content: "hello from the mcp face" }, { origin: "mcp" });
     assert2.equal(r.pending, true);
     resolveSelfImpulseApproval(r.approvalId, true);
@@ -29594,7 +29601,7 @@ describe3("M3 engine \u2014 runSelfImpulseToolCall is the only route, governed e
     const written = path2.join(ROOT, "mcp-approved.txt");
     if (fs2.existsSync(written)) fs2.rmSync(written);
   });
-  it("an unknown tool is refused in words \u2014 and the refusal is selfimpulseed", async () => {
+  it("an unknown tool is refused in words \u2014 and the refusal is attested", async () => {
     const r = await runSelfImpulseToolCall("self_upgrade", {}, { origin: "mcp" });
     assert2.equal(r.ok, false);
     assert2.ok(r.output.includes('unknown tool "self_upgrade"'), "refusal names the tool");
@@ -29698,7 +29705,7 @@ describe3("M3 protocol \u2014 tools/mcp.mjs speaks MCP over stdio, governed", ()
     assert2.equal(r.result.isError, true);
     assert2.ok(r.result.content[0].text.includes('unknown MCP tool "rm_rf_everything"'), r.result.content[0].text);
   });
-  it("the FULL gate flow over the wire: pending \u2192 deny \u2192 selfimpulseed denial", async () => {
+  it("the FULL gate flow over the wire: pending \u2192 deny \u2192 attested denial", async () => {
     const r = await request("tools/call", { name: "workspace_write", arguments: { name: "wire-denied.txt", content: "nope" } });
     const text = r.result.content[0].text;
     assert2.ok(text.includes("Paused at the human gate"), text);
@@ -29714,7 +29721,7 @@ describe3("M3 protocol \u2014 tools/mcp.mjs speaks MCP over stdio, governed", ()
     const v = await request("tools/call", { name: "verify_receipt", arguments: { receiptId: rec[1] } });
     assert2.ok(v.result.content[0].text.startsWith("VALID"));
   });
-  it("the FULL gate flow over the wire: pending \u2192 approve \u2192 executed + selfimpulseed", async () => {
+  it("the FULL gate flow over the wire: pending \u2192 approve \u2192 executed + attested", async () => {
     const r = await request("tools/call", { name: "workspace_write", arguments: { name: "wire-approved.txt", content: "hello wire" } });
     const text = r.result.content[0].text;
     const approval = text.match(/approval (a[0-9a-z]+)/)[1];
@@ -29726,7 +29733,7 @@ describe3("M3 protocol \u2014 tools/mcp.mjs speaks MCP over stdio, governed", ()
     const list = await request("tools/call", { name: "workspace_list", arguments: {} });
     assert2.ok(list.result.content[0].text.includes("wire-approved.txt"), "the approved write is in the workspace");
   });
-  it("dispatch_mission over the wire: gated, then a REAL mission loop runs and selfimpulsees", async () => {
+  it("dispatch_mission over the wire: gated, then a REAL mission loop runs and attests", async () => {
     const r = await request("tools/call", { name: "dispatch_mission", arguments: { objective: "probe: check that the mcp face dispatches a real mission" } });
     const text = r.result.content[0].text;
     assert2.ok(text.includes("Paused at the human gate"), "dispatch is risky \u2192 gated first");
@@ -29843,7 +29850,7 @@ describe3("MCP 2026-07-28 \u2014 dual-era server: stateless modern + legacy, one
     assert2.ok(typeof r.result.requestState === "string" && r.result.requestState.length > 0, "opaque requestState for the retry");
     assert2.equal(r.result.isError, void 0, "input_required is not an error");
   });
-  it("the MRTR retry carries the human decision back: approve \u2192 executed \u2192 selfimpulseed", async () => {
+  it("the MRTR retry carries the human decision back: approve \u2192 executed \u2192 attested", async () => {
     const first = await request("tools/call", { name: "workspace_write", arguments: { name: "wire-mrtr.txt", content: "mrtr" }, _meta: META() });
     assert2.equal(first.result.resultType, "input_required");
     const retry = await request("tools/call", {

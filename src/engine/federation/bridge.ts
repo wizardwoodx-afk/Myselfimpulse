@@ -33,7 +33,7 @@
  *      approvals verified; otherwise the refusal names the side and the rule
  *
  * DISTRIBUTED EVIDENCE, LOCAL TRUST — and the runtime models it, it does not
- * just say it. Two selfimpulses each keep their own trust ledger
+ * just say it. Two agents each keep their own trust ledger
  * (`engine.mesh.trust.v1` on each machine). The evidence — envelopes, approvals,
  * receipts — is portable and verifiable by either party; the trust SCORE is
  * local observation and may legitimately differ. So this module takes a
@@ -283,7 +283,7 @@ export interface CrossingParties {
 }
 
 /**
- * How one selfimpulse reads a pair's standing FROM ITS OWN LOCAL STORE. Two selfimpulses
+ * How one selfimpulse reads a pair's standing FROM ITS OWN LOCAL STORE. Two agents
  * supply two readers; a single-machine caller supplies one for both sides and
  * the outcome records that fact.
  */
@@ -569,7 +569,7 @@ export async function crossFederation(parties: CrossingParties, wiring: Crossing
   return finish(
     "crossed",
     "crossed",
-    `${envelope.capability} crossed between ${envelope.pair}: the owner key of each selfimpulse approved it, naming who authorised it, both selfimpulses lend the capability at their own standing, and both approvals are now spent`,
+    `${envelope.capability} crossed between ${envelope.pair}: the owner key of each selfimpulse approved it, naming who authorised it, both agents lend the capability at their own standing, and both approvals are now spent`,
     filed,
     { receipts: { initiator: filed[0]?.digest ?? "", responder: filed[1]?.digest ?? "" } },
   );

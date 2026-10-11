@@ -289,7 +289,7 @@ export function SelfImpulsePage(): JSX.Element {
 
   /* M5-lite: the mission timeline — every event in the unified chain that
    * carries the selected mission ID (execution phases + the control-plane
-   * bookends of the receipt that selfimpulseed them). */
+   * bookends of the receipt that attested them). */
   const missionTimeline = (() => {
     if (!selMission) return null;
     const out: Array<{ kind: string; phase: string; note: string }> = [];
@@ -588,7 +588,7 @@ export function SelfImpulsePage(): JSX.Element {
           {memoryTab === "missions" && (
             <>
               {selfimpulseMissions().length === 0 ? (
-                <div className="tm-empty">No dispatched missions yet. Ask me to run a mission — the real execution core runs it, and the whole trail lands in one selfimpulseed chain.</div>
+                <div className="tm-empty">No dispatched missions yet. Ask me to run a mission — the real execution core runs it, and the whole trail lands in one attested chain.</div>
               ) : (
                 selfimpulseMissions().map((m) => (
                   <div
@@ -644,7 +644,7 @@ export function SelfImpulsePage(): JSX.Element {
         </div>
 
         <div>
-          <div className="tm-sec">RECEIPTS — every job, selfimpulseed</div>
+          <div className="tm-sec">RECEIPTS — every job, attested</div>
           {sess.receipts.length === 0 ? (
             <div className="tm-empty">No runs yet. Every finished job mints one.</div>
           ) : (

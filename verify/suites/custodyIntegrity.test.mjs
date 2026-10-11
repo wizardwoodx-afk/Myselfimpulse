@@ -10,8 +10,15 @@ var __export = (target, all) => {
 };
 
 // src/app/desktop.ts
+function electronBridge() {
+  if (typeof window === "undefined") return null;
+  const b = window.selfImpulseDesktop;
+  if (!b || b.host !== "electron" || typeof b.minimize !== "function") return null;
+  return b;
+}
 function detectHost() {
   if (typeof window === "undefined") return "web";
+  if (electronBridge()) return "electron";
   const w = window;
   if (w.__TAURI_INTERNALS__) return "tauri";
   if (w.__TAURI__) return "tauri";
@@ -1753,6 +1760,12 @@ function isSealed(e) {
   return SEALED.has(e);
 }
 async function rehydrateEnvelope(e) {
+  if (!e.signature) {
+    return {
+      ok: false,
+      reason: `envelope ${e.id} arrived without a signature \u2014 a boundary-crossing envelope must be signed to be re-admitted. Refused (fail-closed); nothing was trusted.`
+    };
+  }
   const v = await verifyEnvelope(e);
   if (!v.ok) return v;
   return { ok: true, reason: `envelope ${e.id} re-verified and re-admitted`, ...(markSealed(e), {}) };

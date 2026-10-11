@@ -305,8 +305,15 @@ var init_guardrail = __esm({
 });
 
 // src/app/desktop.ts
+function electronBridge() {
+  if (typeof window === "undefined") return null;
+  const b = window.selfImpulseDesktop;
+  if (!b || b.host !== "electron" || typeof b.minimize !== "function") return null;
+  return b;
+}
 function detectHost() {
   if (typeof window === "undefined") return "web";
+  if (electronBridge()) return "electron";
   const w = window;
   if (w.__TAURI_INTERNALS__) return "tauri";
   if (w.__TAURI__) return "tauri";
@@ -6779,7 +6786,7 @@ ok("legacy v0.3 cards STILL parse (upgrade is additive)", legacyCard.ok === true
 section("4. selfimpulse links \u2014 identity is the trust anchor");
 var id1 = await loadOrCreateCrossSelfImpulseIdentity(memStore(), "user-one-selfimpulse");
 var id2 = await loadOrCreateCrossSelfImpulseIdentity(memStore(), "user-two-selfimpulse");
-ok("both selfimpulses hold real ECDSA identities", id1.ok === true && id2.ok === true);
+ok("both agents hold real ECDSA identities", id1.ok === true && id2.ok === true);
 var link12ok = false;
 var verified = false;
 var tamperCaught = false;

@@ -612,8 +612,15 @@ var init_tokenOptim = __esm({
 });
 
 // src/app/desktop.ts
+function electronBridge() {
+  if (typeof window === "undefined") return null;
+  const b2 = window.selfImpulseDesktop;
+  if (!b2 || b2.host !== "electron" || typeof b2.minimize !== "function") return null;
+  return b2;
+}
 function detectHost() {
   if (typeof window === "undefined") return "web";
+  if (electronBridge()) return "electron";
   const w = window;
   if (w.__TAURI_INTERNALS__) return "tauri";
   if (w.__TAURI__) return "tauri";
@@ -23246,8 +23253,17 @@ async function execNetFetch(input2, ctx) {
   if (!doFetch) return { outcome: "error", output: "no fetch available in this runtime" };
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  const HEADERS = { accept: "text/html,application/json;q=0.9,*/*;q=0.8", "user-agent": "SelfImpulse/19.7 (+evidence-fetch)" };
   try {
-    const res = await doFetch(url2, { signal: controller.signal, headers: { accept: "text/html,application/json;q=0.9,*/*;q=0.8", "user-agent": "SelfImpulse/19.7 (+evidence-fetch)" } });
+    let res = await doFetch(url2, { signal: controller.signal, redirect: "manual", headers: HEADERS });
+    if (res && (res.status === 301 || res.status === 302 || res.status === 303 || res.status === 307 || res.status === 308)) {
+      const loc = res.headers?.get?.("location") ?? "";
+      const next = loc ? new URL(loc, url2).href : "";
+      if (!next) return { outcome: "refused", output: "egress refused (redirect): no target" };
+      const chk = checkEgressUrl(next);
+      if (!chk.ok) return { outcome: "refused", output: `egress refused (redirect): ${chk.reason}` };
+      res = await doFetch(next, { signal: controller.signal, redirect: "manual", headers: HEADERS });
+    }
     if (!res.ok) return { outcome: "error", output: `HTTP ${res.status} from ${url2}` };
     const text = (await res.text()).slice(0, MAX_FETCH_CHARS);
     return { outcome: "ok", output: text };
@@ -24004,7 +24020,7 @@ var init_selfimpulseMesh = __esm({
     hmac = pureHmacSha256;
     jointCanonical = (missionId, channelDigest, actions) => JSON.stringify({ v: "vh.mesh.joint.v1", missionId, channelDigest, actions });
     pairKey = (a, b2) => [a, b2].sort().join("\u2194");
-    meshStanding = (t) => !t ? "unknown" : t.trust < 3 ? "probation" : t.trust < 10 ? "selfimpulseed" : "proven";
+    meshStanding = (t) => !t ? "unknown" : t.trust < 3 ? "probation" : t.trust < 10 ? "attested" : "proven";
   }
 });
 
@@ -24041,7 +24057,7 @@ function grantCanonical(g) {
   return [g.id, g.pair, g.tier, g.at, String(g.humanFirst), g.granted.join(","), refusals].join("");
 }
 function tiersFor(capability) {
-  return ["probation", "selfimpulseed", "proven"].filter((t) => CAPABILITIES_BY_STANDING[t].includes(capability));
+  return ["probation", "attested", "proven"].filter((t) => CAPABILITIES_BY_STANDING[t].includes(capability));
 }
 function narrowGrant(input2) {
   const tier = input2.standing ?? "unknown";
@@ -24151,7 +24167,7 @@ var init_delegationGrant = __esm({
     CAPABILITIES_BY_STANDING = {
       unknown: [],
       probation: ["repo.read", "data.aggregate"],
-      selfimpulseed: ["repo.read", "data.aggregate", "test.run", "net.fetch", "egress.share"],
+      attested: ["repo.read", "data.aggregate", "test.run", "net.fetch", "egress.share"],
       proven: [
         "repo.read",
         "data.aggregate",
@@ -25195,7 +25211,7 @@ async function crossFederation(parties, wiring = {}) {
   return finish(
     "crossed",
     "crossed",
-    `${envelope.capability} crossed between ${envelope.pair}: the owner key of each selfimpulse approved it, naming who authorised it, both selfimpulses lend the capability at their own standing, and both approvals are now spent`,
+    `${envelope.capability} crossed between ${envelope.pair}: the owner key of each selfimpulse approved it, naming who authorised it, both agents lend the capability at their own standing, and both approvals are now spent`,
     filed,
     { receipts: { initiator: filed[0]?.digest ?? "", responder: filed[1]?.digest ?? "" } }
   );

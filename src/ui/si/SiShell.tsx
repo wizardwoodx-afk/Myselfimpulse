@@ -9,12 +9,14 @@ import Federation from "../screens/Federation";
 import { Memory } from "../screens/Memory";
 import { Docs } from "../screens/Docs";
 import { Settings } from "../screens/Settings";
+import Channels from "../screens/Channels";
 import { Profile } from "../screens/Profile";
 import { Chat } from "../screens/Chat";
 import { GateCard } from "../screens/GateCard";
 import { WindowControls } from "../WindowControls";
 import { ErrorBoundary } from "../../panels/ErrorBoundary";
 import { Toasts } from "../../panels/Toast";
+import { AUTONOMY_MODES, modeForLevel, levelForMode, type AutonomyMode } from "../../engine/initiative";
 
 
 /**
@@ -30,6 +32,7 @@ const NAV: Array<{ key: Screen; label: string; icon: string }> = [
   { key: "steward", label: "Captain", icon: "steward" },
   { key: "work", label: "Work", icon: "crew" },
   { key: "specialists", label: "Specialists", icon: "specialists" },
+  { key: "channels", label: "Channels", icon: "channels" },
   { key: "federation", label: "Federation", icon: "federation" },
   { key: "receipts", label: "Receipts", icon: "receipts" },
   { key: "docs", label: "Docs", icon: "docs" },
@@ -45,7 +48,7 @@ const NAV: Array<{ key: Screen; label: string; icon: string }> = [
  */
 const NAV_GROUPS: Array<{ caption: string; keys: Screen[] }> = [
   { caption: "Mission", keys: ["steward", "work", "docs", "memory"] },
-  { caption: "Oversight", keys: ["specialists", "federation", "receipts", "settings"] },
+  { caption: "Records", keys: ["specialists", "channels", "federation", "receipts", "settings"] },
 ];
 
 /** The conversation door is not in the rail; it is reached from inside Work. */
@@ -63,20 +66,16 @@ export function Shell(): React.ReactElement {
      opening a screen called "SelfImpulse" inside an app called SelfImpulse. */
   const title = screen === "chat" ? CHAT_LABEL : current?.label ?? (screen === "profile" ? "Profile" : PRODUCT_NAME);
 
-  /* The rail's one dial, and it is the store's own number rather than a decoration:
-     ME/ is autonomy level 0 — "acts only when the user sends a task" — and TEAMS is
-     any level above it, where the heartbeat wakes the crew and the crew may carry
-     its own follow-ups. Both halves read `initiative.level`, so Settings → Autonomy,
-     the composer's approval dial and this control cannot disagree. The gate is not
+  /* The rail's one dial: the three modes an owner actually chooses — MANUAL
+     (level 0, nothing runs unsent), SEMI-AUTONOMOUS (a schedule wakes the crew
+     for safe, capped work), FIA (the crew self-schedules and adapts inside
+     hard caps). Every mode reads `initiative.level`, so Settings, the
+     composer's approval dial and this control cannot disagree. The gate is not
      on this dial: risky and critical work asks at every level. */
-  const solo = initiative.level === 0;
-  const pickMode = (wantSolo: boolean): void => {
-    if (wantSolo === solo) return;
-    /* Upward is the floor, not a memory. Leaving ME/ lifts a silent engine to
-       level 1 and never to a higher level the operator did not just choose;
-       going to ME/ can only ever lower the number. The exact rung is the
-       composer's own dial. */
-    setAutonomy(wantSolo ? 0 : initiative.level || 1);
+  const mode = modeForLevel(initiative.level);
+  const pickMode = (want: AutonomyMode): void => {
+    const level = levelForMode(want);
+    if (level !== initiative.level) setAutonomy(level);
   };
 
   return (
@@ -92,28 +91,27 @@ export function Shell(): React.ReactElement {
       <a className="si-skip" href="#main-content">Skip to content</a>
 
       <aside className="si-rail">
+        {/* The brand, top-left, exactly as the mark was drawn: a wordmark on its
+            own dark chip. The chip is deliberate so the white word reads on a
+            light rail too — the artwork is white-on-black, and the black drops
+            into the chip on either theme. */}
+        <div className="si-brand">
+          <img src="/brand/si-wordmark.png" alt="SelfImpulse" />
+        </div>
         <div className="si-head">
-          <div className="si-mode" role="group" aria-label="Who works this mission">
-            <button
-              type="button"
-              className="si-mode-btn"
-              aria-pressed={solo}
-              title="ME — nothing runs that you did not send"
-              onClick={() => pickMode(true)}
-            >
-              <i className="si-mode-ic si-g-solo" aria-hidden />
-              <span>ME</span>
-            </button>
-            <button
-              type="button"
-              className="si-mode-btn"
-              aria-pressed={!solo}
-              title="TEAMS — the crew wakes on the heartbeat without being asked"
-              onClick={() => pickMode(false)}
-            >
-              <i className="si-mode-ic si-g-team" aria-hidden />
-              <span>TEAMS</span>
-            </button>
+          <div className="si-mode" role="group" aria-label="How much runs on its own">
+            {AUTONOMY_MODES.map((m) => (
+              <button
+                key={m.mode}
+                type="button"
+                className="si-mode-btn"
+                aria-pressed={mode === m.mode}
+                title={`${m.label} — ${m.blurb}`}
+                onClick={() => pickMode(m.mode)}
+              >
+                <span>{m.short}</span>
+              </button>
+            ))}
           </div>
 
           {/* The mission reset keeps its wiring and loses its sentence — the rail
@@ -214,6 +212,7 @@ export function Shell(): React.ReactElement {
               {screen === "docs" && door("docs", <Docs />)}
               {screen === "memory" && door("memory", <Memory />)}
               {screen === "settings" && door("settings", <Settings />)}
+      {screen === "channels" && door("channels", <Channels />)}
               {screen === "profile" && door("profile", <Profile />)}
               {screen === "chat" && (
                 <ErrorBoundary label="Conversation" resetKey={screen} onLeave={() => go("steward")}>

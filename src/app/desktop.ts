@@ -1,4 +1,25 @@
-export type DesktopHost = "tauri" | "web";
+export type DesktopHost = "tauri" | "electron" | "web";
+
+/** The surface `electron/preload.cjs` exposes on the renderer's window. */
+interface ElectronBridge {
+  host: "electron";
+  minimize: () => Promise<void>;
+  toggleMaximize: () => Promise<void>;
+  close: () => Promise<void>;
+  isMaximized: () => Promise<boolean>;
+  setFullscreen: (v: boolean) => Promise<void>;
+  setAlwaysOnTop: (v: boolean) => Promise<void>;
+}
+
+function electronBridge(): ElectronBridge | null {
+  if (typeof window === "undefined") return null;
+  const b = (window as unknown as { selfImpulseDesktop?: ElectronBridge }).selfImpulseDesktop;
+  // Whitelisted by SHAPE, not by name: a page that happens to define
+  // `selfImpulseDesktop` with the wrong shape is not a desktop host, and
+  // trusting the property alone would let any web page claim native rights.
+  if (!b || b.host !== "electron" || typeof b.minimize !== "function") return null;
+  return b;
+}
 
 /**
  * Whether the app is running inside the desktop shell.
@@ -17,6 +38,7 @@ export type DesktopHost = "tauri" | "web";
  */
 export function detectHost(): DesktopHost {
   if (typeof window === "undefined") return "web";
+  if (electronBridge()) return "electron";
   const w = window as unknown as {
     __TAURI_INTERNALS__?: unknown;
     __TAURI__?: unknown;
@@ -46,6 +68,20 @@ export interface WindowApi {
 }
 
 export async function getWindowApi(): Promise<WindowApi> {
+  const el = electronBridge();
+  if (el) {
+    return {
+      minimize: () => el.minimize(),
+      toggleMaximize: () => el.toggleMaximize(),
+      close: () => el.close(),
+      // The frameless Electron window is dragged by a `-webkit-app-region:
+      // drag` header the main process injects, so there is no drag IPC here.
+      startDragging: async () => {},
+      isFullscreen: async () => Boolean(document.fullscreenElement),
+      setFullscreen: (v) => el.setFullscreen(v),
+      setAlwaysOnTop: (v) => el.setAlwaysOnTop(v),
+    };
+  }
   if (detectHost() === "tauri") {
     try {
       const { getCurrentWindow } = await import("@tauri-apps/api/window");

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { THINKING, useRunWord, useThinkingLevel, type ThinkingLevel } from "../voice";
 import { useVh } from "../store";
 import { AUTONOMY_LEVEL_NAMES, type AutonomyLevel } from "../../engine/initiative";
+import { sidekickReply } from "../sidekick";
 
 /* File System Access entries. Chrome/Edge expose these on a dropped item; other
    browsers do not, and `files` remains the fallback. Declared structurally
@@ -199,6 +200,10 @@ export function Composer({ value, onChange, onSend, busy, placeholder, small, on
      derived from it. */
   const [dragDepth, bumpDrag] = React.useReducer((n: number, delta: 1 | -1) => Math.max(0, n + delta), 0);
   const over = dragDepth > 0;
+  /* The Sidekick: a small companion that answers WHILE the big agent runs, so a
+     long run is never a locked door. Kept composer-local on purpose — it can
+     never touch the in-flight run, the store, or the gate. */
+  const [side, setSide] = React.useState<{ q: string; a: string }[]>([]);
   /* The word a run in flight speaks, seeded by the text that started it — the same
      request always opens on the same word rather than shuffling. src/ui/voice.ts
      holds the list, the cadence and the reduced-motion rule; the row that renders
@@ -208,7 +213,11 @@ export function Composer({ value, onChange, onSend, busy, placeholder, small, on
      feed it have to be reachable. Every entry below goes through the store —
      the same path every screen takes — and none of them claims a surface this
      app does not have. */
-  const { go, newMission, initiative, setAutonomy, knowledge, federation } = useVh();
+  const { go, newMission, initiative, setAutonomy, knowledge, federation, stewardName } = useVh();
+  const askSidekick = (text: string): void => {
+    setSide((s) => [...s, { q: text, a: sidekickReply(text, { running: busy, captainName: stewardName }) }]);
+    onChange("");
+  };
   const [thinking, setThinking] = useThinkingLevel();
   const waitingSkills = knowledge.filter((k) => k.status === "proposed").length;
 
@@ -289,7 +298,18 @@ export function Composer({ value, onChange, onSend, busy, placeholder, small, on
             <span className="sr" role="status" aria-live="polite">Working on this request</span>
           </>
         )}
+        {busy && <span className="faint">Enter to ask your sidekick</span>}
       </div>
+      {side.length > 0 && (
+        <div role="log" aria-live="polite" aria-label="Sidekick" style={{ margin: "var(--s-2) var(--s-4) 0", display: "flex", flexDirection: "column", gap: 6, maxHeight: 168, overflowY: "auto" }}>
+          {side.map((m, i) => (
+            <div key={i} style={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              <span className="faint mono" style={{ fontSize: 11 }}>{m.q}</span>
+              <span style={{ fontSize: 12.5, lineHeight: 1.4 }}>{m.a}</span>
+            </div>
+          ))}
+        </div>
+      )}
       <textarea
         value={value} placeholder={placeholder} rows={small ? 2 : 3}
         /* N3 names what the field takes. It stayed in ARIA when "Think ahead"
@@ -305,7 +325,7 @@ export function Composer({ value, onChange, onSend, busy, placeholder, small, on
         aria-label="Describe what you need"
         aria-keyshortcuts="Enter"
         onChange={(e) => onChange(e.target.value)}
-        onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); if (value.trim() && !busy) onSend(); } }}
+        onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); if (!value.trim()) return; if (busy) askSidekick(value); else onSend(); } }}
       />
       <div className="bar">
         {onFiles && (
